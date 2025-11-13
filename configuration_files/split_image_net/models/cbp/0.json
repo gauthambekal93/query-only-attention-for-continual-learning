@@ -1,0 +1,28 @@
+
+
+{
+"seed": 20,
+"use_gpu":0,
+"step_size": 0.0001,
+"momentum": 0,
+"weight_decay": 0,
+"beta_1":0.9,
+"beta_2":0.999,
+"act_type": "relu",
+"loss":"nll",
+"opt": "adam",
+"num_features": 128,
+"num_outputs":2,
+"num_hidden_layers":2,
+"change_after":1000,
+"mini_batch_size":10,
+"queries_per_mini_batch":1,
+"backward_task_samples":1,
+"past_task_offset":5,
+"util_type": "adaptable_contribution",
+"replacement_rate": 3e-4,
+"maturity_threshold": 100,
+"decay_rate": 0.99,
+
+"model_dir": "results/split_image_net/cbp\\0\\0"
+}

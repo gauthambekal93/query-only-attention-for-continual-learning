@@ -1,0 +1,13 @@
+{
+  "_comment_1_": "List of problem/experiment parameters",
+   "num_tasks": 10000,
+   "task_datapoints":1000,
+   "images_per_class_train": 500,
+   "images_per_class_val": 50,
+   "total_labels": 200,
+   "classes_per_task": 2,
+   "save_after_every_n_tasks":100,
+   "source_train_data_dir": "datasets/split_image_net/tiny-imagenet-200/train/",
+   "source_val_data_dir": "datasets/split_image_net/tiny-imagenet-200/val/",
+   "dest_data_dir": "datasets/split_image_net/0.pkl"
+}

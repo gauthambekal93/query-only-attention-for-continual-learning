@@ -1,0 +1,28 @@
+{
+"model_version": "",
+
+  "_comment_1_": "List of problem/experiment parameters",
+  "gen_prob_data": false,
+  "num_runs":  100,
+  "num_inputs": 20,
+  "num_data_points": 1e7,
+  "run_time_config_dir": "runtime_config/models/slowly_changing_regression/cbp",
+  "model_dir": "results/slowly_changing_regression/cbp",
+  "flip_after": 10000,
+  "num_target_features": 100,
+  "num_flipping_bits": 15,
+  "to_log_features": false,
+  "beta": 0.7,
+
+  "_comment_2_": "Learner parameters",
+  "agent": "cbp",
+  "num_features": 40,
+  "hidden_activation": "relu",
+  "util_type": "adaptable_contribution",
+  "opt": "adam",
+  "step_size": [0.01, 0.001 , 0.0001],
+  "replacement_rate": [1e-3],
+  "decay_rate": 0.99,
+  "maturity_threshold": 100,
+  "accumulate": true
+}

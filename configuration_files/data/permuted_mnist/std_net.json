@@ -1,0 +1,19 @@
+{
+"model_version": "CBP on net with 3 hidden layer and 2000 hidden-units",
+
+  "_comment_1_": "List of problem/experiment parameters",
+  "num_runs":  100,
+  "num_tasks": 10000,
+  "use_gpu": 1,
+  "run_time_config_dir": "runtime_config/data/permuted_mnist",
+  "data_dir": "datasets/permuted_mnist",
+  "to_log": true,
+
+  "_comment_2_": "Learner parameters",
+  "agent": "cbp",
+  "opt": "adam",
+  "num_features": 2000,
+  "num_hidden_layers": 3,
+  "step_size": [0.001],
+  "weight_decay": 0
+}

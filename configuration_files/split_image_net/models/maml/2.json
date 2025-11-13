@@ -1,0 +1,28 @@
+
+
+{
+"seed": 40,
+"use_gpu":0,
+"inner_step_size": 0.01,
+"outer_step_size":0.0001,
+"momentum": 0,
+"weight_decay": 0,
+"beta_1":0.9,
+"beta_2":0.999,
+"act_type": "relu",
+"loss":"nll",
+"opt": "adam",
+"num_features": 128,
+"num_outputs":2,
+"num_hidden_layers":2,
+"inner_loop_count":5,
+"change_after":1000,
+"mini_batch_size":10,
+"queries_per_mini_batch":1,
+"past_task_offset":5,
+"buffer_depth":20000,
+"num_support": 10,
+"num_query":10,
+"num_of_task_sampled":5,
+"model_dir": "results/split_image_net/maml\\2\\0"
+}

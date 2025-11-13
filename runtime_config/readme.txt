@@ -1,0 +1,1 @@
+This folder will be discarded in future release.
