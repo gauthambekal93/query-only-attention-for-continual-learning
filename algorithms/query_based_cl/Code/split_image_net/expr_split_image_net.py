@@ -215,7 +215,7 @@ def expr(model_params , data_params):
         prev_task_data.append(data_dict_val)
         
         test_iter += 1
-        
+        '''
         if task_idx % save_after_every_n_tasks == 0:
             data = {
                    'train_accuracies': train_accuracies.cpu(),
@@ -231,7 +231,7 @@ def expr(model_params , data_params):
             model_path = os.path.join(project_root, model_dir, 'model.pth' )
            
             torch.save(relation_network.state_dict(), model_path ) 
-        
+        ''' 
         
     print("stop")
     print("stop")     

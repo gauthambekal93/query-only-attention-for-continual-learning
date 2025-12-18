@@ -1,0 +1,20 @@
+
+
+{
+"seed": 20,
+"use_gpu":0,
+"image_dims": [32, 32, 3],
+"batch_sizes": {"train": 90, "test": 100, "validation":50},
+"reset_head":"false",
+"early_stopping": "true",
+"replacement_rate":0,
+"utility_function":"weight",
+"maturity_threshold":0,
+"noise_std":0,
+"perturb_weights_indicator":"false",
+"step_size":0.1,
+"momentum": 0.9, 
+"weight_decay": 0.0005,
+"num_epochs":4000,
+"model_dir": "results/cifar_100/bp\\0\\0"
+}

@@ -1,0 +1,2 @@
+This folder will contain results for various experiments which includes saved model checkpoints, train and evaluation performance .
+The result data has been ignored due to large size and user will have to run the experiments to replicate the results.
