@@ -24,14 +24,14 @@ sys.path.insert(0, str(ROOT))
 
 import json
 import torch
-import pickle
+
 import argparse
 import numpy as np
 import random
 from tqdm import tqdm
 
-from collections import deque
-import time
+#from collections import deque
+#import time
 
 
 def set_seed(seed):
@@ -67,11 +67,11 @@ class IncrementalCIFARExperiment():
         
         self.total_classes = data_params["total_classes"]
 
-        self.classes_per_task =  data_params["classes_per_task"]
+        self.class_increase_per_task =  data_params["class_increase_per_task"]
         
-        self.total_tasks = self.total_classes / self.classes_per_task
+        self.total_tasks = self.total_classes / self.class_increase_per_task
         
-        self.current_num_classes = self.classes_per_task
+        self.current_num_classes = self.class_increase_per_task
         
         self.num_images_per_class = data_params["num_images_per_class"] #450
         
@@ -118,17 +118,12 @@ class IncrementalCIFARExperiment():
         self.current_epoch = 0
         
         self.current_task_id = 0
+    
         
-        self.train_summary, self.test_summary = {}, {} 
-        
-
-        
-    def save_test(self, current_accuracy, current_reg_loss):
-        
-        self.test_summary["accuracy"] = current_accuracy.detach()
-        self.test_summary["loss"] = current_reg_loss.detach()
         
     def evaluvate_network(self):
+        
+        self.net.eval()
         
         avg_loss = 0.0
         avg_acc = 0.0
@@ -152,15 +147,10 @@ class IncrementalCIFARExperiment():
                 num_test_batches += 1
             
         
-        self.save_test(avg_loss / num_test_batches, avg_acc / num_test_batches)
+        self.data_model.save_test(avg_loss / num_test_batches, avg_acc / num_test_batches, self.current_epoch )
          
-    
-    
-    def save_train(self, current_accuracy, current_reg_loss):
-        
-        self.train_summary["accuracy"] = current_accuracy.detach()
-        self.train_summary["loss"] = current_reg_loss.detach()
-        
+        self.net.train()
+ 
     def train(self):
 
         """train model """
@@ -188,14 +178,14 @@ class IncrementalCIFARExperiment():
                 
                 current_accuracy = torch.mean((predictions.argmax(axis=1) == batch_y.argmax(axis=1)).to(torch.float32))
         
-        self.current_epoch += 1
         
         """save checkpoints """
-        self.save_train(current_accuracy, current_reg_loss)
+        self.data_model.save_train(current_accuracy, current_reg_loss, self.net)
         
         """obtain performance """
         self.evaluvate_network()
         
+        self.current_epoch += 1
         
     def run(self):
         
@@ -210,142 +200,10 @@ class IncrementalCIFARExperiment():
             
             self.train()
             
-            self.current_task_id = self.current_task_id + 1
-        
-    
-def expr(model_params , data_params):
-    
-
-    
-    
-    """-----THESE ARE DATA SPECIFIC PARAMETERS----- """
-
-    #num_tasks = data_params['num_tasks']
-    
-    #task_datapoints = data_params["task_datapoints"]
-    
-    #images_per_class_train = data_params["images_per_class_train"]
-
-    #images_per_class_val = data_params["images_per_class_val"]
-
-    
-        
-    #dest_data_dir = data_params['dest_data_dir']
-    
-    #save_after_every_n_tasks = data_params["save_after_every_n_tasks"]
-    
-    """-----THESE ARE MODEL SPECIFIC PARAMETERS----- """
-    
-
-        
-    
-
-
-    
-
+            self.current_task_id += 1
             
-            
-    total_examples = int(num_tasks * change_after)
+            self.current_num_classes += self.class_increase_per_task
     
-    total_iters = int(total_examples/mini_batch_size)
-
-    iter , test_iter = 0, 0
-    
-    with open(os.path.join(project_root, dest_data_dir  ), 'rb+') as f:
-        image_net_train_x, image_net_train_y, _, image_net_val_x, image_net_val_y = pickle.load(f)
-        if use_gpu == 0:
-            image_net_train_x = image_net_train_x.to(dev)
-            image_net_train_y = image_net_train_y.to(dev)
-            
-            image_net_val_x = image_net_val_x.to(dev)
-            image_net_val_y = image_net_val_y.to(dev)        
-            
-    label_ids = [i for i in range(0, total_labels)]      
-    
-    prev_task_data = deque(maxlen = past_task_offset)
-    
-    # input_features is  128 * 3 * 3 is because we flatten the cnn output.
-    mlp = MLP(input_features= 128 * 3 * 3   , num_features=num_features, num_outputs=num_outputs, 
-                          act_type=act_type, opt = opt, step_size = step_size , weight_decay= weight_decay,  momentum= momentum, 
-                          beta_1=beta_1, beta_2=beta_2, loss=loss, task_datapoints = task_datapoints, classes_per_task = classes_per_task).to(dev)
-    
-    train_accuracies = torch.zeros(total_iters, dtype=torch.float)
-    
-    backward_accuracies =  torch.zeros( num_tasks, dtype=torch.float)  
-    
-    forward_accuracies =  torch.zeros( num_tasks , dtype=torch.float)
-        
-    overall_accuracies =  torch.zeros( num_tasks , dtype=torch.float)
-    
-    
-    for task_idx in (range(num_tasks)):
-        
-        print("Task Index ", task_idx)
-                
-        new_iter_start = iter 
-        
-        train_x, train_y, train_y_one_hot, label_1, label_2 = generate_train_data(image_net_train_x, label_ids, images_per_class_train, classes_per_task)
-        
-        for start_idx in tqdm(range(0, change_after, mini_batch_size)):
-                
-            train_loss, train_accuracy = mlp.learn( train_x [start_idx : start_idx + mini_batch_size] , train_y_one_hot [start_idx: start_idx + mini_batch_size]) 
-        
-            train_accuracies[iter] = train_accuracy
-         
-            iter += 1   
-          
-        data_dict_val = generate_test_data(image_net_val_x, image_net_val_y, label_1, label_2 , images_per_class_val, classes_per_task )
-        
-        if  task_idx >= past_task_offset:
-            
-            with torch.no_grad():
-                
-                forward_accuracies[test_iter] = mlp.test( data_dict_val ) 
-                
-                backward_accuracies[test_iter] =  mlp.test( prev_task_data[0] ) 
-                
-            overall_accuracies[test_iter]  = (forward_accuracies[test_iter] + backward_accuracies[test_iter] ) / 2
-        
-        print("Task ID ", task_idx, 
-              'Train accuracy: ', train_accuracies[new_iter_start:iter - 1].mean().item(), 
-              'Forward Test accuracy: ', forward_accuracies[test_iter].item(),
-              'Backward Test accuracy: ', backward_accuracies[test_iter].item(),
-              'Overall Test accuracy: ', overall_accuracies[test_iter].item()
-              )
-        
-        prev_task_data.append(data_dict_val)
-        
-        test_iter += 1
-        
-        '''
-        if task_idx % save_after_every_n_tasks == 0:
-            data = {
-                   'train_accuracies': train_accuracies.cpu(),
-                   'backward_accuracies': backward_accuracies.cpu(),
-                   'forward_accuracies': forward_accuracies.cpu(),
-                   'overall_accuracies': overall_accuracies.cpu(),
-                 }
-            result_path = os.path.join( project_root, model_dir, 'output.pkl' )
-            
-            with open(result_path, 'wb+') as f:
-                 pickle.dump(data, f)
-                 
-            model_path = os.path.join(project_root, model_dir, 'model.pth' )
-           
-            torch.save(mlp.state_dict(), model_path ) 
-        '''
-        
-    print("stop")
-    print("stop")     
-    print("stop")
-
-
-
-
-
-
-
-
 
 
 def main(arguments):
@@ -369,8 +227,7 @@ def main(arguments):
    model = IncrementalCIFARExperiment(data_params, model_params)
    
    model.run()
-   
-   expr(model_params , data_params)
+
 
 
 

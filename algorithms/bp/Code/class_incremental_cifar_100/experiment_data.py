@@ -12,7 +12,7 @@ from torchvision import datasets, transforms
 #import argparse
 #import sys
 import torch
-
+import pickle
 
 class CifarData:
     
@@ -28,6 +28,30 @@ class CifarData:
         self.data_params = data_params
        
         self.ROOT = ROOT
+        
+        self.result_path = os.path.join( self.ROOT, self.model_params["model_dir"], 'results.pkl' )
+        
+        self.model_path = os.path.join(self.ROOT, self.model_params["model_dir"], 'model.pth' )
+        
+        self.current_running_avg_step = 0
+        
+        total_tasks = int( data_params["total_classes"]/data_params["class_increase_per_task"] )
+        epochs_per_task = int(model_params['num_epochs'] / (total_tasks)) 
+        
+        bin_size = int( (data_params["running_avg_window"] * model_params["batch_sizes"]["train"]))
+        
+        num_images_per_task = data_params["num_images_per_class"] * data_params["class_increase_per_task"]
+        
+        total_updates = np.sum([(i + 1) * num_images_per_task * epochs_per_task for i in range(total_tasks)])
+            
+        self.results_dict = {}
+        self.results_dict["train_loss_per_checkpoint"] = torch.zeros(  int(total_updates/ bin_size) )
+        self.results_dict["train_accuracy_per_checkpoint"] = torch.zeros(  int(total_updates/ bin_size) )
+        
+        self.results_dict["test_loss_per_epoch"] = torch.zeros(  model_params["num_epochs"] )
+        self.results_dict["test_accuracy_per_epoch"] =  torch.zeros(  model_params["num_epochs"] )
+        
+        
         
     def create_cifar_data(self):
        
@@ -57,7 +81,7 @@ class CifarData:
     
        label_ids = np.random.permutation(self.data_params["total_classes"])
        
-       label_ids = label_ids.reshape(-1, self.data_params["classes_per_task"])
+       label_ids = label_ids.reshape(-1, self.data_params["class_increase_per_task"])
     
        self.comp_train_x , self.comp_train_y= {}, {}
     
@@ -89,8 +113,6 @@ class CifarData:
             self.comp_test_y[task_id].append(label)       
        
        
-
-       
     def create_task_data(self):
         
         if self.current_task_id ==0:
@@ -118,9 +140,28 @@ class CifarData:
         os.makedirs( os.path.join(self.ROOT, self.model_params["model_dir"]), exist_ok=True)
     
 
-    
-    
+    def save_train(self, current_accuracy, current_reg_loss, net):
+        
+        self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  current_reg_loss.detach()  
+        self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] =  current_accuracy.detach()  
+        
+        with open(self.result_path , 'wb+') as f:
+             pickle.dump(self.results_dict, f)     
+       
+        torch.save(net.state_dict(), self.model_path ) 
+        
+        self.current_running_avg_step += 1
+        
+        
+    def save_test(self, current_accuracy, current_reg_loss, epoch):
+        
+        self.results_dict["test_accuracy_per_epoch"][epoch] = current_accuracy.detach() 
+        self.results_dict["test_loss_per_epoch"][epoch] = current_reg_loss.detach()
+        
+        with open(self.result_path , 'wb+') as f:
+             pickle.dump(self.results_dict, f)
+      
+        
 
 
         
-    

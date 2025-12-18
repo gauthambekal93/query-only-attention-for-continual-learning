@@ -1,6 +1,7 @@
 {  "total_classes":100,
-   "classes_per_task":5,
-   "num_images_per_class": 450,
+   "class_increase_per_task":5,
+   "num_images_per_class": 500,
+   "running_avg_window": 25,
    "class_increase_frequency":200,
    "data_dir": "datasets/cifar_100/"
 }
