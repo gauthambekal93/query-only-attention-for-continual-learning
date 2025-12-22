@@ -60,8 +60,9 @@ class IncrementalCIFARExperiment():
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         
-        if self.device.type == "cuda":    
-            torch.set_default_tensor_type('torch.cuda.FloatTensor')
+        """The below line is not a good practice and can lead to silent bugs """
+        #if self.device.type == "cuda":    
+        #    torch.set_default_tensor_type('torch.cuda.FloatTensor')
         
         self.data_model = CifarData( ROOT, data_params, model_params)    
         
@@ -101,7 +102,7 @@ class IncrementalCIFARExperiment():
                 
         self.weight_decay = model_params['weight_decay']
         
-        self.num_epochs = model_params['num_epochs']  
+        self.epochs_per_task = int( model_params['num_epochs']  / self.total_tasks )
         
         self.model_dir = model_params["model_dir"]
         
@@ -115,15 +116,11 @@ class IncrementalCIFARExperiment():
        
         self.net.to(self.device)
         
-        self.current_epoch = 0
-        
         self.current_task_id = 0
-    
         
         
-    def evaluvate_network(self):
         
-        self.net.eval()
+    def evaluvate_network(self, epoch):
         
         avg_loss = 0.0
         avg_acc = 0.0
@@ -146,19 +143,20 @@ class IncrementalCIFARExperiment():
                 
                 num_test_batches += 1
             
-        
-        self.data_model.save_test(avg_loss / num_test_batches, avg_acc / num_test_batches, self.current_epoch )
+        self.data_model.save_test(avg_loss / num_test_batches, avg_acc / num_test_batches, epoch )
          
-        self.net.train()
+        
  
     def train(self):
 
         """train model """
-        for epoch in tqdm(range(self.current_epoch, self.num_epochs)):
+        for epoch in tqdm( range(self.epochs_per_task)):
             
-            rand_idx = torch.random.permutation( len(self.data_model.task_train_y) )
+            self.net.train()
             
-            for batch_no in range( len(rand_idx) ):
+            rand_idx = torch.randperm(len(self.data_model.task_train_y)) 
+            
+            for batch_no in range( 0, len(rand_idx), self.batch_sizes['train'] ):
                 
                 batch_ids = rand_idx[batch_no: batch_no + self.batch_sizes['train']]
             
@@ -168,7 +166,7 @@ class IncrementalCIFARExperiment():
                 for param in self.net.parameters(): 
                     param.grad = None   # apparently faster than optim.zero_grad()
                 
-                predictions = self.net.forward(batch_x, current_features =[] )[:, self.all_classes[:self.current_num_classes]]
+                predictions = self.net.forward(batch_x )   [ self.data_model.label_ids_flattened [:self.current_num_classes] ] 
                 
                 current_reg_loss = self.loss(predictions, batch_y)
                 
@@ -176,17 +174,19 @@ class IncrementalCIFARExperiment():
                 
                 self.optim.step()
                 
-                current_accuracy = torch.mean((predictions.argmax(axis=1) == batch_y.argmax(axis=1)).to(torch.float32))
-        
-        
-        """save checkpoints """
-        self.data_model.save_train(current_accuracy, current_reg_loss, self.net)
-        
-        """obtain performance """
-        self.evaluvate_network()
-        
-        self.current_epoch += 1
-        
+                self.data_model.running_accuracy += torch.mean((predictions.argmax(axis=1) == batch_y.argmax(axis=1)).to(torch.float32)).detach()
+                self.data_model.running_loss += current_reg_loss.detach()
+                
+                """save checkpoints """
+                if (batch_no + 1) % self.data_model.running_avg_window == 0:
+                    self.data_model.save_train(self.net)
+            
+            self.net.eval()
+            """obtain performance """
+            self.evaluvate_network()
+            
+            
+            
     def run(self):
         
         """iterate over tasks """
@@ -196,7 +196,7 @@ class IncrementalCIFARExperiment():
         
             self.data_model.create_result_dir()
             
-            self.data_model.create_task_data()
+            self.data_model.create_task_data(self.current_task_id)
             
             self.train()
             
