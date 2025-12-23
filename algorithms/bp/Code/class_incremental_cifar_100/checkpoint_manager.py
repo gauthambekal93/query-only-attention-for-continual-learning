@@ -14,14 +14,9 @@ class CheckpointManager:
     
     def __init__(self, data_manager_obj, runner_obj, root, running_avg_window, model_dir ):
         
-        
-        self.result_dir = os.path.join(root, model_dir )
+        self.create_result_path(root, model_dir)
         
         self.current_running_avg_step, self.running_loss, self.running_accuracy, self.running_avg_window = (0, 0.0, 0.0, running_avg_window)
-        
-        #bin_size = int( (running_avg_window * runner_obj.train_batch_size ))
-        
-        #num_images_per_task = num_images_per_class * data_manager_obj.class_increase_per_task
         
         total_updates = np.sum([(i + 1) * data_manager_obj.num_images_per_task * runner_obj.epochs_per_task for i in range(data_manager_obj.total_tasks)]) // runner_obj.train_batch_size
         
@@ -29,35 +24,52 @@ class CheckpointManager:
         self.results_dict["train_loss_per_checkpoint"] = torch.zeros(  int(total_updates / running_avg_window) )
         self.results_dict["train_accuracy_per_checkpoint"] = torch.zeros(  int(total_updates / running_avg_window) )
         
-        self.results_dict["test_loss_per_epoch"] = torch.zeros( runner_obj.num_epochs )
-        self.results_dict["test_accuracy_per_epoch"] =  torch.zeros(  runner_obj.num_epochs )
+        self.results_dict["test_loss_per_epoch"] = torch.zeros( data_manager_obj.total_tasks )
+        self.results_dict["test_accuracy_per_epoch"] =  torch.zeros( data_manager_obj.total_tasks )
         
-        self.model_dir = os.path.join(root, model_dir )
         
-    def create_result_dir(self):
-        os.makedirs( self.model_dir , exist_ok=True)
-    
+    def create_result_path(self, root, model_dir):
+        os.makedirs( model_dir , exist_ok=True)
+        self.result_path = os.path.join(root, model_dir, "result.pkl" )
+        self.model_path = os.path.join(root, model_dir ,  "model.pkl")
     
     def summarize_train(self):
-        self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  self.running_loss
-        self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] =  self.running_accuracy
+        self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  self.running_loss / self.running_avg_window
+        self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] = 100 * (  self.running_accuracy /self.running_avg_window )
     
         self.current_running_avg_step += 1
         self.running_loss *= 0.0 
         self.running_accuracy *= 0.0
         
         
-    def summarize_test(self, current_reg_loss, current_accuracy, epoch):     
-        self.results_dict["test_loss_per_epoch"][epoch] = current_reg_loss.detach()
-        self.results_dict["test_accuracy_per_epoch"][epoch] = current_accuracy.detach() 
+    def summarize_test(self, current_reg_loss, current_accuracy, current_task_id):     
+        self.results_dict["test_loss_per_epoch"][current_task_id] = current_reg_loss.detach()
+        self.results_dict["test_accuracy_per_epoch"][current_task_id] = current_accuracy.detach() 
 
         
     def save_experiment_checkpoint(self, train_context):
         
         with open(self.result_path , 'wb+') as f:
              pickle.dump(self.results_dict, f)     
-       
-        torch.save(train_context.state_dict(), self.model_path ) 
         
-    
+        checkpoint = {
+        "model_state": train_context.net.state_dict(),
+        "optimizer_state": train_context.optim.state_dict(),
+        "step_size": train_context.step_size,
+        "momentum": train_context.momentum,
+        "weight_decay": train_context.weight_decay
+        }
 
+        torch.save(checkpoint, self.model_path ) 
+        
+
+    def load_experiment_checkpoint(self, train_context):
+        
+        checkpoint = torch.load(self.model_path,  map_location = train_context.device)
+        
+        train_context.net.load_state_dict(checkpoint["model_state"])
+        
+        train_context.optim.load_state_dict(checkpoint["optimizer_state"])
+        
+            
+        

@@ -30,7 +30,7 @@ class DataManager:
          """we are assigning 5 labels per task, hence 100 labels in cifar creates 20 tasks """
          self.label_ids  = torch.randperm(total_classes)
          
-         self.label_ids_flattened = self.label_ids.clone() #self.label_ids.copy()
+         #self.label_ids_flattened = self.label_ids.clone() #self.label_ids.copy()
          
          self.label_ids = self.label_ids.reshape(-1, class_increase_per_task)
          
@@ -80,7 +80,6 @@ class DataManager:
             self.comp_train_y[task_id].append(label)
      
             
-     
         for img, label in test_set:
              task_id = (self.label_ids == label).nonzero(as_tuple=True)[0].item() #np.where(self.label_ids== label)[0][0]
              
@@ -92,20 +91,35 @@ class DataManager:
              self.comp_test_y[task_id].append(label)       
      
         
+        """ Store data of each task as torch tensor from list """
+        for k in self.comp_train_x.keys():
+            self.comp_train_x[k] = torch.stack(self.comp_train_x [k], dim = 0)
+            self.comp_train_y[k] = torch.tensor(self.comp_train_y [k])
+            self.comp_test_x[k] = torch.stack(self.comp_test_x [k], dim = 0)
+            self.comp_test_y[k] = torch.tensor(self.comp_test_y [k])
+            
+            
      def get_one_hot_encoded(self, labels):
 
         index = [] 
         for label in labels:
             
-            index .append( (self.label_ids[self.current_task_id] == label).nonzero(as_tuple=True)[0].item() )
+            index .append( (self.label_ids[:self.current_task_id + 1].reshape(-1) == label).nonzero(as_tuple=True)[0].item() )
             
         one_hot_encoded = F.one_hot( torch.tensor(index), num_classes =  self.current_num_classes)
         
         return one_hot_encoded
         
-        
+     
      def create_task_data(self):
          
+         self.task_train_x = torch.cat( [ self.comp_train_x[task_id] for task_id in range(self.current_task_id + 1) ] ).to(self.device)
+         self.task_train_y = self.get_one_hot_encoded( torch.cat( [ self.comp_train_y[task_id] for task_id in range(self.current_task_id + 1)])).to(self.device, dtype=torch.float32)  
+             
+         self.task_test_x = torch.cat( [ self.comp_test_x[task_id] for task_id in range(self.current_task_id + 1) ] ).to(self.device)
+         self.task_test_y = self.get_one_hot_encoded(  torch.cat( [ self.comp_test_y[task_id] for task_id in range(self.current_task_id + 1) ])).to(self.device, dtype=torch.float32)  
+         
+         '''
          if self.current_task_id ==0:
              
              self.task_train_x =  torch.stack( self.comp_train_x[self.current_task_id], dim = 0).to(self.device)
@@ -117,45 +131,18 @@ class DataManager:
              self.task_test_y =   self.get_one_hot_encoded(self.comp_test_y[self.current_task_id]).to(self.device,  dtype=torch.float32) #torch.tensor ( self.comp_test_y[self.current_task_id] )
              
          else:
-             self.task_train_x = torch.cat ( self.task_train_x,  torch.stack( self.comp_train_x[self.current_task_id], dim = 0).to(self.device) , dim = 0)
+             self.task_train_x = torch.cat ( (self.task_train_x,  torch.stack( self.comp_train_x[self.current_task_id], dim = 0).to(self.device) ), dim = 0)
              
-             self.task_train_y = torch.cat ( self.task_train_y,  self.get_one_hot_encoded(self.comp_train_y[self.current_task_id]).to(self.device,  dtype=torch.float32) , dim = 0 )
+             self.task_train_y = torch.cat ( (self.task_train_y,  self.get_one_hot_encoded(self.comp_train_y[self.current_task_id]).to(self.device,  dtype=torch.float32) ), dim = 0 )
              
-             self.task_test_x = torch.cat ( self.task_test_x, torch.stack(  self.comp_test_x[self.current_task_id], dim = 0 ).to(self.device), dim = 0)
+             self.task_test_x = torch.cat ( ( self.task_test_x, torch.stack(  self.comp_test_x[self.current_task_id], dim = 0 ).to(self.device) ), dim = 0)
              
-             self.task_test_y = torch.cat ( self.task_test_y,  self.get_one_hot_encoded(self.comp_test_y[self.current_task_id]).to(self.device,  dtype=torch.float32), dim = 0 )
+             self.task_test_y = torch.cat ( ( self.task_test_y,  self.get_one_hot_encoded(self.comp_test_y[self.current_task_id]).to(self.device,  dtype=torch.float32) ), dim = 0 )
 
-
+         '''
+         
          self.selected_classes = self.label_ids[:self.current_task_id + 1].reshape(-1).to(self.device)
         
-'''
-for a in self.comp_train_y[self.current_task_id]:
-    
-    print(a)
-
-
-
-x = torch.tensor([2, 44, 56, 70, 74])
-v = 56
-
-idx = (self.label_ids[self.current_task_id] == 56).nonzero(as_tuple=True)[0]
-
-'''
-
-
-'''
-index = [] 
-for label in self.comp_train_y[self.current_task_id]:
-    
-    index .append( (self.label_ids[0] == label).nonzero(as_tuple=True)[0].item() )
-    
-        
-    
-
-one_hot = F.one_hot( torch.tensor(index), num_classes =  self.current_num_classes)
-
-'''
-
 
 
 

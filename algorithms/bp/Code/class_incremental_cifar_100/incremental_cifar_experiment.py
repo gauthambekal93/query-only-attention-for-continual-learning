@@ -67,9 +67,13 @@ class TrainContext:
         self.optim = torch.optim.SGD(self.net.parameters(), lr = step_size, momentum= momentum, weight_decay= weight_decay)
 
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
-
-
-    
+        
+        self.step_size = step_size
+        
+        self.momentum = momentum
+         
+        self.weight_decay = weight_decay
+       
     
 class IncrementalCIFARExperiment:
     

@@ -15,6 +15,6 @@
 "step_size":0.001,
 "momentum": 0.9, 
 "weight_decay": 0.0005,
-"num_epochs":800,
+"num_epochs":4000,
 "model_dir": "results/cifar_100/bp\\0\\0"
 }
