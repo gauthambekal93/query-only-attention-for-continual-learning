@@ -12,13 +12,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
-# Get current file's directory
-#BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
-
-# Add it to sys.path
-#sys.path.append(str(BASE_DIR / "common" / "codes"))
-#sys.path.append(str(BASE_DIR / "algorithms" / "bp"/ "Code"/"split_image_net"))
-
 
 import json
 import torch
@@ -26,7 +19,7 @@ import torch
 import argparse
 import numpy as np
 import random
-from tqdm import tqdm
+
 
 
 
@@ -43,9 +36,9 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.bp.Code.class_incremental_cifar_100.data_manager import DataManager 
-    from algorithms.bp.Code.class_incremental_cifar_100.runner import Runner 
-    from algorithms.bp.Code.class_incremental_cifar_100.checkpoint_manager import CheckpointManager 
+    from algorithms.full_reinitialization.Code.class_incremental_cifar_100.data_manager import DataManager 
+    from algorithms.full_reinitialization.Code.class_incremental_cifar_100.runner import Runner 
+    from algorithms.full_reinitialization.Code.class_incremental_cifar_100.checkpoint_manager import CheckpointManager 
 
     from common.codes.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
 
@@ -150,8 +143,8 @@ class IncrementalCIFARExperiment:
         self.checkpoint_obj = CheckpointManager(self.data_manager_obj, self.runner_obj, root = ROOT, running_avg_window = self.running_avg_window , 
                                                 model_dir = self.model_dir )
     
-
-
+                
+                
 def main(arguments):
    parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
    
@@ -182,16 +175,23 @@ def main(arguments):
    
    exp_obj.data_manager_obj.create_cifar_data()
    
-   #exp_obj.checkpoint_obj.load_experiment_checkpoint(exp_obj.train_context)
    
-   exp_obj.runner_obj.run(exp_obj.train_context, exp_obj.data_manager_obj, exp_obj.checkpoint_obj)
-   
-
+   while exp_obj.data_manager_obj.current_task_id < exp_obj.data_manager_obj.total_tasks:
+       
+       exp_obj.data_manager_obj.create_task_data()
+       
+       exp_obj.runner_obj.run(exp_obj.train_context, exp_obj.data_manager_obj, exp_obj.checkpoint_obj)
+       
+       exp_obj.data_manager_obj.current_task_id += 1
+       
+       exp_obj.data_manager_obj.current_num_classes += exp_obj.data_manager_obj.class_increase_per_task
+       
+       exp_obj.initialize_model()
 
 
 if __name__ == '__main__':
     
-    model_config_path = os.path.join( ROOT, "configuration_files","cifar_100", "models", "bp", "0.json") 
+    model_config_path = os.path.join( ROOT, "configuration_files","cifar_100", "models", "full_reinitialization", "0.json") 
     
     data_config_path = os.path.join( ROOT, "configuration_files","cifar_100", "data", "0.json")
     

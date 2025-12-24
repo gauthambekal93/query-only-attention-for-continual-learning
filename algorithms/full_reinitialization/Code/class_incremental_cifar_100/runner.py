@@ -19,7 +19,7 @@ class Runner:
         self.train_batch_size = train_batch_size
         self.test_batch_size = test_batch_size
       
-    
+        
     def set_lr(self, epoch, train_context):
             """ Changes the learning rate of the optimizer according to the current epoch of the task """
             current_stepsize = None
@@ -40,7 +40,6 @@ class Runner:
                 for g in train_context.optim.param_groups:
                     g['lr'] = current_stepsize
                     
-                
     def evaluvate_network(self, epoch, train_context, data_manager_obj, checkpoint_obj):
         
         train_context.net.eval()
@@ -81,7 +80,6 @@ class Runner:
 
         """train model """
         start = time.perf_counter()
-        
         train_context.net.train()
         
         for epoch in tqdm( range(self.epochs_per_task)):
@@ -99,7 +97,7 @@ class Runner:
                 start_id , end_id = self.train_batch_size  * batch_no,  self.train_batch_size  * (batch_no +1)
                 
                 batch_ids = rand_idx[start_id: end_id ]
-                            
+                
                 batch_x, batch_y = data_manager_obj.task_train_x[batch_ids], data_manager_obj.task_train_y[batch_ids]
                 
                 batch_x = data_manager_obj.augment_batch(batch_x)
@@ -123,7 +121,7 @@ class Runner:
                 if (batch_no + 1) % checkpoint_obj.running_avg_window == 0  :
                     
                     checkpoint_obj.summarize_train()
-
+        
         """obtain performance """
         self.evaluvate_network(epoch, train_context, data_manager_obj, checkpoint_obj)
         
@@ -135,19 +133,11 @@ class Runner:
         
     def run(self, train_context, data_manager_obj, checkpoint_obj):
         
-        while data_manager_obj.current_task_id < data_manager_obj.total_tasks:
+        self.train( train_context, data_manager_obj, checkpoint_obj)
+        
+        
+             
             
-            data_manager_obj.create_task_data()
-            
-            self.train( train_context, data_manager_obj, checkpoint_obj)
-            
-            data_manager_obj.current_task_id += 1
-            
-            data_manager_obj.current_num_classes += data_manager_obj.class_increase_per_task
-            
-'''             
-for i, group in enumerate(train_context.optim.param_groups):
-    print(f"Param group {i} LR = {group['lr']}")         
-'''    
+    
         
         

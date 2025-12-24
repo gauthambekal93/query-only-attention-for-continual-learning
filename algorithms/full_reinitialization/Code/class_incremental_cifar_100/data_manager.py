@@ -121,6 +121,7 @@ class DataManager:
          self.task_test_x = torch.cat( [ self.comp_test_x[task_id] for task_id in range(self.current_task_id + 1) ] ).to(self.device)
          self.task_test_y = self.get_one_hot_encoded(  torch.cat( [ self.comp_test_y[task_id] for task_id in range(self.current_task_id + 1) ])).to(self.device, dtype=torch.float32)  
          
+         
          self.selected_classes = self.label_ids[:self.current_task_id + 1].reshape(-1).to(self.device)
         
 
@@ -156,6 +157,5 @@ class DataManager:
         # NOTE: rotation on GPU uses TF.rotate which expects CPU sometimes depending on backend.
         # Easiest: do it on CPU in your dataloader. If you insist on pure tensor-GPU, skip rotation.
         return x
-
 
 

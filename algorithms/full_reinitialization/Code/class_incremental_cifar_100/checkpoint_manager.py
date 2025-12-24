@@ -21,8 +21,8 @@ class CheckpointManager:
         self.total_updates = np.sum([(i + 1) * data_manager_obj.num_images_per_task * runner_obj.epochs_per_task for i in range(data_manager_obj.total_tasks)]) // runner_obj.train_batch_size
         
         self.results_dict = {}
-        self.results_dict["train_loss_per_checkpoint"] = torch.zeros(  int(self.total_updates / running_avg_window) )
-        self.results_dict["train_accuracy_per_checkpoint"] = torch.zeros(  int(self.total_updates / running_avg_window) )
+        self.results_dict["train_loss_per_checkpoint"] = torch.zeros(  int( self.total_updates / running_avg_window) )
+        self.results_dict["train_accuracy_per_checkpoint"] = torch.zeros(  int( self.total_updates / running_avg_window) )
         
         self.results_dict["test_loss_per_task"] = torch.zeros( data_manager_obj.total_tasks )
         self.results_dict["test_accuracy_per_task"] =  torch.zeros( data_manager_obj.total_tasks )
@@ -32,6 +32,7 @@ class CheckpointManager:
         os.makedirs( model_dir , exist_ok=True)
         self.result_path = os.path.join(root, model_dir, "result.pkl" )
         self.model_path = os.path.join(root, model_dir ,  "model.pkl")
+    
     
     def summarize_train(self):
         self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  self.running_loss / self.running_avg_window
