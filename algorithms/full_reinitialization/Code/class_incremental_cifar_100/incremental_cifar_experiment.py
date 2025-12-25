@@ -175,6 +175,7 @@ def main(arguments):
    
    exp_obj.data_manager_obj.create_cifar_data()
    
+   exp_obj.checkpoint_obj.load_experiment_checkpoint(exp_obj.train_context, exp_obj.data_manager_obj)
    
    while exp_obj.data_manager_obj.current_task_id < exp_obj.data_manager_obj.total_tasks:
        
@@ -187,7 +188,7 @@ def main(arguments):
        exp_obj.data_manager_obj.current_num_classes += exp_obj.data_manager_obj.class_increase_per_task
        
        exp_obj.initialize_model()
-
+   
 
 if __name__ == '__main__':
     

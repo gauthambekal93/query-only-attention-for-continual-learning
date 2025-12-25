@@ -26,6 +26,8 @@ class CheckpointManager:
         
         self.results_dict["test_loss_per_task"] = torch.zeros( data_manager_obj.total_tasks )
         self.results_dict["test_accuracy_per_task"] =  torch.zeros( data_manager_obj.total_tasks )
+        self.results_dict["current_task_id"]  = data_manager_obj.current_task_id
+        self.results_dict["current_running_avg_step"]  = self.current_running_avg_step
         
         
     def create_result_path(self, root, model_dir):
@@ -43,10 +45,12 @@ class CheckpointManager:
         self.running_accuracy *= 0.0
         
         
-    def summarize_test(self, current_reg_loss, current_accuracy, current_task_id):     
+    def summarize_test(self, current_reg_loss, current_accuracy, current_task_id, current_num_classes ):     
         self.results_dict["test_loss_per_task"][current_task_id] = current_reg_loss.detach()
         self.results_dict["test_accuracy_per_task"][current_task_id] = current_accuracy.detach() 
-
+        self.results_dict["current_task_id"] = current_task_id
+        self.results_dict["current_running_avg_step"] = self.current_running_avg_step
+        self.results_dict['current_num_classes'] = current_num_classes
         
     def save_experiment_checkpoint(self, train_context):
         
@@ -61,7 +65,7 @@ class CheckpointManager:
         torch.save(checkpoint, self.model_path ) 
         
     
-    def load_experiment_checkpoint(self, train_context):
+    def load_experiment_checkpoint(self, train_context, data_manager_obj):
         
         checkpoint = torch.load(self.model_path,  map_location = train_context.device)
         
@@ -72,5 +76,14 @@ class CheckpointManager:
         with open(self.result_path, "rb") as f:
             self.results_dict = pickle.load(f)
     
-            
+        """We want to update the current running step and task id where the training was previously stopped and saved. """
+        self.current_running_avg_step = self.results_dict['current_running_avg_step']
+        data_manager_obj.current_task_id = self.results_dict['current_task_id'] 
+        data_manager_obj.current_num_classes = self.results_dict['current_num_classes'] 
         
+        #self.results_dict['current_num_classes'] = self.results_dict['current_num_classes'] 
+        #self.results_dict["current_task_id"] = self.results_dict['test_accuracy_per_task'].argmin().item()    
+        #self.results_dict["current_running_avg_step"] = self.results_dict['train_accuracy_per_checkpoint'].argmin().item()  
+        
+        
+        #self.save_experiment_checkpoint(train_context)

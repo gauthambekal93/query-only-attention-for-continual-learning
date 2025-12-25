@@ -72,7 +72,8 @@ class Runner:
                 
         print("t2" ,time.perf_counter() - start)         
         
-        checkpoint_obj.summarize_test(avg_loss / num_test_batches, avg_acc / num_test_batches, data_manager_obj.current_task_id )
+        checkpoint_obj.summarize_test(avg_loss / num_test_batches, avg_acc / num_test_batches, 
+                                      data_manager_obj.current_task_id, data_manager_obj.current_num_classes )
     
         
  
