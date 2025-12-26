@@ -108,14 +108,18 @@ class Runner:
                 for param in train_context.net.parameters(): 
                     param.grad = None   # apparently faster than optim.zero_grad()
                 
-                predictions = train_context.net.forward( batch_x )[:, data_manager_obj.selected_classes] #t2 0.34693420003168285
+                train_context.current_features = []
+                
+                predictions = train_context.net.forward( batch_x , train_context.current_features)[:, data_manager_obj.selected_classes] #t2 0.34693420003168285
                 
                 current_reg_loss = train_context.loss(predictions, batch_y)
                 
                 current_reg_loss.backward()
                 
                 train_context.optim.step()
-            
+                
+                train_context.resgnt.gen_and_test(train_context.current_features)
+                
                 checkpoint_obj.running_accuracy += torch.mean((predictions.argmax(axis=1) == batch_y.argmax(axis=1)).to(torch.float32)).detach()
                 checkpoint_obj.running_loss += current_reg_loss.detach()
                 

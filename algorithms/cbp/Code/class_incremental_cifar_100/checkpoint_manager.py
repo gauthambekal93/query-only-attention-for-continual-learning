@@ -32,7 +32,7 @@ class CheckpointManager:
         self.results_dict['current_num_classes'] = data_manager_obj.current_num_classes
         
     def create_result_path(self, root, model_dir):
-        os.makedirs( model_dir , exist_ok=True)
+        os.makedirs( os.path.join(root , model_dir ) , exist_ok=True)
         self.result_path = os.path.join(root, model_dir, "result.pkl" )
         self.model_path = os.path.join(root, model_dir ,  "model.pkl")
     
@@ -60,7 +60,8 @@ class CheckpointManager:
         
         checkpoint = {
         "model_state": train_context.net.state_dict(),
-        "optimizer_state": train_context.optim.state_dict()
+        "optimizer_state": train_context.optim.state_dict(),
+        "resgnt": train_context.resgnt
         }
 
         torch.save(checkpoint, self.model_path ) 
@@ -73,6 +74,8 @@ class CheckpointManager:
         train_context.net.load_state_dict(checkpoint["model_state"])
         
         train_context.optim.load_state_dict(checkpoint["optimizer_state"])
+        
+        train_context.resgnt = checkpoint["resgnt"]
         
         with open(self.result_path, "rb") as f:
             self.results_dict = pickle.load(f)
