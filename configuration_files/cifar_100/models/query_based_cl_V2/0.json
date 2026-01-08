@@ -12,12 +12,12 @@
 "maturity_threshold":0,
 "noise_std":0,
 "perturb_weights_indicator":"false",
-"step_size":0.1,
+"step_size":0.001,
 "momentum": 0.9, 
 "weight_decay": 0.0005,
 "num_epochs":4000,
-"buffer_size_per_label":5,
-"model_dir": "results/cifar_100/query_based_cl\\0\\0"
+"buffer_size_per_label":20,
+"model_dir": "results/cifar_100/query_based_cl_V2\\0\\0"
 }
 
 

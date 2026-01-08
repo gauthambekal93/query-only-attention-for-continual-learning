@@ -39,7 +39,8 @@ class CheckpointManager:
     def summarize_train(self):
         self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  self.running_loss / self.running_avg_window
         self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] = 100 * (  self.running_accuracy /self.running_avg_window )
-    
+        
+        #print("Loss ",self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step], "Accuracy ",self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step])
         self.current_running_avg_step += 1
         self.running_loss *= 0.0 
         self.running_accuracy *= 0.0

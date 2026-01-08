@@ -43,19 +43,18 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.cbp.Code.class_incremental_cifar_100.data_manager import DataManager 
-    from algorithms.cbp.Code.class_incremental_cifar_100.runner import Runner 
-    from algorithms.cbp.Code.class_incremental_cifar_100.checkpoint_manager import CheckpointManager 
+    from algorithms.query_based_cl_V5.Code.class_incremental_cifar_100.data_manager import DataManager 
+    from algorithms.query_based_cl_V5.Code.class_incremental_cifar_100.runner import Runner 
+    from algorithms.query_based_cl_V5.Code.class_incremental_cifar_100.checkpoint_manager import CheckpointManager 
 
-    from common.codes.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
-    from common.codes.res_gnt import ResGnT
-    
-    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager, ResGnT
+    from algorithms.query_based_cl_V5.Code.class_incremental_cifar_100.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+
+    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
     
     
     
 class TrainContext:
-    def __init__(self, step_size, momentum, weight_decay, total_classes, replacement_rate, utility_function, maturity_threshold):
+    def __init__(self, step_size, momentum, weight_decay, total_classes):
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         
@@ -75,15 +74,6 @@ class TrainContext:
          
         self.weight_decay = weight_decay
        
-        self.resgnt = ResGnT(net = self.net,
-                              hidden_activation="relu",
-                              replacement_rate=replacement_rate,
-                              decay_rate=0.99,
-                              util_type=utility_function,
-                              maturity_threshold=maturity_threshold,
-                              device=self.device)
-        
-        self.current_features = []
     
 class IncrementalCIFARExperiment:
     
@@ -92,6 +82,7 @@ class IncrementalCIFARExperiment:
         """The below line is not a good practice and can lead to silent bugs """
         #if self.device.type == "cuda":    
         #    torch.set_default_tensor_type('torch.cuda.FloatTensor')
+        
         
         self.data_dir = data_params["data_dir"]
         
@@ -137,24 +128,32 @@ class IncrementalCIFARExperiment:
         
         self.train_batch_size = model_params["batch_sizes"]["train"]
         
+        self.val_batch_size = model_params["batch_sizes"]["validation"]
+        
         self.test_batch_size = model_params["batch_sizes"]["test"]
         
+        self.num_labels_previous_task = model_params["num_labels_previous_task"]
+        
+        self.num_data_points_current_task = model_params["num_data_points_current_task"]
+        
+        self.num_support_per_label = model_params["num_support_per_label"]
         
         
     def initialize_model(self):
-       self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.total_classes, self.replacement_rate, self.utility_function, self.maturity_threshold)
+       self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.total_classes)
        
-    
-    
+       
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(root = ROOT, data_dir = self.data_dir, num_images_per_class = self.num_images_per_class , 
                                              initial_num_classes =self.initial_num_classes, 
                                              class_increase_per_task = self.class_increase_per_task, total_classes = self.total_classes,
-                                             device = self.train_context.device)
+                                             num_labels_previous_task = self.num_labels_previous_task, num_data_points_current_task = self.num_data_points_current_task,
+                                             num_support_per_label = self.num_support_per_label, device = self.train_context.device)
          
     
     def initialize_runner(self):
-        self.runner_obj = Runner(self.data_manager_obj, self.num_epochs, train_batch_size = self.train_batch_size, test_batch_size = self.test_batch_size)
+        self.runner_obj = Runner(self.data_manager_obj, self.num_epochs, train_batch_size = self.train_batch_size, 
+                                 val_batch_size = self.val_batch_size, test_batch_size = self.test_batch_size)
     
     
 
@@ -163,7 +162,7 @@ class IncrementalCIFARExperiment:
                                                 model_dir = self.model_dir )
     
 
-    
+
 def main(arguments):
    parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
    
@@ -203,7 +202,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    model_config_path = os.path.join( ROOT, "configuration_files","cifar_100", "models", "cbp", "0.json") 
+    model_config_path = os.path.join( ROOT, "configuration_files","cifar_100", "models", "query_based_cl_V5", "0.json") 
     
     data_config_path = os.path.join( ROOT, "configuration_files","cifar_100", "data", "0.json")
     

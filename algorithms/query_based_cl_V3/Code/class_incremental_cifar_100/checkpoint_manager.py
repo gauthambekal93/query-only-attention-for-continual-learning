@@ -24,7 +24,7 @@ class CheckpointManager:
         self.results_dict["train_loss_per_checkpoint"] = torch.zeros(  int(self.total_updates / running_avg_window) )
         self.results_dict["train_accuracy_per_checkpoint"] = torch.zeros(  int(self.total_updates / running_avg_window) )
         
-        self.results_dict["test_loss_per_task"] = torch.zeros( data_manager_obj.total_tasks )
+        #self.results_dict["test_loss_per_task"] = torch.zeros( data_manager_obj.total_tasks )
         self.results_dict["test_accuracy_per_task"] =  torch.zeros( data_manager_obj.total_tasks )
         
         self.results_dict["current_task_id"]  = data_manager_obj.current_task_id
@@ -39,28 +39,31 @@ class CheckpointManager:
     def summarize_train(self):
         self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  self.running_loss / self.running_avg_window
         self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] = 100 * (  self.running_accuracy /self.running_avg_window )
-    
+        
+        print("Train Loss ",self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step].item(), "Train Accuracy ",self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step].item())
         self.current_running_avg_step += 1
         self.running_loss *= 0.0 
         self.running_accuracy *= 0.0
         
         
-    def summarize_test(self, current_reg_loss, current_accuracy, current_task_id, current_num_classes):     
-        self.results_dict["test_loss_per_task"][current_task_id] = current_reg_loss.detach()
+    def summarize_test(self,  current_accuracy, current_task_id, current_num_classes):     
+        #self.results_dict["test_loss_per_task"][current_task_id] = current_reg_loss.detach()
         self.results_dict["test_accuracy_per_task"][current_task_id] = current_accuracy.detach() 
 
         self.results_dict["current_task_id"] = current_task_id
         self.results_dict["current_running_avg_step"] = self.current_running_avg_step
         self.results_dict['current_num_classes'] = current_num_classes
         
-    def save_experiment_checkpoint(self, train_context):
+    def save_experiment_checkpoint(self, train_context, data_manager_obj):
         
         with open(self.result_path , 'wb+') as f:
              pickle.dump(self.results_dict, f)     
         
         checkpoint = {
         "model_state": train_context.net.state_dict(),
-        "optimizer_state": train_context.optim.state_dict()
+        "optimizer_state": train_context.optim.state_dict(),
+        "support_x":data_manager_obj.test_support_x,
+        "support_y":data_manager_obj.test_support_y
         }
 
         torch.save(checkpoint, self.model_path ) 
@@ -74,11 +77,15 @@ class CheckpointManager:
         
         train_context.optim.load_state_dict(checkpoint["optimizer_state"])
         
+        data_manager_obj.test_support_x = checkpoint["support_x"]
+        
+        data_manager_obj.test_support_y = checkpoint["support_y"]
+        
         with open(self.result_path, "rb") as f:
             self.results_dict = pickle.load(f)
     
         """We want to update the current running step and task id where the training was previously stopped and saved. """
-        self.current_running_avg_step = self.results_dict['current_running_avg_step']
-        data_manager_obj.current_task_id = self.results_dict['current_task_id'] 
-        data_manager_obj.current_num_classes = self.results_dict['current_num_classes']     
+        self.current_running_avg_step = self.results_dict['current_running_avg_step'] + 1
+        data_manager_obj.current_task_id = self.results_dict['current_task_id']  + 1
+        data_manager_obj.current_num_classes = self.results_dict['current_num_classes']  + data_manager_obj.class_increase_per_task
         
