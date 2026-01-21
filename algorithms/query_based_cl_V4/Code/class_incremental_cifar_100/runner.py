@@ -42,63 +42,7 @@ class Runner:
                 for g in train_context.optim.param_groups:
                     g['lr'] = current_stepsize
                     
-    '''            
-    def test_network(self, epoch, train_context, data_manager_obj, checkpoint_obj):
-        
-        train_context.net.eval()
-        
-        avg_acc = 0.0
 
-        with torch.no_grad():
-            test_ids = torch.arange( len(data_manager_obj.task_test_y) )
-            
-            no_of_batches = len(data_manager_obj.task_test_y) // self.test_batch_size
-            
-            for batch_no in range( no_of_batches ): 
-                
-                start_id , end_id = self.test_batch_size  * batch_no,  self.test_batch_size  * (batch_no +1)
-                
-                batch_ids = test_ids[start_id: end_id ]
-                
-                batch_x, batch_y = data_manager_obj.task_test_x[batch_ids], data_manager_obj.task_test_y[batch_ids]
-                                
-                predictions = train_context.net.forward(batch_x, data_manager_obj = data_manager_obj, mode = "test", batch_y = batch_y ).to(train_context.device) [:, data_manager_obj.selected_classes]
-                
-                avg_acc += torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32))
-        
-        checkpoint_obj.summarize_test(avg_acc / no_of_batches,  data_manager_obj.current_task_id, data_manager_obj.current_num_classes )
-        print("Test accuracy ", 100 * (avg_acc.item() / no_of_batches)  )
-        
-    
-                    
-    def val_network(self, epoch, train_context, data_manager_obj, checkpoint_obj):
-        
-        train_context.net.eval()
-
-        avg_acc = 0.0
-
-        with torch.no_grad():
-            test_ids = torch.arange( len(data_manager_obj.task_val_y) )
-            
-            no_of_batches = len(data_manager_obj.task_val_y) // self.val_batch_size
-            
-            for batch_no in range( no_of_batches ): 
-                
-                start_id , end_id = self.val_batch_size  * batch_no,  self.val_batch_size  * (batch_no +1)
-                
-                batch_ids = test_ids[start_id: end_id ]
-                
-                batch_x, batch_y = data_manager_obj.task_val_x[batch_ids], data_manager_obj.task_val_y[batch_ids]
-                
-                predictions = train_context.net.forward(batch_x, data_manager_obj = data_manager_obj, mode = "test", batch_y = batch_y ).to(train_context.device) [:, data_manager_obj.selected_classes]
-                
-                avg_acc += torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32))
-                
-        
-        checkpoint_obj.summarize_test(avg_acc / no_of_batches,  data_manager_obj.current_task_id, data_manager_obj.current_num_classes )
-        print("Validation accuracy ", 100 * (avg_acc.item() / no_of_batches) )
-        
-     '''
      
     def test_network(self, epoch, train_context, data_manager_obj, checkpoint_obj):
          
@@ -172,8 +116,6 @@ class Runner:
             
             for batch_no in range( no_of_batches ): 
                 
-                #start = time.perf_counter()
-                
                 start_id , end_id = self.train_batch_size  * batch_no,  self.train_batch_size  * (batch_no +1)
                 
                 batch_ids = rand_idx[start_id: end_id ]
@@ -198,18 +140,22 @@ class Runner:
                 train_context.optim.step()
             
                 #checkpoint_obj.running_accuracy += torch.mean((predictions.argmax(axis=1) == batch_y.argmax(axis=1)).to(torch.float32)).detach()
-                checkpoint_obj.running_accuracy += torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).detach()
-                checkpoint_obj.running_loss += current_reg_loss.detach()
-                              
+                checkpoint_obj.running_accuracy.append( torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item())
+                checkpoint_obj.running_loss.append( current_reg_loss.item() )
+                  
             
                 """save checkpoints """
-                if (batch_no + 1) % 16 ==0: 
-                    checkpoint_obj.summarize_train()
+                #if (batch_no + 1) % 16 ==0: 
+                #    checkpoint_obj.summarize_train()
+          
+
+            #if epoch % 10 ==0:
+                
+            checkpoint_obj.summarize_train()
             
-            if epoch % 10:
-                self.val_network(epoch, train_context, data_manager_obj, checkpoint_obj) 
-                print("===========================================================================================")
-                #self.test_network(epoch, train_context, data_manager_obj, checkpoint_obj)
+            self.val_network(epoch, train_context, data_manager_obj, checkpoint_obj) 
+            print("===========================================================================================")
+            #self.test_network(epoch, train_context, data_manager_obj, checkpoint_obj)
                 
         """obtain performance """
         self.test_network(epoch, train_context, data_manager_obj, checkpoint_obj)

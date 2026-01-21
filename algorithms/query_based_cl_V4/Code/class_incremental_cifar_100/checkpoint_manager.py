@@ -16,7 +16,7 @@ class CheckpointManager:
         
         self.create_result_path(root, model_dir)
         
-        self.current_running_avg_step, self.running_loss, self.running_accuracy, self.running_avg_window = (0, 0.0, 0.0, running_avg_window)
+        self.current_running_avg_step, self.running_loss, self.running_accuracy, self.running_avg_window = (0, [], [], running_avg_window)
         
         self.total_updates = np.sum([(i + 1) * data_manager_obj.num_images_per_task * runner_obj.epochs_per_task for i in range(data_manager_obj.total_tasks)]) // runner_obj.train_batch_size
         
@@ -30,6 +30,7 @@ class CheckpointManager:
         self.results_dict["current_task_id"]  = data_manager_obj.current_task_id
         self.results_dict["current_running_avg_step"]  = self.current_running_avg_step
         self.results_dict['current_num_classes'] = data_manager_obj.current_num_classes
+
         
     def create_result_path(self, root, model_dir):
         os.makedirs( os.path.join(root, model_dir) , exist_ok=True)
@@ -37,14 +38,14 @@ class CheckpointManager:
         self.model_path = os.path.join(root, model_dir ,  "model.pkl")
     
     def summarize_train(self):
-        self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  self.running_loss / self.running_avg_window
-        self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] = 100 * (  self.running_accuracy /self.running_avg_window )
+        self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step] =  np.mean( self.running_loss)
+        self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step] =  np.mean( self.running_accuracy )
         
         print("Train Loss ",self.results_dict["train_loss_per_checkpoint"][self.current_running_avg_step].item(), "Train Accuracy ",self.results_dict["train_accuracy_per_checkpoint"][self.current_running_avg_step].item())
         self.current_running_avg_step += 1
-        self.running_loss *= 0.0 
-        self.running_accuracy *= 0.0
-        
+        self.running_loss = [] 
+        self.running_accuracy = []
+
         
     def summarize_test(self,  current_accuracy, sub_task_accuracies, current_task_id, current_num_classes):     
         #self.results_dict["test_loss_per_task"][current_task_id] = current_reg_loss.detach()

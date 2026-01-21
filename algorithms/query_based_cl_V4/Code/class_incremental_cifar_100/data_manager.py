@@ -145,35 +145,65 @@ class DataManager:
          
          return index
      
-     
+     '''
      def fill_replay_buffer(self):
-         
+            
             for label in self.selected_classes:
                 
                 sample_ids = (  self.unmapped_train_y == label).nonzero(as_tuple=True)[0][: self.num_labels_previous_task]
                 
+                temp_1 =  self.task_train_x[sample_ids].repeat(20, 1, 1, 1)
+                
+                temp_2 = self.unmapped_train_y[sample_ids].repeat(20)  
+                
                 if self.replay_train_x is None:
-
-                    self.replay_train_x = self.task_train_x[sample_ids]
+            
+                    self.replay_train_x = temp_1
                 
-                    self.replay_train_y = self.unmapped_train_y[sample_ids]
-                
+                    self.replay_train_y = temp_2
+                    
                 else:
-                     self.replay_train_x = torch.cat( (self.replay_train_x, self.task_train_x[sample_ids]), dim = 0 )
+                     self.replay_train_x = torch.cat( (self.replay_train_x, temp_1 ), dim = 0 )
                  
-                     self.replay_train_y = torch.cat( (self.replay_train_y, self.unmapped_train_y[sample_ids]), dim = 0 )
+                     self.replay_train_y = torch.cat( (self.replay_train_y, temp_2 ), dim = 0 )
+     '''
+
+            
+     def fill_replay_buffer(self):
                  
- 
+                 for label in self.label_ids[self.current_task_id ]:
+                     
+                     sample_ids = (  self.comp_train_y[self.current_task_id] == label).nonzero(as_tuple=True)[0][: self.num_labels_previous_task]
+                     
+                     temp_1 =  self.comp_train_x[self.current_task_id] [sample_ids].repeat(20, 1, 1, 1).to(self.device)
+                     
+                     temp_2 = self.comp_train_y[self.current_task_id] [sample_ids].repeat(20).to(self.device)
+                     
+                     if self.replay_train_x is None:
+                         
+                         self.replay_train_x = temp_1
+                     
+                         self.replay_train_y = temp_2
+                         
+                     else:
+                          self.replay_train_x = torch.cat( (self.replay_train_x, temp_1 ), dim = 0 )
+                      
+                          self.replay_train_y = torch.cat( (self.replay_train_y, temp_2 ), dim = 0 )
+                      
+                        
      def create_train_data(self):
          
          self.selected_classes = self.label_ids[:self.current_task_id + 1].reshape(-1).to(self.device)
          
          self.task_train_x = self.comp_train_x[self.current_task_id].to(self.device) 
+         
          self.unmapped_train_y = self.comp_train_y[self.current_task_id].to(self.device)
          
          """add data from buffer """
-         if self.replay_train_x is not None:
+         if self.current_task_id > 0 :
+             
              self.task_train_x = torch.cat( (self.task_train_x, self.replay_train_x), dim = 0)
+             
              self.unmapped_train_y = torch.cat( (self.unmapped_train_y, self.replay_train_y), dim = 0)
          
          self.task_train_y = self.label_remapping( self.unmapped_train_y )
