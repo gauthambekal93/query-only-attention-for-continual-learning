@@ -156,7 +156,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.output_pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc1 = nn.Linear(512 * block.expansion * 2 + 30, 100)
+        self.fc1 = nn.Linear(512 * block.expansion * 2, 100)
         self.fc2 = nn.Linear(100, 100)
         self.fc3 = nn.Linear(100, 100)
         self.fc4 = nn.Linear(100, 100)
@@ -266,11 +266,7 @@ class ResNet(nn.Module):
         
         support_x = support_x.expand(query_shape[0], support_shape[0],  query_shape[1]  )
         
-        temp = support_y.unsqueeze(0)
-        
-        temp = temp.expand(query_shape[0], temp.shape[1],  temp.shape[2]  )
-        
-        x = torch.cat( (query_x, support_x, temp), dim = -1 )
+        x = torch.cat( (query_x, support_x), dim = -1 )
         
         x = self.relu ( self.fc1(x) )
         
@@ -292,8 +288,6 @@ class ResNet(nn.Module):
         
         x = x.sum(dim = 1)
         
-        #x = F.softmax(x, dim=-1) 
-        
         return x
     
 
@@ -312,7 +306,7 @@ class ResNet(nn.Module):
         
         query_x = self.get_flattened_features( query_x , feature_list)
         
-        support_x , support_y = data_manager_obj.get_support(task_id)
+        support_x, support_y  = data_manager_obj.get_support(task_id)
     
         support_x = self.get_flattened_features( support_x , feature_list)
         
@@ -328,11 +322,11 @@ class ResNet(nn.Module):
         
         query_x = self.get_flattened_features( query_x , feature_list)
         
-        support_x , support_y = data_manager_obj.get_test_support(task_id)
+        support_x  = data_manager_obj.get_test_support(task_id)
     
         support_x = self.get_flattened_features( support_x , feature_list)
         
-        predictions = self.classify_images( query_x, support_x, support_y)
+        predictions = self.classify_images( query_x, support_x)
         
         return predictions
 

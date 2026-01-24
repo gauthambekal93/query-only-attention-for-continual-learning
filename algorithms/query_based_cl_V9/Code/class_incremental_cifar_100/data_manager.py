@@ -101,10 +101,12 @@ class DataManager:
         """ We are assigning random labels to one of the possible 20 tasks. 
         Each task will contain 5 labels and all 100 labels assigned to 20 tasks
         """
-        base_labels = self.label_ids[0]
+        
+        
+        #base_labels = self.label_ids[0]
+        base_labels = self.label_ids[-1]
         
         train_data = { label.item(): [] for label in base_labels }
-        #self.comp_val = { }
         
         for img, label in self.train_set:
             if label in base_labels:
@@ -115,13 +117,13 @@ class DataManager:
             train_data[label] = torch.stack( train_data[label], dim = 0)
             
         """ Create newer labels and images to be created from base labels"""   
-        labels = self.label_ids[: self.num_label_rows + 1 ].reshape(-1).to(self.device) #torch.arange(self.total_classes)    
-        
+        #labels = self.label_ids[: self.num_label_rows + 1 ].reshape(-1).to(self.device) 
+        labels = self.label_ids[ - self.num_label_rows - 1 :].reshape(-1).to(self.device) 
+       
         mask = ~torch.isin(labels, base_labels)
         
         addition_labels = labels[mask]
-
-
+         
         for label in addition_labels:
             
             rand_idx = torch.randperm( len(base_labels))[0]
@@ -138,6 +140,22 @@ class DataManager:
             
             train_data[label.item()]  = permuted_images
         
+        
+        '''
+        base_labels = self.label_ids[: self.num_label_rows + 1 ].reshape(-1)
+        
+        train_data = { label.item(): [] for label in base_labels }
+        
+        for img, label in self.train_set:
+            if label in base_labels:
+                train_data[label].append(img)
+        
+        """Convert list of images to a image tensors """
+        for label, img in train_data.items():
+            train_data[label] = torch.stack( train_data[label], dim = 0)
+        '''
+            
+            
         train_size_per_label , val_size_per_label = 400, 100
         
         """Split data train and validation for the task seperately"""
@@ -155,11 +173,11 @@ class DataManager:
       
         
         """Carry out data permuation on train data """
-        data_permutation =  torch.randperm( self.task_train_x[self.current_task_id ].shape[0] )
+        #data_permutation =  torch.randperm( self.task_train_x[self.current_task_id ].shape[0] )
         
-        self.task_train_x[self.current_task_id] = self.task_train_x[self.current_task_id ][data_permutation, :, :, :]   
+        #self.task_train_x[self.current_task_id] = self.task_train_x[self.current_task_id ][data_permutation, :, :, :]   
              
-        self.task_train_y[self.current_task_id ] = self.task_train_y[self.current_task_id ][data_permutation]
+        #self.task_train_y[self.current_task_id ] = self.task_train_y[self.current_task_id ][data_permutation]
              
      
               
@@ -167,8 +185,8 @@ class DataManager:
      def label_remapping(self, labels ):
           
          index = []
-         label_ids = self.label_ids[: self.num_label_rows + 1].reshape(-1)
-         
+         #label_ids = self.label_ids[: self.num_label_rows + 1].reshape(-1)
+         label_ids = self.label_ids[ - self.num_label_rows - 1 : ].reshape(-1)
          for label in labels:
              
              index .append( (label == label_ids).nonzero(as_tuple=True)[0].item() )
@@ -186,12 +204,12 @@ class DataManager:
         
          mapping[label_ids] = torch.arange(label_ids.numel(), device=label_ids.device)
 
-         new_labels = mapping[labels]   # shape [7500], values in 0..74
+         new_labels = mapping[labels]   
           
          return new_labels
  
     
- 
+     
      def create_task_data(self):
              
              """Obtain pixel and data permutation """
@@ -216,9 +234,35 @@ class DataManager:
              self.task_val_x[self.current_task_id] = self.task_val_x[self.current_task_id][:, :, :, pixel_permutation]
             
              self.task_val_y[self.current_task_id] =  self.task_val_y[self.current_task_id -1]
+     '''
+       
+     def create_task_data(self):
+             
+             """Obtain pixel and data permutation """
+             #pixel_permutation = torch.randperm(self.task_train_x[self.current_task_id - 1].shape[2])  
+             
+             #data_permutation =  torch.randperm( self.task_train_x[self.current_task_id - 1].shape[0] )
+             
+             
+             """Carry out pixel and data permuation on train data """
+             self.task_train_x[self.current_task_id] = self.task_train_x[self.current_task_id - 1][:, :, :, :]   
+             
+             self.task_train_y[self.current_task_id ] = self.task_train_y[self.current_task_id - 1][:]
+             
+             self.task_train_x[self.current_task_id] = self.task_train_x[self.current_task_id ][:, :, : , :]
+             
+             self.task_train_x[self.current_task_id] =  self.task_train_x[self.current_task_id][:, :, :, :]
+             
+             
+             """Carry out pixel and data permuation on validation data """
+             self.task_val_x[self.current_task_id] = self.task_val_x[self.current_task_id -1][:, :, : , : ]
             
-
-
+             self.task_val_x[self.current_task_id] = self.task_val_x[self.current_task_id][:, :, :, :]
+            
+             self.task_val_y[self.current_task_id] =  self.task_val_y[self.current_task_id -1]
+     '''
+     
+     
      def delete_data(self):
          
          del self.task_train_x[self.current_task_id - 20]
@@ -317,7 +361,7 @@ class DataManager:
                  
          support_x, support_y = [], []
          
-         test_classes = len( torch.unique(self.cifar_train_y[task_id]))
+         #test_classes = len( torch.unique(self.cifar_train_y[task_id]))
          
          for label in torch.unique(self.cifar_train_y[task_id]) :
              
@@ -329,16 +373,16 @@ class DataManager:
          
          support_x = torch.cat(support_x , dim =0)
             
-         support_y = torch.cat(support_y , dim =0)
+         #support_y = torch.cat(support_y , dim =0)
             
-         support_y = F.one_hot( support_y  , num_classes = test_classes ).to(self.device, dtype=torch.float32) 
+         #support_y = F.one_hot( support_y  , num_classes = test_classes ).to(self.device, dtype=torch.float32) 
          
-         return support_x, support_y
+         return support_x
      
         
 
      
-     '''   
+     
      def augment_batch(self, x: torch.Tensor) -> torch.Tensor:
         """
         x: [B,3,32,32] normalized tensors on GPU
@@ -371,7 +415,7 @@ class DataManager:
         # Easiest: do it on CPU in your dataloader. If you insist on pure tensor-GPU, skip rotation.
         return x
 
-     '''
+     
      
          
 

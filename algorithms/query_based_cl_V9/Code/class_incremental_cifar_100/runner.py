@@ -55,9 +55,6 @@ class Runner:
              
              for task_id in data_manager_obj.cifar_test_x.keys():
                  
-                 if task_id != 5:
-                     continue
-                 
                  batch_x, batch_y = data_manager_obj.cifar_test_x[ task_id ], data_manager_obj.cifar_test_y[ task_id ]
                  
                  predictions = train_context.net.forward_test(batch_x, data_manager_obj = data_manager_obj, batch_y = batch_y, task_id = task_id).to(train_context.device) 
@@ -84,9 +81,8 @@ class Runner:
          
          with torch.no_grad():
              task_id = data_manager_obj.current_task_id - 20
+             #task_id = 0
              
-             #for task_id in data_manager_obj.task_val_x[data_manager_obj.current_task_id-5]: # data_manager_obj.task_val_x.keys():
-            
              batch_x, batch_y = data_manager_obj.task_val_x[ task_id ], data_manager_obj.task_val_y[ task_id ]
             
              predictions = train_context.net.forward(batch_x, data_manager_obj = data_manager_obj, batch_y = batch_y, task_id = task_id).to(train_context.device) 
@@ -100,8 +96,13 @@ class Runner:
          print("Task id ", task_id, "Validation task accuracy ", 100 * accuracy )
          
          #print("Validation sub-task accuracy: ", { task_id: 100*accuracy for task_id, accuracy in sub_task_accuracies.items() }  )
-    
-    
+         label_accuracy = {}
+         for l in torch.unique(batch_y):
+             mask = torch.isin(batch_y, l)
+             indices = torch.nonzero(mask).squeeze()
+             label_accuracy[l.item()] = torch.mean((predictions[indices].argmax(axis=1) == batch_y[indices]).to(torch.float32)).item()
+             
+            
     def train(self, train_context, data_manager_obj, checkpoint_obj):
 
         """train model """
@@ -132,7 +133,6 @@ class Runner:
             train_accuracy.append( torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item())
             
             train_loss.append( current_reg_loss.item())
-        
             #if i%100==0:                
             
         print("task id ", data_manager_obj.current_task_id, "Train accuracy: ", 100* np.mean(train_accuracy), "Train Loss: ", np.mean(train_loss) )
@@ -143,15 +143,19 @@ class Runner:
     
     def run(self, train_context, data_manager_obj, checkpoint_obj):
         
-        checkpoint = torch.load(r"C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/results/cifar_100/query_based_cl_V8/0/0/model_30_way_classification_20_supports.pkl" ,  map_location = train_context.device)
+        #checkpoint = {
+        #"model_state": train_context.net.state_dict(),
+        #"optimizer_state": train_context.optim.state_dict()
+        #}
         
-        train_context.net.load_state_dict(checkpoint["model_state"])
+        #checkpoint = torch.load(r"C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/results/cifar_100/query_based_cl_V9/0/0/model_30_way_classification_20_supports_x.pkl" ,  map_location = train_context.device)
+       
+        #train_context.net.load_state_dict(checkpoint["model_state"])
         
-        train_context.optim.load_state_dict(checkpoint["optimizer_state"])
+        #train_context.optim.load_state_dict(checkpoint["optimizer_state"])
         
-        data_manager_obj.create_test_data()
+        #data_manager_obj.create_test_data()
     
-        
         while data_manager_obj.current_task_id < 50000: #data_manager_obj.total_tasks:
             
             start = time.perf_counter()
@@ -159,18 +163,16 @@ class Runner:
             if data_manager_obj.current_task_id > 0:
                 data_manager_obj.create_task_data()
             
-            #data_manager_obj.create_eval_data()
-            
             self.train( train_context, data_manager_obj, checkpoint_obj)
             
-            if data_manager_obj.current_task_id >=20:
+            if data_manager_obj.current_task_id >=20: # >=20:
                 
                 self.val_network(train_context, data_manager_obj, checkpoint_obj) 
                 
                 data_manager_obj.delete_data()
                 
-            
-            #data_manager_obj.current_num_classes += data_manager_obj.class_increase_per_task
+                #self.test_network( train_context, data_manager_obj, checkpoint_obj)
+
             
             data_manager_obj.current_task_id += 1
             
@@ -178,16 +180,16 @@ class Runner:
             
             print("===========================================================================================")
             
-            self.test_network( train_context, data_manager_obj, checkpoint_obj)
+           
             
         #checkpoint = {
         #"model_state": train_context.net.state_dict(),
         #"optimizer_state": train_context.optim.state_dict()
         #}
 
-        #torch.save(checkpoint, r"C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/results/cifar_100/query_based_cl_V8/0/0/model_30_way_classification_20_supports.pkl" ) 
+        #torch.save(checkpoint, r"C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/results/cifar_100/query_based_cl_V9/0/0/model_30_way_classification_20_supports_x.pkl" ) 
         
-        #checkpoint = torch.load(r"C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/results/cifar_100/query_based_cl_V8/0/0/model_30_way_classification_20_supports.pkl" ,  map_location = train_context.device)
+        #checkpoint = torch.load(r"C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/results/cifar_100/query_based_cl_V9/0/0/model_30_way_classification_20_supports_x.pkl" ,  map_location = train_context.device)
         
         #train_context.net.load_state_dict(checkpoint["model_state"])
         
