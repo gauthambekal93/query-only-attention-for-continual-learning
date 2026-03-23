@@ -1,0 +1,12 @@
+Existing algorithms:
+Vanilla NN
+Replay based ==> Reservoir sampling
+Reinitialization technique ==> Continual Backprop (Dohare Sutton, Nature)
+Activation Based ==> Concat Relu
+Regularization based ==>  L2, Shrink and perturb, regenerative regularization
+
+
+Meta learning Techniques:
+Query only attention
+Full attention
+Model agnostic meta learning

@@ -8,7 +8,7 @@ Created on Fri Dec 19 11:06:35 2025
 import os
 import sys
 from pathlib import Path
-
+experiment_dir = Path(__file__).resolve().parent
 ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
@@ -73,7 +73,9 @@ class TrainContext:
     
 class PermutedMNISTExperiment:
     
-    def __init__(self, data_params, model_params):
+    def __init__(self, config_params):
+        
+        data_params = config_params["data_config"]
         
         self.data_dir = data_params["data_dir"]
         
@@ -89,6 +91,8 @@ class PermutedMNISTExperiment:
         
         self.change_after = data_params["change_after"]
         
+        
+        model_params = config_params["model_config"]
         
         self.model_dir = model_params["model_dir"]
         
@@ -138,18 +142,23 @@ def main(arguments):
    
    args = parser.parse_args(arguments)
   
-   with open(args.c1, 'r') as f:
-      model_params = json.load(f)
+   #with open(args.c1, 'r') as f:
+   #   model_params = json.load(f)
   
-   with open(args.c2, 'r') as f:
-      data_params = json.load(f)
+   #with open(args.c2, 'r') as f:
+   #   data_params = json.load(f)
+   
+   with open(args.c1, 'r') as f:
+      config_params = json.load(f)
       
-   set_seed(model_params["seed"])
+   set_seed(config_params["model_config"]["seed"])
     
    import_modules()
        
-   exp_obj = PermutedMNISTExperiment(data_params, model_params)
-
+   #exp_obj = PermutedMNISTExperiment(data_params, model_params)
+   
+   exp_obj = PermutedMNISTExperiment(config_params)
+   
    exp_obj.initialize_model()  
     
    exp_obj.initialize_data_manager() 
@@ -169,11 +178,15 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    model_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "models", "experience_replay", "reservoir_replay","0.json") 
+    #model_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "models", "experience_replay", "reservoir_replay","0.json") 
     
-    data_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "data", "0.json")
+    #data_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "data", "0.json")
     
-    sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
+    #sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
+    
+    config_path = os.path.join( experiment_dir, "configuration.json") 
+
+    sys.exit( main ( ['-c1', config_path ] ) )
     
     
        
