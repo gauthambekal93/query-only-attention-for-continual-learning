@@ -1,0 +1,9 @@
+{  "total_classes":100,
+   "initial_num_classes":5,
+   "class_increase_per_task":5,
+   "incoming_batch_size": 10, 
+   "num_images_per_class": 500,
+   "running_avg_window": 20,
+    "task_lag":20,
+   "data_dir": "datasets/cifar_100/"
+}

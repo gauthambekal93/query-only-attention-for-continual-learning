@@ -1,0 +1,16 @@
+
+
+{
+"seed": 20,
+"use_gpu":0,
+"model_dir": "results/permuted_mnist/experience_replay/fifo_replay\\3\\0",
+"input_size": 49,    
+"num_features":200,
+"num_hidden_layers": 4,
+"step_size":0.001,
+"momentum": 0.9, 
+"weight_decay": 0.0005,
+"buffer_size":400,
+"samples_from_buffer":400, 
+"test_batch_size": 1000
+}

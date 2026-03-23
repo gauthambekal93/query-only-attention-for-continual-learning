@@ -1,0 +1,12 @@
+
+{
+"seed": 20,
+"use_gpu":0,
+"model_dir": "results//cifar_100/permuted/experience_replay/reservoir_replay\\0\\0",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0,
+"buffer_size": 2000,
+"samples_from_buffer":10 
+
+}

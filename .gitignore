@@ -1,11 +1,17 @@
 runtime_config/data
 runtime_config/models
+
 datasets/cifar_100
 datasets/permuted_mnist
 datasets/split_image_net
 datasets/slowly_changing_regression
+datasets/tiny_image_net
+datasets/tiny-imagenet-200
+
 
 results/cifar_100
 results/permuted_mnist
 results/split_image_net
 results/slowly_changing_regression
+results/tiny_image_net
+

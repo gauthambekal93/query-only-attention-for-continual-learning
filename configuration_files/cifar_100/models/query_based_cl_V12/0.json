@@ -1,0 +1,25 @@
+
+
+{
+"seed": 20,
+"use_gpu":0,
+"image_dims": [32, 32, 3],
+"batch_sizes": {"train": 10, "test": 100, "validation":100},
+"reset_head":"false",
+"early_stopping": "true",
+"replacement_rate":0,
+"utility_function":"weight",
+"maturity_threshold":0,
+"noise_std":0,
+"perturb_weights_indicator":"false",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0005,
+"num_epochs":1,
+"num_support_per_label":20,
+"num_labels_previous_task":20,
+"num_data_points_current_task":2000,
+"model_dir": "results/cifar_100/query_based_cl_V12\\0\\0"
+}
+
+

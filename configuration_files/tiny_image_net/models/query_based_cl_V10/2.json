@@ -1,0 +1,23 @@
+
+
+{
+"seed": 20,
+"use_gpu":0,
+"image_dims": [32, 32, 3],
+"batch_sizes": {"train": 10, "test": 100, "validation":100},
+"reset_head":"false",
+"early_stopping": "true",
+"replacement_rate":0,
+"utility_function":"weight",
+"maturity_threshold":0,
+"noise_std":0,
+"perturb_weights_indicator":"false",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0005,
+"num_epochs":1,
+"num_support_per_label":10,
+"model_dir": "results/tiny_image_net/query_based_cl_V10\\2\\0"
+}
+
+

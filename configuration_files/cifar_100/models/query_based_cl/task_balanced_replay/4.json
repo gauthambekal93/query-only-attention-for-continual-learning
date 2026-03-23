@@ -1,0 +1,13 @@
+
+{
+"seed": 20,
+"use_gpu":0,
+"model_dir": "results//cifar_100/permuted/query_based_cl/task_balanced_replay\\4\\0",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0,
+"fifo_buffer_size": 200,
+"per_task_buffer_size": 400,
+"fifo_samples":5,
+"balanced_task_samples":10
+}

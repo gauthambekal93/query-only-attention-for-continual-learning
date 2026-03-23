@@ -1,0 +1,9 @@
+{  
+   "num_tasks": 50000,
+   "total_classes":100,
+   "initial_num_classes":5,
+   "classes_per_task":5,
+   "num_old_task_window":5,
+   "num_datapoints_per_timestep": 10,
+   "data_dir": "datasets/cifar_100/"
+}
