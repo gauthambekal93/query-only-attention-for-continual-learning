@@ -5,6 +5,9 @@ Created on Fri Dec 19 11:06:35 2025
 @author: gauthambekal93
 """
 
+# configuration.json -> Pick seed from the set {20,30,40} 
+# and change directory label accordingly {0,1,2}  
+
 import os
 import sys
 from pathlib import Path
@@ -169,7 +172,9 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    #Change config.json name
+    
+    config_path = os.path.join( experiment_dir, "configuration_2.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     
