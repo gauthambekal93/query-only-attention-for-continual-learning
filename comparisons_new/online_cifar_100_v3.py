@@ -183,9 +183,9 @@ plot_graph({
 
 
 
-"""==============Query based cl with balanced task rbuffer==================== """
+"""==============Query based cl with balanced task buffer==================== """
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "query_based_cl", "task_balanced_replay")
 
 fwd_query_based_acc_4, fwd_query_based_std_4  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
@@ -203,7 +203,7 @@ plot_graph({
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 
 loss_query_based_4, loss_query_based_std_4  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
 
@@ -215,6 +215,39 @@ plot_graph({
 
 
 
+
+
+
+"""==============Continual Backprop ==================== """
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "cbp",)
+
+fwd_cbp_acc, fwd_query_cbp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
+#bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+
+
+plot_graph({ 
+            "Forward Accurcy":  (fwd_cbp_acc, fwd_query_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
+            
+            },
+             title="Permuted CIFAR 100 - Continual Backprop",)
+
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+
+loss_cbp, loss_cbp_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
+
+plot_graph({ 
+            "Forward Accurcy":  (loss_cbp, loss_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            
+            },
+             title="Permuted CIFAR 100 - Continual Backprop",)
 
 
 

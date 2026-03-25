@@ -10,3 +10,28 @@ Meta learning Techniques:
 Query only attention
 Full attention
 Model agnostic meta learning
+
+Experiments:
+Slowly changing regression
+permuted mnist
+split cifar 100
+tiny image net
+
+
+Results needed:
+1. Performance:
+    1. Loss of plasticity
+      - prequential accuracy
+      - forward accuracy
+
+    2. Catastrophic Forgetting(if time permits)
+       - Backward performance
+
+2. Analysis:
+   Hessian Rank
+
+
+ Approach:
+No epochs
+Task agnostic for train and test
+1000s of tasks 
