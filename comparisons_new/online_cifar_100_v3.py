@@ -224,16 +224,16 @@ plot_graph({
 """==============Continual Backprop ==================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "cbp",)
 
-fwd_cbp_acc, fwd_query_cbp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
+fwd_cbp_acc, fwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
 #bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
 
 
 plot_graph({ 
-            "Forward Accurcy":  (fwd_cbp_acc, fwd_query_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Forward Accurcy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
             "Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
             #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             
@@ -243,7 +243,7 @@ plot_graph({
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 
 loss_cbp, loss_cbp_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
 
@@ -257,6 +257,39 @@ plot_graph({
 
 
 
+
+"""==============Concat Relu ==================== """
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "concat_relu",)
+
+fwd_concat_relu_acc, fwd_concat_relu_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_concat_relu_acc, prequential_concat_relu_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
+#bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+
+
+plot_graph({ 
+            "Forward Accurcy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Prequential Accuracy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
+            
+            },
+             title="Augmented CIFAR 100 - ConcatReLU",
+             ylabel = "Accuracy")
+
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+
+loss_concat_relu, loss_concat_relu_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
+
+plot_graph({ 
+            "Train Loss":  (loss_cbp, loss_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            
+            },
+             title="Augmented CIFAR 100 - ConcatReLU",
+             ylabel = "Train Loss")
 
 
 
