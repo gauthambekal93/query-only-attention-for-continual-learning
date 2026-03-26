@@ -98,7 +98,7 @@ def calculate_curve( base_path, run_numbers, lr_index, key, num_tasks=None, aver
     return mean_curve, std
 
 
-def plot_graph(series_dict, title, ylabel="Accuracy", hline_at=None, vline_at=None):
+def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
     """
     series_dict: {label: y | label: (y, {style})}
       style keys: color, marker, linewidth, alpha, plot_every, linestyle
@@ -179,7 +179,8 @@ plot_graph({
             "Prequential Accuracy":  (prequential_er_replay, prequential_er_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
             "Backward Accurcy":  (bwd_er_replay, bwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             },
-             title="Augmented CIFAR 100 - Experience replay Reservoir Buffer - 2000",)
+             title="Augmented CIFAR 100 - Experience replay Reservoir Buffer - 2000",
+             ylabel = "Accuracy")
 
 
 
@@ -199,7 +200,8 @@ plot_graph({
             #"Backward Accurcy":  (bwd_query_based_acc_4, bwd_query_based_std_4, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             
             },
-             title="Permuted CIFAR 100 - Query only attention with balanced task buffer - 140",)
+             title="Augmented CIFAR 100 - Query only attention with balanced task buffer - 140",
+             ylabel = "Accuracy")
 
 
 
@@ -208,10 +210,11 @@ lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 loss_query_based_4, loss_query_based_std_4  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
 
 plot_graph({ 
-            "Forward Accurcy":  (loss_query_based_4, loss_query_based_std_4, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Train Loss":  (loss_query_based_4, loss_query_based_std_4, {"color":"red", "linestyle": "-",  "marker": "d"}),
             
             },
-             title="Permuted CIFAR 100 - Query only attention with balanced task buffer - 140",)
+             title="Augmented CIFAR 100 - Query only attention with balanced task buffer - 140",
+             ylabel = "Train Loss")
 
 
 
@@ -221,7 +224,7 @@ plot_graph({
 """==============Continual Backprop ==================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "cbp",)
 
 fwd_cbp_acc, fwd_query_cbp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
@@ -235,19 +238,21 @@ plot_graph({
             #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             
             },
-             title="Permuted CIFAR 100 - Continual Backprop",)
+             title="Augmented CIFAR 100 - Continual Backprop",
+             ylabel = "Accuracy")
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
 
 loss_cbp, loss_cbp_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
 
 plot_graph({ 
-            "Forward Accurcy":  (loss_cbp, loss_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Train Loss":  (loss_cbp, loss_cbp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
             
             },
-             title="Permuted CIFAR 100 - Continual Backprop",)
+             title="Augmented CIFAR 100 - Continual Backprop",
+             ylabel = "Train Loss")
 
 
 

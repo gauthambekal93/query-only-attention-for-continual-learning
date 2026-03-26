@@ -41,17 +41,15 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
 
    
-def import_modules():
-    
-    from algorithms.cbp.cifar_100_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.cbp.cifar_100_augmentation.code_v1.runner import Runner 
-    from algorithms.cbp.cifar_100_augmentation.code_v1.checkpoint_manager import CheckpointManager 
-    
-    from common.codes.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
-    from common.codes.res_gnt import ResGnT
-    
-    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager, ResGnT
-    
+def import_modules():    
+        
+    from algorithms.bp.cifar_100_augmentation.code_v1.data_manager import DataManager 
+    from algorithms.bp.cifar_100_augmentation.code_v1.runner import Runner 
+    from algorithms.bp.cifar_100_augmentation.code_v1.checkpoint_manager import CheckpointManager 
+
+    from algorithms.bp.cifar_100_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+
+    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
     
     
 class TrainContext:
@@ -76,6 +74,8 @@ class IncrementalCIFARExperiment:
         
         
         data_params = config_params["data_config"]
+        
+        self.data_dir = data_params["data_dir"]
         
         self.num_tasks = data_params["num_tasks"]
     
