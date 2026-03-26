@@ -12,6 +12,7 @@ import torch.nn as nn
 from torch import Tensor
 
 from torchvision.utils import _log_api_usage_once
+import torch.nn.functional as F
 
 """ 
 This is a modified version of torchvision's code for instantiating resnets. Here's a list of the changes made to the 
@@ -155,7 +156,6 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.output_pool = nn.AdaptiveAvgPool2d((1, 1))
-
         self.fc1 = nn.Linear(512 * block.expansion, 100)
         self.fc2 = nn.Linear(100, 100)
         self.fc3 = nn.Linear(100, 100)
@@ -218,8 +218,10 @@ class ResNet(nn.Module):
             )
 
         return SequentialWithKeywordArguments(*layers)
-
-
+   
+    def concat_pairs(self, x):
+        x = torch.cat (( x, x), dim = 1 )
+        return x
     
     
     def get_flattened_features(self, x: Tensor, feature_list: list = None) -> Tensor:
@@ -266,15 +268,28 @@ class ResNet(nn.Module):
         return x
     
     
-    def forward(self, x: Tensor, feature_list: list = None) -> Tensor:
+    def calculate_entropy(self, p):
+        eps = 1e-12            # to avoid log(0)
+        entropy = -(p * torch.log(p + eps)).sum()
+        
+        return entropy
     
+
+    
+    #def forward(self, queries_x: Tensor, feature_list: list = None, data_manager_obj = None, batch_y = None, task_id = 0, mode = "train") -> Tensor:
+    def forward(self, x: Tensor,  feature_list: list = None) -> Tensor:
+        
+        """Add elements to the replay buffer as support data to be used in predicting query """
+        """Create a support set ready for using on query_x and predict query_y""" 
+        
         x = self.get_flattened_features( x , feature_list)
     
         predictions = self.classify_images( x )
     
         return predictions
-
-
+    
+    
+    
 def build_resnet18(num_classes: int, norm_layer):
     """
     :param num_classes: number of classes for the classification problem
