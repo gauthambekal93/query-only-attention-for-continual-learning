@@ -276,7 +276,6 @@ class ResNet(nn.Module):
     
 
     
-    #def forward(self, queries_x: Tensor, feature_list: list = None, data_manager_obj = None, batch_y = None, task_id = 0, mode = "train") -> Tensor:
     def forward(self, x: Tensor,  feature_list: list = None) -> Tensor:
         
         """Add elements to the replay buffer as support data to be used in predicting query """
@@ -288,6 +287,35 @@ class ResNet(nn.Module):
     
         return predictions
     
+    
+    def initialize_fisher(self):
+        self.prev_params = {}
+        self.fisher = {}
+        for name, p in self.named_parameters():
+            if p.requires_grad:
+                self.prev_params[name] = p.detach().clone()
+                self.fisher[name] = torch.zeros_like(p)
+
+    def update_fisher(self, x, y, alpha=0.9):
+        self.zero_grad()
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        loss.backward()
+        for name, p in self.named_parameters():
+            if p.requires_grad and p.grad is not None:
+                self.fisher[name] = alpha * self.fisher[name] + (1 - alpha) * (p.grad.detach() ** 2)
+    
+    def update_prev_params(self):
+        for name, p in self.named_parameters():
+            if p.requires_grad:
+                self.prev_params[name] = p.detach().clone()
+    
+    def ewc_loss(self):
+        loss = 0.0
+        for name, p in self.named_parameters():
+            if p.requires_grad:
+                loss = loss + (self.fisher[name] * (p - self.prev_params[name]) ** 2).sum()
+        return loss
     
     
 def build_resnet18(num_classes: int, norm_layer):

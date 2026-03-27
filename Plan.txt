@@ -1,6 +1,6 @@
 Existing algorithms:
 Vanilla NN
-Replay based ==> Reservoir sampling
+Replay based ==> Reservoir sampling, Dark experience replay
 Reinitialization technique ==> Continual Backprop (Dohare Sutton, Nature)
 Activation Based ==> Concat Relu
 Regularization based ==>  L2, Shrink and perturb, regenerative regularization

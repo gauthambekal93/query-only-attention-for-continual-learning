@@ -276,7 +276,6 @@ class ResNet(nn.Module):
     
 
     
-    #def forward(self, queries_x: Tensor, feature_list: list = None, data_manager_obj = None, batch_y = None, task_id = 0, mode = "train") -> Tensor:
     def forward(self, x: Tensor,  feature_list: list = None) -> Tensor:
         
         """Add elements to the replay buffer as support data to be used in predicting query """
@@ -288,6 +287,20 @@ class ResNet(nn.Module):
     
         return predictions
     
+    
+    def fill_initial_params(self):
+        self.init_params = {}
+        for name, p in self.named_parameters():
+            self.init_params[name] = p.detach().clone()
+
+
+    def regenerative_loss(self):
+        loss = 0.0
+        for name, p in self.named_parameters():
+            loss += ((p - self.init_params[name]) ** 2).sum()
+        return loss
+    
+
     
     
 def build_resnet18(num_classes: int, norm_layer):

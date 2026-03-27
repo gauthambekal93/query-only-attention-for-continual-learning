@@ -41,24 +41,19 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
 
    
-def import_modules():
-    
-    from algorithms.cbp.cifar_100_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.cbp.cifar_100_augmentation.code_v1.runner import Runner 
-    from algorithms.cbp.cifar_100_augmentation.code_v1.checkpoint_manager import CheckpointManager 
-    
-    #from algorithms.cbp.cifar_100_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
-    #from algorithms.cbp.cifar_100_augmentation.code_v1.res_gnt import ResGnT
-    
-    from common.codes.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
-    from common.codes.res_gnt import ResGnT
-    
-    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager, ResGnT
-    
+def import_modules():    
+        
+    from algorithms.bp.cifar_100_augmentation.code_v1.data_manager import DataManager 
+    from algorithms.bp.cifar_100_augmentation.code_v1.runner import Runner 
+    from algorithms.bp.cifar_100_augmentation.code_v1.checkpoint_manager import CheckpointManager 
+
+    from algorithms.bp.cifar_100_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+
+    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
     
     
 class TrainContext:
-    def __init__(self, step_size, momentum, weight_decay, classes_per_task, replacement_rate, utility_function, maturity_threshold):
+    def __init__(self, step_size, momentum, weight_decay, classes_per_task):
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         
@@ -71,22 +66,6 @@ class TrainContext:
         self.opt = torch.optim.SGD(self.net.parameters(), lr = step_size, momentum= momentum, weight_decay= weight_decay)
 
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
-        
-        self.step_size = step_size
-        
-        self.momentum = momentum
-         
-        self.weight_decay = weight_decay
-       
-        self.resgnt = ResGnT(net = self.net,
-                              hidden_activation="relu",
-                              replacement_rate=replacement_rate,
-                              decay_rate=0.99,
-                              util_type=utility_function,
-                              maturity_threshold=maturity_threshold,
-                              device=self.device)
-        
-        self.current_features = []
     
     
 class IncrementalCIFARExperiment:
@@ -99,7 +78,7 @@ class IncrementalCIFARExperiment:
         self.data_dir = data_params["data_dir"]
         
         self.num_tasks = data_params["num_tasks"]
-        
+    
         self.total_classes = data_params["total_classes"]
         
         self.classes_per_task = data_params["classes_per_task"]
@@ -114,30 +93,17 @@ class IncrementalCIFARExperiment:
         
         self.model_dir = model_params["model_dir"]
         
-        self.reset_head = model_params["reset_head"]
-        
-        self.early_stopping = model_params["early_stopping"]
-        
-        self.replacement_rate = model_params["replacement_rate"]
-        
-        self.utility_function = model_params["utility_function"]
-        
-        self.maturity_threshold = model_params["maturity_threshold"]
-        
-        self.noise_std = model_params["noise_std"]
-        
-        self.perturb_weights_indicator = model_params["perturb_weights_indicator"]
-        
         self.step_size = model_params["step_size"]
+                
+        self.weight_decay = model_params['weight_decay']
         
         self.momentum = model_params["momentum"]
         
-        self.weight_decay = model_params["weight_decay"]
         
         
         
     def initialize_model(self):
-       self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.classes_per_task, self.replacement_rate, self.utility_function, self.maturity_threshold)
+       self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.classes_per_task)
        
     
     def initialize_data_manager(self):
@@ -192,7 +158,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration_2.json") 
+    config_path = os.path.join( experiment_dir, "configuration.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     

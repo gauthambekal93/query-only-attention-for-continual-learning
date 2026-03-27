@@ -56,12 +56,15 @@ class ResGnT(object):
         Utility of all features/neurons
         """
         self.util, self.ages, self.mean_feature_mag = [], [], []
-
-        for i in range(self.num_hidden_layers):
-            self.util.append(zeros(self.weight_layers[i].out_channels, dtype=torch.float32, device=self.device))
-            self.ages.append(zeros(self.weight_layers[i].out_channels, dtype=torch.float32, device=self.device))
-            self.mean_feature_mag.append(zeros(self.weight_layers[i].out_channels, dtype=torch.float32, device=self.device))
-
+        try:
+            for i in range(self.num_hidden_layers):
+                self.util.append(zeros(self.weight_layers[i].out_channels, dtype=torch.float32, device=self.device))
+                self.ages.append(zeros(self.weight_layers[i].out_channels, dtype=torch.float32, device=self.device))
+                self.mean_feature_mag.append(zeros(self.weight_layers[i].out_channels, dtype=torch.float32, device=self.device))
+        except:
+            print("stop")
+            print("stop")
+            
         self.accumulated_num_features_to_replace = [0 for i in range(self.num_hidden_layers)]
         self.m = torch.nn.Softmax(dim=1)
 

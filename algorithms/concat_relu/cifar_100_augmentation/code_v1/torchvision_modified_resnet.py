@@ -26,7 +26,11 @@ source code:
 To see the source code, go to: torchvision.models.resnet (for torchvision==0.15.1)
 """
 
-
+class CReLU(nn.Module):
+    def forward(self, x):
+        return torch.cat([F.relu(x), F.relu(-x)], dim=1)
+    
+    
 class SequentialWithKeywordArguments(torch.nn.Sequential):
 
     """
@@ -156,11 +160,12 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.output_pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc1 = nn.Linear(512 * block.expansion, 100)
-        self.fc2 = nn.Linear(100, 100)
-        self.fc3 = nn.Linear(100, 100)
-        self.fc4 = nn.Linear(100, 100)
+        self.fc1 = nn.Linear(512 * block.expansion, 50)
+        self.fc2 = nn.Linear(100, 50)
+        self.fc3 = nn.Linear(100, 50)
+        self.fc4 = nn.Linear(100, 50)
         self.fc5 = nn.Linear(100, num_classes)
+        self.crelu = CReLU()
         
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -255,13 +260,13 @@ class ResNet(nn.Module):
     
     def classify_images(self, x):
         
-        x = self.relu ( self.fc1(x) )
+        x = self.crelu( self.fc1(x) )
         
-        x = self.relu( self.fc2(x) )
+        x = self.crelu( self.fc2(x) )
         
-        x = self.relu( self.fc3(x) )
+        x = self.crelu( self.fc3(x) )
         
-        x = self.relu( self.fc4(x) )
+        x = self.crelu( self.fc4(x) )
         
         x = self.fc5(x)
             
