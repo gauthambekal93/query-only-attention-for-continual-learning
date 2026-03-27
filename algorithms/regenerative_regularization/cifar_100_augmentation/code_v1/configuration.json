@@ -14,11 +14,11 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//cifar_100/augmentation/ewc\\0\\0",
+"model_dir": "results//cifar_100/augmentation/regenerative_regularization\\0\\0",
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,
-"ewc_lambda":10
+"regerative_lambda": 0.00001
 }
 
 }

@@ -176,10 +176,7 @@ class ResNet(nn.Module):
             for m in self.modules():
                 if isinstance(m, BasicBlock) and m.bn2.weight is not None:
                     nn.init.constant_(m.bn2.weight, 0)  # type: ignore[arg-type]
-        
-        
 
-    
     def _make_layer(
         self,
         block: Type[Union[BasicBlock]],
@@ -277,8 +274,8 @@ class ResNet(nn.Module):
         
         return entropy
     
+
     
-    #def forward(self, queries_x: Tensor, feature_list: list = None, data_manager_obj = None, batch_y = None, task_id = 0, mode = "train") -> Tensor:
     def forward(self, x: Tensor,  feature_list: list = None) -> Tensor:
         
         """Add elements to the replay buffer as support data to be used in predicting query """
@@ -290,46 +287,22 @@ class ResNet(nn.Module):
     
         return predictions
     
-    '''
-    def initialize_fisher(self):
-        
-        self.device = next(self.parameters()).device
-        
-        self.prev_params = {}
-        self.fisher = {}
+    
+    def fill_initial_params(self):
+        self.init_params = {}
+        for name, p in self.named_parameters():
+            self.init_params[name] = p.detach().clone()
 
-        for name, p in self.named_parameters():
-            if p.requires_grad:
-                self.prev_params[name] = p.detach().clone().to(self.device)
-                self.fisher[name] = torch.zeros_like(p).to(self.device)
-                
-    def update_fisher(self, x, y):
-        self.zero_grad()
-        
-        x = self.get_flattened_features(x, [])
-        
-        logits = self.classify_images( x )
-        
-        loss = F.cross_entropy(logits, y)
-        loss.backward()
-    
-        for name, p in self.named_parameters():
-            if p.grad is not None:
-                self.fisher[name] = 0.9 * self.fisher[name] + 0.1 * (p.grad.detach() ** 2)
-                self.prev_params[name] = p.detach().clone()
-            
-    def ewc_loss(self):
-        
+
+    def regenerative_loss(self):
         loss = 0.0
-    
         for name, p in self.named_parameters():
-            if name in self.fisher:
-                loss += (self.fisher[name] * (p - self.prev_params[name])**2).sum()
-    
+            loss += ((p - self.init_params[name]) ** 2).sum()
         return loss
     
-    '''
-  
+
+    
+    
 def build_resnet18(num_classes: int, norm_layer):
     """
     :param num_classes: number of classes for the classification problem

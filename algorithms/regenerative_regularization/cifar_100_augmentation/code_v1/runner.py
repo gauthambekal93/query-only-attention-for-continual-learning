@@ -14,12 +14,13 @@ import numpy as np
 
 class Runner:
     
-    def __init__(self, num_datapoints_per_timestep, ewc_lambda):
+    def __init__(self, num_datapoints_per_timestep, regerative_lambda):
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
         
-        self.ewc_lambda = 10
-                    
+        self.regerative_lambda  = regerative_lambda
+      
+            
     def prequential_testing(self, train_context, batch_x, batch_y):
         
         train_context.net.eval()
@@ -88,9 +89,9 @@ class Runner:
         train_y = data_manager_obj.task_train_y[data_manager_obj.current_task_id]
         
         for i in range(0, train_x.shape[0], self.num_datapoints_per_timestep ):
-                
+            
             batch_x, batch_y = train_x[ i : i + self.num_datapoints_per_timestep], train_y[ i : i + self.num_datapoints_per_timestep] 
-                
+            
             prequential_accuracy.append(  self.prequential_testing(train_context, batch_x, batch_y) )
             
             train_context.net.train()
@@ -99,24 +100,22 @@ class Runner:
                 param.grad = None   # apparently faster than optim.zero_grad()
             
             predictions = train_context.net.forward( x = batch_x)
-               
+            
             loss_1 = train_context.loss(predictions, batch_y )
             
-            loss_2 = train_context.net.ewc_loss()
+            loss_2 = train_context.net.regenerative_loss()
             
-            current_reg_loss = loss_1 + self.ewc_lambda * loss_2
+            current_reg_loss = loss_1 + self.regerative_lambda * loss_2
             
             current_reg_loss.backward()
             
             train_context.opt.step()
-            
-            if i % 100 == 0:
-                train_context.net.update_fisher(batch_x, batch_y)
-                
+
             train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
             
             train_loss.append( current_reg_loss)
-        
+            
+            
         
         train_loss= torch.stack(train_loss).mean().item()
 
@@ -165,5 +164,5 @@ class Runner:
             
             print("===========================================================================================")
             
-    
+           
 

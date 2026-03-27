@@ -18,7 +18,7 @@
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,
-"ewc_lambda": 100000
+"ewc_lambda": 1000
 }
 
 }

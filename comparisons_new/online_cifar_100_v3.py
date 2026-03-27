@@ -293,3 +293,34 @@ plot_graph({
 
 
 
+"""=============== EWC ============"""
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "ewc",)
+
+fwd_ewc_acc, fwd_ewc_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_ewc_acc, prequential_ewc_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
+#bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+
+
+plot_graph({ 
+            "Forward Accurcy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
+            
+            },
+             title="Augmented CIFAR 100 - EWC",
+             ylabel = "Accuracy")
+
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+
+loss_ewc, loss_ewc_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
+
+plot_graph({ 
+            "Train Loss":  (loss_ewc, loss_ewc_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            
+            },
+             title="Augmented CIFAR 100 - EWC",
+             ylabel = "Train Loss")
