@@ -34,40 +34,7 @@ def _load_pickle(path):
     with open(path, "rb") as f:
         return pickle.load(f)
 
-'''
-def calculate_curve(model_type, run_numbers, lr_index, key, num_tasks=None, average_over = 0, sub_model_type = None):
-    """
-    Loads output.pkl from multiple seeds (run_numbers) and returns mean curve over runs.
-    key: 'forward_accuracies' | 'backward_accuracies' | 'forward_effective_ranks' | ...
-    num_tasks: optional truncate length
-    """
-    runs = []
-    for rn in run_numbers:
-        if sub_model_type is None:
-            p = os.path.join(project_root, "results", "cifar_100", model_type, rn, lr_index, "result.pkl")
-        else:
-            p = os.path.join(project_root, "results", "cifar_100", model_type, sub_model_type,  rn, lr_index, "result.pkl")
-        out = _load_pickle(p)
-        arr = np.array([v for k, v in out[key].items()])   [: num_tasks] 
-            
-            
-        runs.append(arr)
-        
-    runs = np.stack(runs, axis=1)  # [T, R]
-    mean_curve = runs.mean(axis=1)  # [T]
-    std  = runs.std(axis = 1)  
-    
-    
-    """Block avg """
-    mean_curve = np.array( [np.mean(mean_curve[i: i+ average_over]) for i in range (0, len (mean_curve), average_over )])
-    std = np.array([np.mean(std[i: i+ average_over]) for i in range (0, len (std), average_over )])
-    """Running avg """
-    #mean_curve = np.array( [np.mean(mean_curve[i:i+average_over]) for i in range(0, len(mean_curve), average_over)])
-    #std = np.array( [np.mean(std[i:i+average_over]) for i in range(0, len(std), average_over)])
-            
-    
-    return mean_curve, std
-'''
+
 
 def calculate_curve( base_path, run_numbers, lr_index, key, num_tasks=None, average_over = 0):
     """
@@ -363,7 +330,7 @@ plot_graph({
 """===============DARK EXPERIENCE REPLAY================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "dark_experience_replay","reservoir_replay",)
 
 fwd_der_acc, fwd_der_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
@@ -381,7 +348,7 @@ plot_graph({
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 
 loss_der, loss_der_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
 
