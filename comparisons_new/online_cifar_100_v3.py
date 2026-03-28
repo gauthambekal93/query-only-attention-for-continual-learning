@@ -295,18 +295,18 @@ plot_graph({
 
 """=============== EWC ============"""
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "ewc",)
 
 fwd_ewc_acc, fwd_ewc_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_ewc_acc, prequential_ewc_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
-#bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+bwd_ewc_acc, bwd_ewc_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
 
 
 plot_graph({ 
             "Forward Accurcy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
             "Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
+            "Backward Accurcy":  (bwd_ewc_acc, bwd_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             
             },
              title="Augmented CIFAR 100 - EWC",
@@ -314,7 +314,7 @@ plot_graph({
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 
 loss_ewc, loss_ewc_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
 
@@ -324,3 +324,71 @@ plot_graph({
             },
              title="Augmented CIFAR 100 - EWC",
              ylabel = "Train Loss")
+
+
+
+""" ===================== REGENERATIVE REGULARIZATION================="""
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "REGENERATIVE_REGULARIZATION",)
+
+fwd_rr_acc, fwd_rr_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_rr_acc, prequential_rr_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
+#bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+
+
+plot_graph({ 
+            "Forward Accurcy":  (fwd_rr_acc, fwd_rr_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Prequential Accuracy":  (prequential_rr_acc, prequential_rr_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            #"Backward Accurcy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
+            
+            },
+             title="Augmented CIFAR 100 - Regenerative Regularization",
+             ylabel = "Accuracy")
+
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+
+loss_rr, loss_rr_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
+
+plot_graph({ 
+            "Train Loss":  (loss_rr, loss_rr_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            
+            },
+             title="Augmented CIFAR 100 - Regenerative Regularization",
+             ylabel = "Train Loss")
+
+
+"""===============DARK EXPERIENCE REPLAY================== """
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "dark_experience_replay","reservoir_replay",)
+
+fwd_der_acc, fwd_der_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_der_acc, prequential_der_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_der_acc, bwd_der_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+
+
+plot_graph({ 
+            "Forward Accurcy":  (fwd_der_acc, fwd_der_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            "Prequential Accuracy":  (prequential_der_acc, prequential_der_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            "Backward Accurcy":  (bwd_der_acc, bwd_der_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
+            },
+             title="Augmented CIFAR 100 - Dark Experience Replay",
+             ylabel = "Accuracy")
+
+
+
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
+
+loss_der, loss_der_std  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
+
+plot_graph({ 
+            "Train Loss":  (loss_der, loss_der_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
+            
+            },
+             title="Augmented CIFAR 100 - Dark Experience Replay",
+             ylabel = "Train Loss")
+
