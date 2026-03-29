@@ -43,7 +43,7 @@ def calculate_curve( base_path, run_numbers, lr_index, key, num_tasks=None, aver
     """
     runs = []
     for rn in run_numbers:
-        p = os.path.join(base_path, rn, lr_index, "result.pkl" )
+        p = os.path.join(base_path, lr_index, rn, "result.pkl" )
         out = _load_pickle(p)
         arr = np.array([v for k, v in out[key].items()])   [: num_tasks] 
         runs.append(arr)
@@ -124,8 +124,8 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 """==============Vanilla Backprop ==================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
-base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "bp",)
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0","1","2"] , 50000, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "augmentation", "bp",)
 
 fwd_bp_acc, fwd_bp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_bp_acc, prequential_bp_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -136,8 +136,8 @@ bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, runs, lr_index, "backward_a
 """==============Continual Backprop ==================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
-base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "cbp",)
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0","1","2"] , 50000, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "augmentation", "cbp",)
 
 fwd_cbp_acc, fwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -150,8 +150,8 @@ bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward
 """ ===============Experience replay with reservoir============"""
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
-base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "experience_replay", "reservoir_replay")
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0","1","2"] , 50000, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "augmentation", "experience_replay", "reservoir_replay")
 
 fwd_er_replay, fwd_er_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_er_replay, prequential_er_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
