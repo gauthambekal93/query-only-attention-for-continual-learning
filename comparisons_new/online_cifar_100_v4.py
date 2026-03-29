@@ -34,16 +34,15 @@ def _load_pickle(path):
         return pickle.load(f)
 
 
-
-def calculate_curve( base_path, run_numbers, lr_index, key, num_tasks=None, average_over = 0):
+def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, average_over = 0):
     """
     Loads output.pkl from multiple seeds (run_numbers) and returns mean curve over runs.
     key: 'forward_accuracies' | 'backward_accuracies' | 'forward_effective_ranks' | ...
     num_tasks: optional truncate length
     """
     runs = []
-    for rn in run_numbers:
-        p = os.path.join(base_path, rn, lr_index, "result.pkl" )
+    for seed_id in seed_ids:
+        p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
         out = _load_pickle(p)
         arr = np.array([v for k, v in out[key].items()])   [: num_tasks] 
         runs.append(arr)
@@ -124,24 +123,24 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 """==============Vanilla Backprop ==================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "bp",)
 
-fwd_bp_acc, fwd_bp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
-prequential_bp_acc, prequential_bp_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
-bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+fwd_bp_acc, fwd_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_bp_acc, prequential_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
 
 
 """==============Continual Backprop ==================== """
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "cbp",)
 
-fwd_cbp_acc, fwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
-prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
-bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+fwd_cbp_acc, fwd_cbp_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
 
 
@@ -150,12 +149,12 @@ bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, runs, lr_index, "backward
 """ ===============Experience replay with reservoir============"""
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
 base_path = os.path.join(project_root, "results", "cifar_100", "AUGMENTATION", "experience_replay", "reservoir_replay")
 
-fwd_er_replay, fwd_er_std  = calculate_curve(base_path, runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over)
-prequential_er_replay, prequential_er_std  = calculate_curve(base_path, runs, lr_index, "prequential_accuracy",  NUM_TASKS, average_over)
-bwd_er_replay, bwd_er_std  = calculate_curve(base_path, runs, lr_index, "backward_accuracy",  NUM_TASKS, average_over)
+fwd_er_replay, fwd_er_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_er_replay, prequential_er_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_er_replay, bwd_er_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
 
 
