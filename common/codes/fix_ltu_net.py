@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 #from lop.utils.ltu import LTU
-from ltu import LTU
+from common.codes.ltu import LTU
 
 class FixLTUNet(nn.Module):
     def __init__(self, num_inputs=20, num_features=80, beta=0.75):

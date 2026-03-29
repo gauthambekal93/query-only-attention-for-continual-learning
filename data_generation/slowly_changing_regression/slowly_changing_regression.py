@@ -1,15 +1,20 @@
+
+
 import os
 import sys
+from pathlib import Path
+experiment_dir = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent.parent   # go up two levels, adjust as needed
+sys.path.insert(0, str(ROOT))
 
-sys.path.append("C:/Users/gauthambekal93/Research/continual_learning/loss_of_plasticity_and_forgetting/common/codes")
 
 import json
 import torch
 import pickle
 import argparse
 from tqdm import tqdm
-from fix_ltu_net import FixLTUNet
-
+#from fix_ltu_net import FixLTUNet
+from common.codes.fix_ltu_net import FixLTUNet 
 
 def generate_problem_data(
         flip_after=10000,
@@ -100,7 +105,7 @@ if __name__ == '__main__':
     
     project_root = os.path.abspath ( os.path.join( os.getcwd(), "..","..") )
     
-    confguration_path = os.path.join(project_root,"runtime_config", "data","slowly_changing_regression","0.json")
+    confguration_path = os.path.join(experiment_dir,"configuration.json")
     
     sys.exit(main( ['-c',  confguration_path  ] ) )# we use the hyperparameters stored in env_temp_cfg to create data for a specifc run
     #sys.exit(main(sys.argv[1:]))
