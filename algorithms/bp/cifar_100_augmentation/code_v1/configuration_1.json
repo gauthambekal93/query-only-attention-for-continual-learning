@@ -5,7 +5,6 @@
 "data_config":{ 
    "num_tasks": 10000,
    "total_classes":100,
-   "initial_num_classes":5,
    "classes_per_task":5,
    "num_old_task_window":5,
    "num_datapoints_per_timestep": 10,
@@ -13,16 +12,9 @@
 },
 
 "model_config":{
-"seed": 20,
+"seed": 30,
 "use_gpu":0,
-"model_dir": "results//cifar_100/augmentation/cbp\\0\\0",
-"reset_head":"false",
-"early_stopping": "true",
-"replacement_rate": 0.00001,
-"utility_function":"contribution",
-"maturity_threshold": 1000,
-"noise_std":0,
-"perturb_weights_indicator":"false",
+"model_dir": "results//cifar_100/augmentation/bp\\0\\1",
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0

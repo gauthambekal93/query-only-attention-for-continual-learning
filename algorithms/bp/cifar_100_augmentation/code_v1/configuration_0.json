@@ -3,7 +3,7 @@
 "experiment_discription":"cifar 100 with data augmentation, generates 5 label at neural net output with reservoir replay algorithm",
 
 "data_config":{ 
-   "num_tasks": 50000,
+   "num_tasks": 10000,
    "total_classes":100,
    "classes_per_task":5,
    "num_old_task_window":5,
