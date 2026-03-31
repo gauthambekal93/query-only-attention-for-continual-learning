@@ -20,6 +20,7 @@ class CheckpointManager:
         self.results_dict = {}
         self.results_dict["train_loss"] = {}
         self.results_dict["prequential_loss"] = {}
+        self.results_dict["forward_loss"] = {}
         self.results_dict["backward_loss"] = {} 
         
     
@@ -30,7 +31,7 @@ class CheckpointManager:
         self.model_path = os.path.join(root, model_dir ,  "model.pkl")
 
         
-    def save_result_checkpoint(self,  data_manager_obj, train_loss, prequential_loss, backward_loss):
+    def save_result_checkpoint(self,  data_manager_obj, train_loss, prequential_loss, forward_loss, backward_loss):
         
         try:
             current_task_id = data_manager_obj.current_task_id
@@ -40,10 +41,14 @@ class CheckpointManager:
             self.results_dict["train_loss"][current_task_id] = train_loss
             
             self.results_dict["prequential_loss"][current_task_id] = prequential_loss
+            self.results_dict["forward_loss"][current_task_id] = forward_loss
             self.results_dict["backward_loss"][current_task_id] = backward_loss
             
-            self.results_dict["task_train_x"] = copy.deepcopy ( data_manager_obj.task_x )
-            self.results_dict["task_train_y"] = copy.deepcopy ( data_manager_obj.task_y)
+            self.results_dict["task_train_x"] = copy.deepcopy ( data_manager_obj.task_train_x )
+            self.results_dict["task_train_y"] = copy.deepcopy ( data_manager_obj.task_train_y)
+            
+            self.results_dict["task_test_x"] = copy.deepcopy ( data_manager_obj.task_test_x )
+            self.results_dict["task_test_y"] = copy.deepcopy ( data_manager_obj.task_test_y)
             
             with open(self.result_path , 'wb+') as f:
                  pickle.dump(self.results_dict, f) 
@@ -94,6 +99,8 @@ class CheckpointManager:
             data_manager_obj.train_loss =  self.results_dict["train_loss"]
             
             data_manager_obj.prequential_loss =  self.results_dict["prequential_loss"]
+            
+            data_manager_obj.forward_loss =  self.results_dict["forward_loss"]
             
             data_manager_obj.backward_loss =  self.results_dict["backward_loss"]
             

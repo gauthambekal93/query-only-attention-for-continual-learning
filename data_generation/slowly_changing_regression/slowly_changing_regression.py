@@ -16,6 +16,22 @@ from tqdm import tqdm
 #from fix_ltu_net import FixLTUNet
 from common.codes.fix_ltu_net import FixLTUNet 
 
+
+import numpy as np
+import random
+
+def set_seed(seed):
+    
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    
+    
 def generate_problem_data(
         flip_after=10000,
         data_file_path='data/env_data/0',
@@ -88,7 +104,9 @@ def main(arguments):
         params['add_noise'] = True
     if 'flip_one' not in params.keys():
         params['flip_one'] = False
-
+    
+    set_seed(params["seed"])
+    
     generate_problem_data(
         data_file_path= params['data_dir'], 
         num_data_points=int(params['num_data_points']),

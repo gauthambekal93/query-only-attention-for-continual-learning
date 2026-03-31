@@ -126,7 +126,7 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 
 
 
-""" ===============Experience replay with reservoir============"""
+""" ===============BP============"""
 
 
 
@@ -134,6 +134,7 @@ lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 1000, 10
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "bp")
 
 train_loss_bp, train_loss_std_bp  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
+forward_loss_bp, forward_loss_std_bp = calculate_curve(base_path, runs, lr_index, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_bp, prequential_loss_std_bp = calculate_curve(base_path, runs, lr_index, "prequential_loss",  NUM_TASKS, average_over)
 bwd_loss_bp, bwd_loss_std_bp  = calculate_curve(base_path, runs, lr_index, "backward_loss",  NUM_TASKS, average_over)
 
@@ -142,6 +143,7 @@ bwd_loss_bp, bwd_loss_std_bp  = calculate_curve(base_path, runs, lr_index, "back
 plot_graph({ 
             "Train Loss":  (train_loss_bp, train_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "d"}),
             "Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            "Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Backward Loss":  (bwd_loss_bp, bwd_loss_std_bp, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             },
              title="Slowly Changing Regression - BP",

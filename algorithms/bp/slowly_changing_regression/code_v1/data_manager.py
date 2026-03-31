@@ -15,7 +15,7 @@ import pickle
 
 class DataManager:
      
-     def __init__(self, device, root, data_dir, flip_after, num_data_points, num_old_task_window, num_datapoints_per_timestep): 
+     def __init__(self, device, root, data_dir, flip_after, num_data_points, num_old_task_window, num_datapoints_per_timestep, train_size): 
          
          self.device = device
          self.data_path = os.path.join( root, data_dir)
@@ -26,10 +26,8 @@ class DataManager:
          self.num_datapoints_per_timestep = num_datapoints_per_timestep
          self.current_task_id = 0
          self.num_tasks = int(self.num_data_points / self.flip_after)
-         self.task_x, self.task_y =  {}, {}
-        
-         
-         
+         self.train_size = train_size
+         self.task_train_x, self.task_train_y ,self.task_test_x, self.task_test_y = {}, {}, {}, {}
          
      def create_scr_data(self):
         
@@ -38,18 +36,23 @@ class DataManager:
              
                   
      def create_task_data(self):
-            
-             self.task_x[self.current_task_id] = self.inputs[self.current_task_id* self.flip_after :self.current_task_id* self.flip_after + self.flip_after].to(self.device) 
-            
-             self.task_y[self.current_task_id]  = self.outputs[self.current_task_id* self.flip_after :self.current_task_id* self.flip_after + self.flip_after].to(self.device) 
-            
+             
+             temp = self.inputs[self.current_task_id* self.flip_after :self.current_task_id* self.flip_after + self.flip_after]
+             
+             self.task_train_x[self.current_task_id] , self.task_test_x[self.current_task_id]  = temp[:self.train_size].to(self.device),  temp[self.train_size:].to(self.device) 
+             
+             temp = self.outputs[self.current_task_id* self.flip_after :self.current_task_id* self.flip_after + self.flip_after]
+             
+             self.task_train_y[self.current_task_id], self.task_test_y[self.current_task_id]  = temp[:self.train_size].to(self.device),  temp[self.train_size:].to(self.device) 
 
 
      def delete_data(self):
          
-         del self.task_x[self.current_task_id - self.num_old_task_window]
+         del self.task_train_x[self.current_task_id - self.num_old_task_window]
          
-         del self.task_y[self.current_task_id - self.num_old_task_window] 
+         del self.task_train_y[self.current_task_id - self.num_old_task_window] 
 
+         del self.task_test_x[self.current_task_id - self.num_old_task_window]
          
+         del self.task_test_y[self.current_task_id - self.num_old_task_window] 
          

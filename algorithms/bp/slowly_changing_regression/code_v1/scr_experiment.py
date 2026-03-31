@@ -46,15 +46,15 @@ def import_modules():
     
     
 class TrainContext:
-    def __init__(self, num_inputs, num_features, num_outputs, hidden_activation, step_size, momentum, weight_decay):
+    def __init__(self, num_inputs, num_features, num_outputs, hidden_activation, step_size, weight_decay, beta_1, beta_2):
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-        self.net = feed_forward_nn(   num_inputs, num_features,num_outputs, hidden_activation  )
+        self.net = feed_forward_nn(   num_inputs, num_features,num_outputs  )
         
         self.net.to(self.device)
         
-        self.opt = torch.optim.SGD(self.net.parameters(), lr = step_size, momentum= momentum, weight_decay= weight_decay)
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
         
         self.loss = F.mse_loss
         
@@ -75,6 +75,8 @@ class SCRExperiment:
         
         self.num_datapoints_per_timestep = data_params["num_datapoints_per_timestep"]
         
+        self.train_size = data_params["train_size"]
+        
         
         model_params = config_params["model_config"]
         
@@ -92,14 +94,17 @@ class SCRExperiment:
         
         self.weight_decay = model_params["weight_decay"]        
         
-        self.momentum = model_params["momentum"]
+        self.beta_1 = model_params["beta_1"]
+        
+        self.beta_2 = model_params["beta_2"]
         
     def initialize_model(self):
-       self.train_context = TrainContext(self.num_inputs, self.num_features, self.num_outputs, self.hidden_activation, self.step_size, self.momentum, self.weight_decay)
+       self.train_context = TrainContext(self.num_inputs, self.num_features, self.num_outputs, self.hidden_activation, self.step_size, self.weight_decay,
+                                         self.beta_1, self.beta_2)
     
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.flip_after, self.num_data_points,
-                                             self.num_old_task_window, self.num_datapoints_per_timestep)
+                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.train_size)
          
     def initialize_runner(self):
         self.runner_obj = Runner(self.num_datapoints_per_timestep)

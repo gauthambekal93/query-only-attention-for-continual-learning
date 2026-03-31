@@ -30,7 +30,20 @@ class Runner:
         return loss
                 
 
-       
+    def forward_testing(self, train_context, data_manager_obj):
+          
+          train_context.net.eval()
+          
+          batch_x, batch_y = data_manager_obj.task_test_x[data_manager_obj.current_task_id], data_manager_obj.task_test_y[ data_manager_obj.current_task_id ]
+          
+          with torch.no_grad():
+              predictions = train_context.net.forward(x=batch_x)
+          
+          loss = train_context.loss(predictions, batch_y ).item()
+          
+          return loss
+      
+        
     def backward_testing(self, train_context, data_manager_obj):
          
          train_context.net.eval()
@@ -40,11 +53,11 @@ class Runner:
 
          with torch.no_grad():
              
-             for task_id in data_manager_obj.task_x.keys():
+             for task_id in data_manager_obj.task_test_x.keys():
                  
                  if task_id != data_manager_obj.current_task_id:
                  
-                     batch_x, batch_y = data_manager_obj.task_x[ task_id ], data_manager_obj.task_y[ task_id ]
+                     batch_x, batch_y = data_manager_obj.task_test_x[ task_id ], data_manager_obj.task_test_y[ task_id ]
                       
                      predictions = train_context.net.forward( x = batch_x)
                      
@@ -54,7 +67,7 @@ class Runner:
                      
                      sub_task_loss[task_id] = loss
   
-         loss =  avg_loss / ( len(data_manager_obj.task_x.keys() ) - 1 ) 
+         loss =  avg_loss / ( len(data_manager_obj.task_test_x.keys() ) - 1 ) 
          
          return loss
          
@@ -67,13 +80,13 @@ class Runner:
         
         train_loss, prequential_loss = [], []
             
-        task_x = data_manager_obj.task_x[data_manager_obj.current_task_id]
+        train_x = data_manager_obj.task_train_x[data_manager_obj.current_task_id]
         
-        task_y = data_manager_obj.task_y[data_manager_obj.current_task_id]
+        train_y = data_manager_obj.task_train_y[data_manager_obj.current_task_id]
         
-        for i in range(0, task_x.shape[0], self.num_datapoints_per_timestep ):
+        for i in range(0, train_x.shape[0], self.num_datapoints_per_timestep ):
             
-            batch_x, batch_y = task_x[ i : i + self.num_datapoints_per_timestep], task_y[ i : i + self.num_datapoints_per_timestep] 
+            batch_x, batch_y = train_x[ i : i + self.num_datapoints_per_timestep], train_y[ i : i + self.num_datapoints_per_timestep] 
             
             prequential_loss.append(  self.prequential_testing(train_context, batch_x, batch_y) )
             
@@ -96,12 +109,14 @@ class Runner:
 
         prequential_loss = np.mean(prequential_loss)
         
+        forward_loss =  self.forward_testing(train_context, data_manager_obj)
+        
         backward_loss =  self.backward_testing(train_context, data_manager_obj)
         
         print("task id ", data_manager_obj.current_task_id, 
-              "Train Loss: ", train_loss,  "Prequential loss", prequential_loss,  "Backward loss: ", backward_loss )
+              "Train Loss: ", train_loss,  "Prequential loss", prequential_loss, "Forward loss", forward_loss,  "Backward loss: ", backward_loss )
         
-        return train_loss, prequential_loss, backward_loss
+        return train_loss, prequential_loss, forward_loss, backward_loss
             
             
     
@@ -117,11 +132,11 @@ class Runner:
             
             if  ( data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window ) :
                 
-                train_loss, prequential_loss, backward_loss = self.train( train_context, data_manager_obj, checkpoint_obj)
+                train_loss, prequential_loss, forward_loss, backward_loss = self.train( train_context, data_manager_obj, checkpoint_obj)
                 
                 checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
                 
-                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, prequential_loss, backward_loss)
+                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, prequential_loss, forward_loss, backward_loss)
                 
             if data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window: 
                 
