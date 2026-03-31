@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.query_based_cl.task_balanced_replay.cifar_100_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.query_based_cl.task_balanced_replay.cifar_100_augmentation.code_v1.runner import Runner 
-    from algorithms.query_based_cl.task_balanced_replay.cifar_100_augmentation.code_v1.checkpoint_manager import CheckpointManager 
-    from algorithms.query_based_cl.task_balanced_replay.cifar_100_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+    from algorithms.query_based_cl.fifo_buffer.cifar_100_augmentation.code_v1.data_manager import DataManager 
+    from algorithms.query_based_cl.fifo_buffer.cifar_100_augmentation.code_v1.runner import Runner 
+    from algorithms.query_based_cl.fifo_buffer.cifar_100_augmentation.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.query_based_cl.fifo_buffer.cifar_100_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
     
     global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
     
