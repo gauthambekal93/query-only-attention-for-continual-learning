@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 
@@ -36,11 +36,11 @@ def set_seed(seed):
    
 def import_modules():    
         
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.data_manager import DataManager 
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.runner import Runner 
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.cbp.slowly_changing_regression.code_v1.data_manager import DataManager 
+    from algorithms.cbp.slowly_changing_regression.code_v1.runner import Runner 
+    from algorithms.cbp.slowly_changing_regression.code_v1.checkpoint_manager import CheckpointManager 
 
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.neural_net import feed_forward_nn
+    from algorithms.cbp.slowly_changing_regression.code_v1.neural_net import feed_forward_nn
 
     global feed_forward_nn, DataManager, Runner, CheckpointManager
     
@@ -98,19 +98,13 @@ class SCRExperiment:
         
         self.beta_2 = model_params["beta_2"]
         
-        self.fifo_buffer_size = model_params["fifo_buffer_size"]
-       
-        self.fifo_samples = model_params["fifo_samples"]
-       
-        
     def initialize_model(self):
        self.train_context = TrainContext(self.num_inputs, self.num_features, self.num_outputs, self.hidden_activation, self.step_size, self.weight_decay,
                                          self.beta_1, self.beta_2)
     
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.flip_after, self.num_data_points,
-                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.train_size,
-                                             self.fifo_buffer_size, self.fifo_samples, self.num_inputs)
+                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.train_size)
          
     def initialize_runner(self):
         self.runner_obj = Runner(self.num_datapoints_per_timestep)

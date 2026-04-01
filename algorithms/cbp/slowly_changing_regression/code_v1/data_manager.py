@@ -15,7 +15,7 @@ import pickle
 
 class DataManager:
      
-     def __init__(self, device, root, data_dir, flip_after, num_data_points, num_old_task_window, num_datapoints_per_timestep, train_size, fifo_buffer_size, fifo_samples, num_inputs): 
+     def __init__(self, device, root, data_dir, flip_after, num_data_points, num_old_task_window, num_datapoints_per_timestep, train_size): 
          
          self.device = device
          self.data_path = os.path.join( root, data_dir)
@@ -29,15 +29,6 @@ class DataManager:
          self.train_size = train_size
          self.task_train_x, self.task_train_y ,self.task_test_x, self.task_test_y = {}, {}, {}, {}
          
-         
-         self.fifo_x = torch.zeros(fifo_buffer_size , num_inputs).to(self.device) 
-         self.fifo_y = torch.zeros(fifo_buffer_size, 1).to(self.device).long()  
-         self.fifo_buffer_size = fifo_buffer_size
-         self.fifo_samples = fifo_samples
-        
-         self.fifo_counter = 0
-        
-        
      def create_scr_data(self):
         
          with open(self.data_path, 'rb+') as f:  #get the input and output features for training  inputs.shape torch.Size([10010000, 20]), outputs.shape torch.Size([10010000, 1])
@@ -55,24 +46,6 @@ class DataManager:
              self.task_train_y[self.current_task_id], self.task_test_y[self.current_task_id]  = temp[:self.train_size].to(self.device),  temp[self.train_size:].to(self.device) 
 
 
-     def fill_fifo_buffer(self, x, y ):
-            
-            i = self.fifo_counter % len(self.fifo_x)
-            
-            self.fifo_x[ i : i + x.shape[0]], self.fifo_y[i: i + x.shape[0]] = x.clone(), y.clone()
-            
-            self.fifo_counter = self.fifo_counter + x.shape[0]
-            
-            
-     def get_fifo_data(self):
-                
-            rand_ids = torch.randperm(  self.fifo_buffer_size)[:self.fifo_samples]
-            
-            support_x, support_y = self.fifo_x[rand_ids], self.fifo_y[rand_ids]
-            
-            return support_x, support_y 
-        
-        
      def delete_data(self):
          
          del self.task_train_x[self.current_task_id - self.num_old_task_window]
