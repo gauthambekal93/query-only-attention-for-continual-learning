@@ -19,33 +19,30 @@ class Runner:
                     
     def prequential_testing(self, train_context, batch_x, batch_y):
         
-        train_context.net.eval()
+        train_context.learner.net.eval()
         
         with torch.no_grad():
-            predictions = train_context.net.forward(x=batch_x)
-        
-        loss = train_context.loss(predictions, batch_y ).item()
+            loss = train_context.learner.test(batch_x, batch_y)
         
         return loss
                 
 
     def forward_testing(self, train_context, data_manager_obj):
           
-          train_context.net.eval()
+          train_context.learner.net.eval()
           
           batch_x, batch_y = data_manager_obj.task_test_x[data_manager_obj.current_task_id], data_manager_obj.task_test_y[ data_manager_obj.current_task_id ]
           
           with torch.no_grad():
-              predictions = train_context.net.forward(x=batch_x)
-          
-          loss = train_context.loss(predictions, batch_y ).item()
+              loss = train_context.learner.test(batch_x, batch_y)
+         
           
           return loss
       
         
     def backward_testing(self, train_context, data_manager_obj):
          
-         train_context.net.eval()
+         train_context.learner.net.eval()
          
          avg_loss = 0.0
          sub_task_loss = {}
@@ -58,9 +55,7 @@ class Runner:
                  
                      batch_x, batch_y = data_manager_obj.task_test_x[ task_id ], data_manager_obj.task_test_y[ task_id ]
                       
-                     predictions = train_context.net.forward( x = batch_x)
-                     
-                     loss = train_context.loss(predictions, batch_y ).item()
+                     loss = train_context.learner.test(batch_x, batch_y)
                      
                      avg_loss += loss
                      
@@ -75,7 +70,7 @@ class Runner:
 
         """train model """
     
-        train_context.net.train()
+        train_context.learner.net.train()
         
         train_loss, prequential_loss = [], []
             
@@ -89,19 +84,13 @@ class Runner:
             
             prequential_loss.append(  self.prequential_testing(train_context, batch_x, batch_y) )
             
-            train_context.net.train()
+            train_context.learner.net.train()
             
-            for param in train_context.net.parameters(): 
+            for param in train_context.learner.net.parameters(): 
                 param.grad = None   # apparently faster than optim.zero_grad()
             
-            predictions = train_context.net.forward( x = batch_x)
-               
-            current_reg_loss = train_context.loss(predictions, batch_y )
-            
-            current_reg_loss.backward()
-            
-            train_context.opt.step()
-            
+            current_reg_loss = train_context.learner.learn( batch_x, batch_y)
+              
             train_loss.append( current_reg_loss)
         
         train_loss= torch.stack(train_loss).mean().item()

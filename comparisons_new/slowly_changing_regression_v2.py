@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 29 17:23:35 2026
+Created on Wed Apr  1 14:27:22 2026
 
 @author: gauthambekal93
 """
+
 
 import os
 import pickle
@@ -34,15 +35,16 @@ def _load_pickle(path):
 
 
 
-def calculate_curve( base_path, run_numbers, lr_index, key, num_tasks=None, average_over = 0):
+#def calculate_curve( base_path, run_numbers, lr_index, key, num_tasks=None, average_over = 0):
+def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, average_over = 0):    
     """
     Loads output.pkl from multiple seeds (run_numbers) and returns mean curve over runs.
     key: 'forward_accuracies' | 'backward_accuracies' | 'forward_effective_ranks' | ...
     num_tasks: optional truncate length
     """
     runs = []
-    for rn in run_numbers:
-        p = os.path.join(base_path, rn, lr_index, "result.pkl" )
+    for seed_id in seed_ids:
+        p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
         out = _load_pickle(p)
         arr = np.array([v for k, v in out[key].items()])   [ 100: num_tasks] 
         runs.append(arr)
@@ -130,13 +132,13 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 1000, 1
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 10
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "bp")
 
-train_loss_bp, train_loss_std_bp  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
-forward_loss_bp, forward_loss_std_bp = calculate_curve(base_path, runs, lr_index, "forward_loss",  NUM_TASKS, average_over)
-prequential_loss_bp, prequential_loss_std_bp = calculate_curve(base_path, runs, lr_index, "prequential_loss",  NUM_TASKS, average_over)
-bwd_loss_bp, bwd_loss_std_bp  = calculate_curve(base_path, runs, lr_index, "backward_loss",  NUM_TASKS, average_over)
+train_loss_bp, train_loss_std_bp  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
+forward_loss_bp, forward_loss_std_bp = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
+prequential_loss_bp, prequential_loss_std_bp = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
+bwd_loss_bp, bwd_loss_std_bp  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
 
 
@@ -155,13 +157,14 @@ plot_graph({
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 1000, 1
+
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 10
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "query_based_cl","fifo_buffer")
 
-train_loss_query_based_fifo, train_loss_std_query_based_fifo  = calculate_curve(base_path, runs, lr_index, "train_loss",  NUM_TASKS, average_over)
-forward_loss_query_based_fifo, forward_loss_std_query_based_fifo = calculate_curve(base_path, runs, lr_index, "forward_loss",  NUM_TASKS, average_over)
-prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo = calculate_curve(base_path, runs, lr_index, "prequential_loss",  NUM_TASKS, average_over)
-bwd_loss_query_based_fifo, bwd_loss_std_query_based_fifo  = calculate_curve(base_path, runs, lr_index, "backward_loss",  NUM_TASKS, average_over)
+train_loss_query_based_fifo, train_loss_std_query_based_fifo  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
+forward_loss_query_based_fifo, forward_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
+prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
+bwd_loss_query_based_fifo, bwd_loss_std_query_based_fifo  = calculate_curve(base_path, config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
 
 
@@ -180,6 +183,3 @@ plot_graph({
             },
              title="Slowly Changing Regression - Forward Loss",
              ylabel = "Loss")
-
-
-

@@ -15,7 +15,7 @@ import pickle
 
 class DataManager:
      
-     def __init__(self, device, root, data_dir, flip_after, num_data_points, num_old_task_window, num_datapoints_per_timestep, train_size, fifo_buffer_size, fifo_samples, num_inputs): 
+     def __init__(self, device, root, data_dir, flip_after, num_data_points, num_old_task_window, num_datapoints_per_timestep, train_size, fifo_buffer_size, fifo_samples, num_inputs, data_input_dim): 
          
          self.device = device
          self.data_path = os.path.join( root, data_dir)
@@ -30,7 +30,7 @@ class DataManager:
          self.task_train_x, self.task_train_y ,self.task_test_x, self.task_test_y = {}, {}, {}, {}
          
          
-         self.fifo_x = torch.zeros(fifo_buffer_size , num_inputs).to(self.device) 
+         self.fifo_x = torch.zeros(fifo_buffer_size , data_input_dim).to(self.device) 
          self.fifo_y = torch.zeros(fifo_buffer_size, 1).to(self.device).long()  
          self.fifo_buffer_size = fifo_buffer_size
          self.fifo_samples = fifo_samples

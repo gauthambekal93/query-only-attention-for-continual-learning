@@ -77,6 +77,7 @@ class SCRExperiment:
         
         self.train_size = data_params["train_size"]
         
+        self.data_input_dim =  data_params["data_input_dim"]
         
         model_params = config_params["model_config"]
         
@@ -110,7 +111,7 @@ class SCRExperiment:
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.flip_after, self.num_data_points,
                                              self.num_old_task_window, self.num_datapoints_per_timestep, self.train_size,
-                                             self.fifo_buffer_size, self.fifo_samples, self.num_inputs)
+                                             self.fifo_buffer_size, self.fifo_samples, self.num_inputs, self.data_input_dim)
          
     def initialize_runner(self):
         self.runner_obj = Runner(self.num_datapoints_per_timestep)
