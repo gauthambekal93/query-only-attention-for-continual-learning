@@ -76,9 +76,9 @@ class CheckpointManager:
             
             checkpoint = torch.load(self.model_path,  map_location = train_context.device)
             
-            train_context.net.load_state_dict(checkpoint["model_state"])
+            train_context.learner.net.load_state_dict(checkpoint["model_state"])
             
-            train_context.opt.load_state_dict(checkpoint["optimizer_state"])
+            train_context.learner.opt.load_state_dict(checkpoint["optimizer_state"])
         
         
         if os.path.exists(self.result_path):        
