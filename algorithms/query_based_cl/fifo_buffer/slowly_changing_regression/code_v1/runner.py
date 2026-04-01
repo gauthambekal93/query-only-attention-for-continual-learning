@@ -18,12 +18,12 @@ class Runner:
         
       
                     
-    def prequential_testing(self, train_context, batch_x, batch_y):
+    def prequential_testing(self, train_context, data_manager_obj, batch_x, batch_y):
         
         train_context.net.eval()
         
         with torch.no_grad():
-            predictions = train_context.net.forward(x=batch_x)
+            predictions = train_context.net.forward(data_manager_obj, batch_x)
         
         loss = train_context.loss(predictions, batch_y ).item()
         
@@ -37,7 +37,7 @@ class Runner:
           batch_x, batch_y = data_manager_obj.task_test_x[data_manager_obj.current_task_id], data_manager_obj.task_test_y[ data_manager_obj.current_task_id ]
           
           with torch.no_grad():
-              predictions = train_context.net.forward(x=batch_x)
+              predictions = train_context.net.forward(data_manager_obj, batch_x)
           
           loss = train_context.loss(predictions, batch_y ).item()
           
@@ -59,7 +59,7 @@ class Runner:
                  
                      batch_x, batch_y = data_manager_obj.task_test_x[ task_id ], data_manager_obj.task_test_y[ task_id ]
                       
-                     predictions = train_context.net.forward( x = batch_x)
+                     predictions = train_context.net.forward( data_manager_obj, batch_x)
                      
                      loss = train_context.loss(predictions, batch_y ).item()
                      
@@ -88,14 +88,16 @@ class Runner:
             
             batch_x, batch_y = train_x[ i : i + self.num_datapoints_per_timestep], train_y[ i : i + self.num_datapoints_per_timestep] 
             
-            prequential_loss.append(  self.prequential_testing(train_context, batch_x, batch_y) )
+            data_manager_obj.fill_fifo_buffer( batch_x, batch_y)
+            
+            prequential_loss.append( self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y ) )
             
             train_context.net.train()
             
             for param in train_context.net.parameters(): 
                 param.grad = None   # apparently faster than optim.zero_grad()
             
-            predictions = train_context.net.forward( x = batch_x)
+            predictions = train_context.net.forward( data_manager_obj, batch_x)
                
             current_reg_loss = train_context.loss(predictions, batch_y )
             

@@ -16,7 +16,6 @@ class Runner:
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
         
-      
                     
     def prequential_testing(self, train_context, batch_x, batch_y):
         

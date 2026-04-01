@@ -15,7 +15,7 @@
 {
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//cifar_100/augmentation/query_based_cl/task_balanced_replay\\0\\0",
+"model_dir": "results//cifar_100/augmentation/query_based_cl/fifo_buffer\\0\\0",
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,

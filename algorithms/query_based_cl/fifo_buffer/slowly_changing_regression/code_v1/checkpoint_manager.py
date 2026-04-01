@@ -50,6 +50,11 @@ class CheckpointManager:
             self.results_dict["task_test_x"] = copy.deepcopy ( data_manager_obj.task_test_x )
             self.results_dict["task_test_y"] = copy.deepcopy ( data_manager_obj.task_test_y)
             
+            self.results_dict["fifo_x"] = copy.deepcopy(data_manager_obj.fifo_x)
+            self.results_dict["fifo_y"] = copy.deepcopy(data_manager_obj.fifo_y)
+          
+            self.results_dict["fifo_counter"] = data_manager_obj.fifo_counter
+     
             with open(self.result_path , 'wb+') as f:
                  pickle.dump(self.results_dict, f) 
         except:
@@ -95,7 +100,12 @@ class CheckpointManager:
             
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
             
-            
+            data_manager_obj.fifo_x =  self.results_dict["fifo_x"]
+         
+            data_manager_obj.fifo_y =  self.results_dict["fifo_y"]
+         
+            data_manager_obj.fifo_counter = self.results_dict["fifo_counter"] 
+         
             data_manager_obj.train_loss =  self.results_dict["train_loss"]
             
             data_manager_obj.prequential_loss =  self.results_dict["prequential_loss"]
