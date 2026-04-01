@@ -20,7 +20,7 @@ class feed_forward_nn(nn.Module):
         self.num_features = num_features
         self.num_outputs = num_outputs
         
-        self.fc1 = nn.Linear(input_size * 2 + 1, num_features)
+        self.fc1 = nn.Linear(input_size, num_features)
         
         self.fc2 = nn.Linear(num_features, num_outputs)
     

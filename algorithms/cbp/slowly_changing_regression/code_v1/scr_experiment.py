@@ -40,9 +40,13 @@ def import_modules():
     from algorithms.cbp.slowly_changing_regression.code_v1.runner import Runner 
     from algorithms.cbp.slowly_changing_regression.code_v1.checkpoint_manager import CheckpointManager 
 
-    from algorithms.cbp.slowly_changing_regression.code_v1.neural_net import feed_forward_nn
+    #from algorithms.cbp.slowly_changing_regression.code_v1.neural_net import feed_forward_nn
+    from algorithms.cbp.slowly_changing_regression.code_v1.AdamGnT import AdamGnT
+    from algorithms.cbp.slowly_changing_regression.code_v1.gnt import GnT
+    from algorithms.cbp.slowly_changing_regression.code_v1.cbp import ContinualBackprop
+    from algorithms.cbp.slowly_changing_regression.code_v1.ffnn import FFNN
 
-    global feed_forward_nn, DataManager, Runner, CheckpointManager
+    global DataManager, Runner, CheckpointManager, GnT, ContinualBackprop,FFNN
     
     
 class TrainContext:
@@ -50,11 +54,25 @@ class TrainContext:
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-        self.net = feed_forward_nn(   num_inputs, num_features,num_outputs  )
+        net = FFNN(
+            input_size=num_inputs,
+            num_features=num_features,
+            hidden_activation=hidden_activation,
+        )
+        net.to(self.device)
         
-        self.net.to(self.device)
-        
-        self.opt = torch.optim.Adam(self.net.parameters(), lr=step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
+        self.learner = ContinualBackprop(
+            net=net,
+            step_size=step_size,
+            opt='adam',
+            replacement_rate= 0.001,
+            decay_rate=0.99,
+            device= self.device,
+            maturity_threshold= 10,
+            util_type='adaptable_contribution',
+            init='kaiming',
+            accumulate=True,
+        )
         
         self.loss = F.mse_loss
         

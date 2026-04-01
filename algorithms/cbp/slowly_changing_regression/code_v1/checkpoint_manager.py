@@ -62,8 +62,8 @@ class CheckpointManager:
         checkpoint = {
          "current_task_id":current_task_id,
          "loss": train_loss,
-         "model_state": train_context.net.state_dict(),
-         "optimizer_state": train_context.opt.state_dict(),
+         "model_state": train_context.learner.net.state_dict(),
+         "optimizer_state": train_context.learner.opt.state_dict(),
           }         
         
         
