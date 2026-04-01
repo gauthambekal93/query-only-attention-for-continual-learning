@@ -23,7 +23,8 @@
 "weight_decay":0.0,
 "beta_1": 0.9,
 "beta_2": 0.999,
-"opt":"adam"
+"opt":"adam",
+"comment":"testing"
 }
 
 }
