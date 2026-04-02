@@ -152,7 +152,7 @@ plot_graph({
 
 
 """ ===============CBP============"""
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 5
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 50
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "cbp")
 
 train_loss_cbp, train_loss_std_cbp  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
@@ -171,6 +171,16 @@ plot_graph({
 '''
 
 
+""" ===============EWC============"""
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 50
+base_path = os.path.join(project_root, "results", "slowly_changing_regression", "ewc")
+
+train_loss_ewc, train_loss_std_ewc  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
+forward_loss_ewc, forward_loss_std_ewc = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
+prequential_loss_ewc, prequential_loss_std_ewc = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
+bwd_loss_ewc, bwd_loss_std_ewc  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
+
+
 
 
 """ ===============Query Based CL============"""
@@ -178,7 +188,7 @@ plot_graph({
 
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 5
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 50
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "query_based_cl","fifo_buffer")
 
 train_loss_query_based_fifo, train_loss_std_query_based_fifo  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
@@ -192,6 +202,7 @@ plot_graph({
             
             "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
             #"CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"brown", "linestyle": "-",  "marker": "s"}),
             "Query Based FIFO: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             },
              title="Slowly Changing Regression - Prequential Loss",
@@ -201,6 +212,7 @@ plot_graph({
             
             "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
             #"CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"brown", "linestyle": "-",  "marker": "s"}),
             "Query Based FIFO: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             },
              title="Slowly Changing Regression - Forward Loss",
