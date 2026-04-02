@@ -46,7 +46,7 @@ def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, averag
     for seed_id in seed_ids:
         p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
         out = _load_pickle(p)
-        arr = np.array([v for k, v in out[key].items()])   [ : num_tasks] 
+        arr = np.array([v for k, v in out[key].items()])   [ 100: num_tasks] 
         runs.append(arr)
         
     runs = np.stack(runs, axis=1)  # [T, R]
@@ -191,8 +191,8 @@ bwd_loss_query_based_fifo, bwd_loss_std_query_based_fifo  = calculate_curve(base
 plot_graph({ 
             
             "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            #"Query Based FIFO: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "Query Based FIFO: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             },
              title="Slowly Changing Regression - Prequential Loss",
              ylabel = "Loss")
@@ -200,8 +200,8 @@ plot_graph({
 plot_graph({ 
             
             "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            #s"Query Based FIFO: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "Query Based FIFO: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             },
              title="Slowly Changing Regression - Forward Loss",
              ylabel = "Loss")
