@@ -8,25 +8,26 @@
    "num_data_points": 10000000,
    "num_datapoints_per_timestep":1,
    "num_old_task_window":5,
-   "train_size":9000,
-   "data_input_dim": 20
+   "train_size":9000
 },
 
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/query_based_cl/fifo_buffer\\0\\0",
-"num_inputs": 41,
+<<<<<<< HEAD:algorithms/bp/slowly_changing_regression/code_v1/configuration_0.json
+"model_dir": "results//slowly_changing_regression/bp/0/0",
+=======
+"model_dir": "results//slowly_changing_regression/bp\\1\\0",
+>>>>>>> main:algorithms/bp/slowly_changing_regression/code_v1/configuration.json
+"num_inputs": 20,
 "num_outputs":1, 
-"num_features": 20,
+"num_features": 40,
 "hidden_activation": "relu",
 "step_size": 0.0001, 
 "weight_decay":0.0,
 "beta_1": 0.9,
 "beta_2": 0.999,
-"opt":"adam",
-"fifo_buffer_size": 100,
-"fifo_samples":100
+"opt":"adam"
 }
 
 }

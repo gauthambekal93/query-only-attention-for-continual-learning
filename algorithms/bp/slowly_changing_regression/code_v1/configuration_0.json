@@ -14,7 +14,11 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/bp\\0\\0",
+<<<<<<< HEAD:algorithms/bp/slowly_changing_regression/code_v1/configuration_0.json
+"model_dir": "results//slowly_changing_regression/bp/0/0",
+=======
+"model_dir": "results//slowly_changing_regression/bp\\1\\0",
+>>>>>>> main:algorithms/bp/slowly_changing_regression/code_v1/configuration.json
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 40,
@@ -23,8 +27,7 @@
 "weight_decay":0.0,
 "beta_1": 0.9,
 "beta_2": 0.999,
-"opt":"adam",
-"comment":"testing"
+"opt":"adam"
 }
 
 }
