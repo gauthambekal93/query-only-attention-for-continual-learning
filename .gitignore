@@ -14,4 +14,4 @@ results/permuted_mnist
 results/split_image_net
 results/slowly_changing_regression
 results/tiny_image_net
-
+tiny_imagenet

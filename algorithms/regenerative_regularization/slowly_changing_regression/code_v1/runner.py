@@ -12,13 +12,11 @@ import numpy as np
 
 class Runner:
     
-    def __init__(self, num_datapoints_per_timestep, ewc_lambda):
+    def __init__(self, num_datapoints_per_timestep, regerative_lambda):
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
-         
-        self.ewc_lambda  = ewc_lambda
+        self.regerative_lambda  = regerative_lambda
       
-        self.full_counter  = 0 
                     
     def prequential_testing(self, train_context, batch_x, batch_y):
         
@@ -101,22 +99,14 @@ class Runner:
                
             loss_1 = train_context.loss(predictions, batch_y )
             
-            loss_2 = train_context.net.ewc_loss()
+            loss_2 = train_context.net.regenerative_loss()
             
-            current_reg_loss = loss_1 + self.ewc_lambda * loss_2
+            current_reg_loss = loss_1 + self.regerative_lambda * loss_2
             
             current_reg_loss.backward()
             
             train_context.opt.step()
             
-            self.full_counter = self.full_counter + self.num_datapoints_per_timestep 
-            
-            if self.full_counter % 1000 == 0: #was 1000, 50000
-                train_context.net.update_fisher(batch_x, batch_y)
-
-            if self.full_counter % 20000   == 0: #was 20000, 800000
-                train_context.net.update_prev_params()
-                
             train_loss.append( current_reg_loss)
         
         train_loss= torch.stack(train_loss).mean().item()

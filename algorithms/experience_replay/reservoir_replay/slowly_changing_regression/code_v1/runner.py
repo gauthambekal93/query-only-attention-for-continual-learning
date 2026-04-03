@@ -12,13 +12,11 @@ import numpy as np
 
 class Runner:
     
-    def __init__(self, num_datapoints_per_timestep, ewc_lambda):
+    def __init__(self, num_datapoints_per_timestep):
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
-         
-        self.ewc_lambda  = ewc_lambda
+        
       
-        self.full_counter  = 0 
                     
     def prequential_testing(self, train_context, batch_x, batch_y):
         
@@ -94,29 +92,27 @@ class Runner:
             
             train_context.net.train()
             
+            data_manager_obj.fill_buffer(  batch_x , batch_y)
+            
+            replay_x, replay_y =  data_manager_obj.get_data()
+            
+            X, Y = torch.cat([batch_x, replay_x]), torch.cat([batch_y,replay_y])
+            
+            rand_ids = torch.randperm(len(X))
+            
+            X, Y = X[rand_ids], Y[rand_ids]
+            
             for param in train_context.net.parameters(): 
                 param.grad = None   # apparently faster than optim.zero_grad()
             
-            predictions = train_context.net.forward( x = batch_x)
+            predictions = train_context.net.forward( X)
                
-            loss_1 = train_context.loss(predictions, batch_y )
-            
-            loss_2 = train_context.net.ewc_loss()
-            
-            current_reg_loss = loss_1 + self.ewc_lambda * loss_2
+            current_reg_loss = train_context.loss(predictions, Y )
             
             current_reg_loss.backward()
             
             train_context.opt.step()
             
-            self.full_counter = self.full_counter + self.num_datapoints_per_timestep 
-            
-            if self.full_counter % 1000 == 0: #was 1000, 50000
-                train_context.net.update_fisher(batch_x, batch_y)
-
-            if self.full_counter % 20000   == 0: #was 20000, 800000
-                train_context.net.update_prev_params()
-                
             train_loss.append( current_reg_loss)
         
         train_loss= torch.stack(train_loss).mean().item()

@@ -9,16 +9,16 @@ Created on Fri Dec 19 11:15:04 2025
 import torch
 import time
 import numpy as np
+import torch.nn.functional as F
 
 class Runner:
     
-    def __init__(self, num_datapoints_per_timestep, ewc_lambda):
+    def __init__(self, num_datapoints_per_timestep, alpha, beta):
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
-         
-        self.ewc_lambda  = ewc_lambda
-      
-        self.full_counter  = 0 
+        
+        self.alpha = alpha
+        self.beta = beta
                     
     def prequential_testing(self, train_context, batch_x, batch_y):
         
@@ -94,29 +94,34 @@ class Runner:
             
             train_context.net.train()
             
+            if data_manager_obj.buffer_counter>0:
+                
+                replay_x1, replay_z1, replay_y1 =  data_manager_obj.get_data()
+                
+                replay_x2, replay_z2, replay_y2  = data_manager_obj.get_data()
+                
             for param in train_context.net.parameters(): 
-                param.grad = None   # apparently faster than optim.zero_grad()
+                  param.grad = None   # apparently faster than optim.zero_grad()
+              
+            predictions = train_context.net.forward( batch_x )
+             
+            if data_manager_obj.buffer_counter>0:
+                
+                predictions_1 = train_context.net.forward( replay_x1 )
+                
+                predictions_2 = train_context.net.forward( replay_x2 )
             
-            predictions = train_context.net.forward( x = batch_x)
-               
-            loss_1 = train_context.loss(predictions, batch_y )
-            
-            loss_2 = train_context.net.ewc_loss()
-            
-            current_reg_loss = loss_1 + self.ewc_lambda * loss_2
-            
+            if data_manager_obj.buffer_counter>0:   
+                current_reg_loss = train_context.loss(predictions, batch_y ) + self.alpha * F.mse_loss(predictions_1, replay_z1) + self.beta * train_context.loss(predictions_2, replay_y2 )
+            else:
+                current_reg_loss = train_context.loss(predictions, batch_y ) 
+                
             current_reg_loss.backward()
             
             train_context.opt.step()
             
-            self.full_counter = self.full_counter + self.num_datapoints_per_timestep 
+            data_manager_obj.fill_buffer(  batch_x , predictions, batch_y )
             
-            if self.full_counter % 1000 == 0: #was 1000, 50000
-                train_context.net.update_fisher(batch_x, batch_y)
-
-            if self.full_counter % 20000   == 0: #was 20000, 800000
-                train_context.net.update_prev_params()
-                
             train_loss.append( current_reg_loss)
         
         train_loss= torch.stack(train_loss).mean().item()
