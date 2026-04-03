@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 # Add it to sys.path
 #sys.path.append(str(BASE_DIR / "common" / "codes"))
-#sys.path.append(str(BASE_DIR / "algorithms" / "concat_relu"/ "Code"/"split_image_net"))
+#sys.path.append(str(BASE_DIR / "algorithms" / "regenerative_regularization"/ "Code"/"split_image_net"))
 
 
 import json
@@ -43,11 +43,11 @@ def set_seed(seed):
    
 def import_modules():    
         
-    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.runner import Runner 
-    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.regenerative_regularization.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
+    from algorithms.regenerative_regularization.tiny_imagenet_augmentation.code_v1.runner import Runner 
+    from algorithms.regenerative_regularization.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
 
-    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+    from algorithms.regenerative_regularization.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
 
     global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
     
@@ -66,7 +66,8 @@ class TrainContext:
         self.opt = torch.optim.SGD(self.net.parameters(), lr = step_size, momentum= momentum, weight_decay= weight_decay)
 
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
-    
+        
+        self.net.fill_initial_params()
     
 class Incremental_Tiny_Imagenet_Experiment:
     
@@ -98,8 +99,8 @@ class Incremental_Tiny_Imagenet_Experiment:
         self.weight_decay = model_params['weight_decay']
         
         self.momentum = model_params["momentum"]
-        
-        
+    
+        self.regerative_lambda = model_params["regerative_lambda"]
         
         
     def initialize_model(self):
@@ -113,7 +114,7 @@ class Incremental_Tiny_Imagenet_Experiment:
          
 
     def initialize_runner(self):
-        self.runner_obj = Runner(self.num_datapoints_per_timestep)
+        self.runner_obj = Runner(self.num_datapoints_per_timestep, self.regerative_lambda)
     
     
 
