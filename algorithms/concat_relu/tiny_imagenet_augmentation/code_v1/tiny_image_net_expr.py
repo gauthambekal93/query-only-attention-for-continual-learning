@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 # Add it to sys.path
 #sys.path.append(str(BASE_DIR / "common" / "codes"))
-#sys.path.append(str(BASE_DIR / "algorithms" / "bp"/ "Code"/"split_image_net"))
+#sys.path.append(str(BASE_DIR / "algorithms" / "concat_relu"/ "Code"/"split_image_net"))
 
 
 import json
@@ -43,11 +43,11 @@ def set_seed(seed):
    
 def import_modules():    
         
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.runner import Runner 
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
+    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.runner import Runner 
+    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
 
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+    from algorithms.concat_relu.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
 
     global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
     
@@ -148,7 +148,7 @@ def main(arguments):
    exp_obj.initialize_checkpoint_manager()
    
    #exp_obj.data_manager_obj.create_tiny_imagenet_data()
-   
+
    exp_obj.data_manager_obj.load_tiny_imagenet_data()
    
    exp_obj.runner_obj.run(exp_obj.train_context, exp_obj.data_manager_obj, exp_obj.checkpoint_obj)
