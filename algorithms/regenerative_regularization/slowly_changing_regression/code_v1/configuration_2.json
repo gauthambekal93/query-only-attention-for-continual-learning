@@ -12,9 +12,9 @@
 },
 
 "model_config":{
-"seed": 20,
+"seed": 40,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/experience_replay/reservoir_replay\\0\\0",
+"model_dir": "results//slowly_changing_regression/regenerative_regularization/0/2",
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 40,
@@ -24,8 +24,8 @@
 "beta_1": 0.9,
 "beta_2": 0.999,
 "opt":"adam",
-"buffer_size": 2000,
-"samples_from_buffer":1
+"regerative_lambda": 0.01
+
 }
 
 }
