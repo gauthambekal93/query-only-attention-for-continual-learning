@@ -14,7 +14,6 @@ import torch.nn.functional as F
 from augmentations import get_task_params, augment_batch
 from torch.utils.data import DataLoader
 
-
 class DataManager:
      
      def __init__(self, device, root, data_dir, classes_per_task, total_classes, num_old_task_window, num_datapoints_per_timestep, num_tasks): 
@@ -36,79 +35,81 @@ class DataManager:
          
          
      def create_tiny_imagenet_data(self):
-          
-            normalize = transforms.Normalize((0.4802, 0.4481, 0.3975), (0.2770, 0.2691, 0.2821))
-            
-            transform_train = transforms.Compose(
-                [transforms.RandomResizedCrop(32), transforms.RandomHorizontalFlip(), transforms.ToTensor(),
-                 normalize, ])
-            transform_test = transforms.Compose([transforms.Resize(32), transforms.ToTensor(), normalize, ])
-            
-            self.train_set = datasets.ImageFolder(root=os.path.join(self.data_path, 'train'), transform=transform_train)
-            
-            self.test_set = datasets.ImageFolder(root=os.path.join(self.data_path, 'val'), transform=transform_test)
-    
-            
-            assert self.train_set.class_to_idx == self.test_set.class_to_idx, "DATA LOADING WENT WRONG"
-           
-            loader = DataLoader(self.train_set, batch_size=500, shuffle=False,num_workers=1, pin_memory=True )
-            
-    
-            train_count =  int(500 * 0.80)
-            
-            for img, label in loader:
-                rand_idx = torch.randperm( 500 )
-                train_idx =  rand_idx[:train_count]
-                val_idx =  rand_idx[train_count:]
-                
-                self.train_x.append(img[train_idx])
-                self.train_y.append(label[train_idx])
-                
-                self.val_x.append(img[val_idx])
-                self.val_y.append(label[val_idx])
-                
-            
-                
-            self.train_x = torch.cat (self.train_x, dim =0)
-            
-            self.train_y = torch.cat(self.train_y, dim =0)
-            
-            self.val_x = torch.cat (self.val_x, dim =0)
-            
-            self.val_y = torch.cat(self.val_y, dim =0)
-            
-            loader = DataLoader(self.test_set, batch_size=1000, shuffle=False,num_workers=1, pin_memory=True )
-            
-            count =0
-            for img, label in loader:
-                print(count)
-                self.test_x.append(img)
-                self.test_y.append(label)
-                count +=1
-                
-                
-            self.test_x =torch.cat (self.test_x, dim =0)
-            
-            self.test_y = torch.cat(self.test_y, dim =0)
-            
-            save_path = os.path.join(self.data_path, "tiny_imagenet_cached-v2.pt")
-            
-            torch.save(
-                {
-                    "train_x": self.train_x.cpu(),
-                    "train_y": self.train_y.cpu(),
-                    "val_x": self.val_x.cpu(),
-                    "val_y": self.val_y.cpu(),
-                    "test_x":  self.test_x.cpu(),
-                    "test_y":  self.test_y.cpu(),
-                    "class_to_idx": self.train_set.class_to_idx,
-                },
-                save_path
-            )
-            
-            print(f"Saved Tiny ImageNet cache to {save_path}")
+      
+        normalize = transforms.Normalize((0.4802, 0.4481, 0.3975), (0.2770, 0.2691, 0.2821))
+        
+        transform_train = transforms.Compose(
+            [transforms.RandomResizedCrop(32), transforms.RandomHorizontalFlip(), transforms.ToTensor(),
+             normalize, ])
+        transform_test = transforms.Compose([transforms.Resize(32), transforms.ToTensor(), normalize, ])
+        
+        self.train_set = datasets.ImageFolder(root=os.path.join(self.data_path, 'train'), transform=transform_train)
+        
+        self.test_set = datasets.ImageFolder(root=os.path.join(self.data_path, 'val'), transform=transform_test)
 
         
+        assert self.train_set.class_to_idx == self.test_set.class_to_idx, "DATA LOADING WENT WRONG"
+       
+        loader = DataLoader(self.train_set, batch_size=500, shuffle=False,num_workers=1, pin_memory=True )
+        
+
+        train_count =  int(500 * 0.80)
+        
+        for img, label in loader:
+            rand_idx = torch.randperm( 500 )
+            train_idx =  rand_idx[:train_count]
+            val_idx =  rand_idx[train_count:]
+            
+            self.train_x.append(img[train_idx])
+            self.train_y.append(label[train_idx])
+            
+            self.val_x.append(img[val_idx])
+            self.val_y.append(label[val_idx])
+            
+        
+            
+        self.train_x = torch.cat (self.train_x, dim =0)
+        
+        self.train_y = torch.cat(self.train_y, dim =0)
+        
+        self.val_x = torch.cat (self.val_x, dim =0)
+        
+        self.val_y = torch.cat(self.val_y, dim =0)
+        
+        loader = DataLoader(self.test_set, batch_size=1000, shuffle=False,num_workers=1, pin_memory=True )
+        
+        count =0
+        for img, label in loader:
+            print(count)
+            self.test_x.append(img)
+            self.test_y.append(label)
+            count +=1
+            
+            
+        self.test_x =torch.cat (self.test_x, dim =0)
+        
+        self.test_y = torch.cat(self.test_y, dim =0)
+        
+        #save_path = os.path.join(self.data_path, "tiny_imagenet_cached.pt")
+        
+        save_path = os.path.join(self.data_path, "tiny_imagenet_cached-v2.pt")
+        
+        torch.save(
+            {
+                "train_x": self.train_x.cpu(),
+                "train_y": self.train_y.cpu(),
+                "val_x": self.val_x.cpu(),
+                "val_y": self.val_y.cpu(),
+                "test_x":  self.test_x.cpu(),
+                "test_y":  self.test_y.cpu(),
+                "class_to_idx": self.train_set.class_to_idx,
+            },
+            save_path
+        )
+        
+        print(f"Saved Tiny ImageNet cache to {save_path}")
+
+     
      def load_tiny_imagenet_data(self):
          
          load_path = os.path.join(self.data_path, "tiny_imagenet_cached-v2.pt")
@@ -127,8 +128,8 @@ class DataManager:
          self.class_to_idx = data["class_to_idx"]
         
          print("Loaded Tiny ImageNet cache")
-         
-         
+            
+            
      def relable_data(self, Y, task_labels):
          
             Y_new = torch.empty_like(Y)

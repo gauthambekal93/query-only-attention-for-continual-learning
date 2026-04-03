@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 # Get current file's directory
@@ -41,15 +41,16 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
 
    
-def import_modules():    
-        
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.runner import Runner 
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
+def import_modules():
+    
+    from algorithms.experience_replay.reservoir_replay.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
+    from algorithms.experience_replay.reservoir_replay.tiny_imagenet_augmentation.code_v1.runner import Runner 
+    from algorithms.experience_replay.reservoir_replay.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
 
-    from algorithms.bp.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+    from algorithms.experience_replay.reservoir_replay.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
 
     global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
+    
     
     
 class TrainContext:
@@ -66,17 +67,26 @@ class TrainContext:
         self.opt = torch.optim.SGD(self.net.parameters(), lr = step_size, momentum= momentum, weight_decay= weight_decay)
 
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
+        
+        #self.step_size = step_size
+        
+        #self.momentum = momentum
+         
+        #self.weight_decay = weight_decay
+       
     
-    
-class IncrementalCIFARExperiment:
+class Incremental_Tiny_Imagenet_Experiment:
     
     def __init__(self, config_params):
         
+        """The below line is not a good practice and can lead to silent bugs """
+        #if self.device.type == "cuda":    
+        #    torch.set_default_tensor_type('torch.cuda.FloatTensor')
         
         data_params = config_params["data_config"]
         
         self.data_dir = data_params["data_dir"]
-        
+    
         self.num_tasks = data_params["num_tasks"]
     
         self.total_classes = data_params["total_classes"]
@@ -86,8 +96,7 @@ class IncrementalCIFARExperiment:
         self.num_old_task_window = data_params["num_old_task_window"]
         
         self.num_datapoints_per_timestep =  data_params['num_datapoints_per_timestep']   
-
-
+        
         
         model_params = config_params["model_config"]
         
@@ -99,29 +108,30 @@ class IncrementalCIFARExperiment:
         
         self.momentum = model_params["momentum"]
         
+        self.buffer_size = model_params["buffer_size"]
         
+        self.samples_from_buffer = model_params["samples_from_buffer"]
         
         
     def initialize_model(self):
        self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.classes_per_task)
        
-    
+       
     def initialize_data_manager(self):
-         self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, 
-                                             self.total_classes, self.num_old_task_window, self.num_datapoints_per_timestep,
-                                             self.num_tasks)
+         self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, self.total_classes, 
+                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.num_tasks, self.buffer_size, self.samples_from_buffer )
          
-
+    
     def initialize_runner(self):
-        self.runner_obj = Runner(self.num_datapoints_per_timestep)
+        self.runner_obj = Runner(self.num_datapoints_per_timestep )
     
     
 
     def initialize_checkpoint_manager(self):
-        self.checkpoint_obj = CheckpointManager(self.data_manager_obj, self.runner_obj, root = ROOT, model_dir = self.model_dir  )
+        self.checkpoint_obj = CheckpointManager(self.data_manager_obj, self.runner_obj, root = ROOT, model_dir = self.model_dir )
     
 
-    
+
 def main(arguments):
    parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
    
@@ -131,13 +141,14 @@ def main(arguments):
    args = parser.parse_args(arguments)
   
    with open(args.c1, 'r') as f:
-       config_params = json.load(f)
+      config_params = json.load(f)
+  
       
    set_seed(config_params["model_config"]["seed"])
     
    import_modules()
        
-   exp_obj = IncrementalCIFARExperiment(config_params)
+   exp_obj = Incremental_Tiny_Imagenet_Experiment(config_params)
 
    exp_obj.initialize_model()  
     
@@ -148,7 +159,7 @@ def main(arguments):
    exp_obj.initialize_checkpoint_manager()
    
    #exp_obj.data_manager_obj.create_tiny_imagenet_data()
-   
+
    exp_obj.data_manager_obj.load_tiny_imagenet_data()
    
    exp_obj.runner_obj.run(exp_obj.train_context, exp_obj.data_manager_obj, exp_obj.checkpoint_obj)
