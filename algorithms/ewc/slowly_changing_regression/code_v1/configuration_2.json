@@ -12,9 +12,9 @@
 },
 
 "model_config":{
-"seed": 20,
+"seed": 40,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/cbp\\0\\0",
+"model_dir": "results//slowly_changing_regression/ewc/0/2",
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 40,
@@ -23,7 +23,8 @@
 "weight_decay":0.0,
 "beta_1": 0.9,
 "beta_2": 0.999,
-"opt":"adam"
+"opt":"adam",
+"ewc_lambda": 1000
 }
 
 }

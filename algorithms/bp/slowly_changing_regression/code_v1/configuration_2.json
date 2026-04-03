@@ -7,7 +7,8 @@
    "flip_after":10000,
    "num_data_points": 10000000,
    "num_datapoints_per_timestep":1,
-   "num_old_task_window":5
+   "num_old_task_window":5,
+   "train_size":9000
 },
 
 "model_config":{
@@ -16,11 +17,13 @@
 "model_dir": "results//slowly_changing_regression/bp/0/2",
 "num_inputs": 20,
 "num_outputs":1, 
-"num_features": 5,
+"num_features": 40,
 "hidden_activation": "relu",
-"step_size": 0.01, 
+"step_size": 0.0001, 
 "weight_decay":0.0,
-"momentum": 0
+"beta_1": 0.9,
+"beta_2": 0.999,
+"opt":"adam"
 }
 
 }

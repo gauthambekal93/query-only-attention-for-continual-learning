@@ -12,9 +12,9 @@
 },
 
 "model_config":{
-"seed": 20,
+"seed": 40,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/bp/0/0",
+"model_dir": "results//slowly_changing_regression/cbp/0/2",
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 40,

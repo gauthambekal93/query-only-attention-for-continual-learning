@@ -14,7 +14,7 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/bp\\0\\0",
+"model_dir": "results//slowly_changing_regression/cbp/0/0",
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 40,
@@ -23,9 +23,7 @@
 "weight_decay":0.0,
 "beta_1": 0.9,
 "beta_2": 0.999,
-"opt":"adam",
-"fifo_buffer_size": 500,
-"fifo_samples":100
+"opt":"adam"
 }
 
 }
