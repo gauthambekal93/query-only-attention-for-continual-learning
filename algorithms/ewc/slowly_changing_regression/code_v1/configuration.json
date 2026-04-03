@@ -24,7 +24,7 @@
 "beta_1": 0.9,
 "beta_2": 0.999,
 "opt":"adam",
-"ewc_lambda": 1000
+"ewc_lambda": 100000
 }
 
 }

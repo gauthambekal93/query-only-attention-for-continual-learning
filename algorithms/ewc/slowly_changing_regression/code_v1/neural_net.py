@@ -47,7 +47,7 @@ class feed_forward_nn(nn.Module):
     def update_fisher(self, x, y, alpha=0.9):
         self.zero_grad()
         logits = self(x)
-        loss = F.cross_entropy(logits, y)
+        loss = F.mse_loss(logits, y) #F.cross_entropy(logits, y)
         loss.backward()
         for name, p in self.named_parameters():
             if p.requires_grad and p.grad is not None:

@@ -7,18 +7,18 @@ Created on Fri Dec 19 11:15:04 2025
 
 
 import torch
+from tqdm import tqdm
 import time
+import torch.nn.functional as F
 import numpy as np
 
 class Runner:
     
-    def __init__(self, num_datapoints_per_timestep, ewc_lambda):
+    def __init__(self, num_datapoints_per_timestep):
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
-         
-        self.ewc_lambda  = ewc_lambda
+        
       
-        self.full_counter  = 0 
                     
     def prequential_testing(self, train_context, batch_x, batch_y):
         
@@ -27,31 +27,32 @@ class Runner:
         with torch.no_grad():
             predictions = train_context.net.forward(x=batch_x)
         
-        loss = train_context.loss(predictions, batch_y ).item()
+        accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
         
-        return loss
+        return accuracy
                 
-
+    
     def forward_testing(self, train_context, data_manager_obj):
-          
-          train_context.net.eval()
-          
-          batch_x, batch_y = data_manager_obj.task_test_x[data_manager_obj.current_task_id], data_manager_obj.task_test_y[ data_manager_obj.current_task_id ]
-          
-          with torch.no_grad():
-              predictions = train_context.net.forward(x=batch_x)
-          
-          loss = train_context.loss(predictions, batch_y ).item()
-          
-          return loss
-      
         
+        train_context.net.eval()
+        
+        batch_x, batch_y = data_manager_obj.task_test_x[data_manager_obj.current_task_id], data_manager_obj.task_test_y[ data_manager_obj.current_task_id ]
+        
+        with torch.no_grad():
+            predictions = train_context.net.forward(x=batch_x)
+        
+        accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
+        
+        return accuracy
+    
+    
+    
     def backward_testing(self, train_context, data_manager_obj):
          
          train_context.net.eval()
          
-         avg_loss = 0.0
-         sub_task_loss = {}
+         avg_acc = 0.0
+         sub_task_accuracies = {}
 
          with torch.no_grad():
              
@@ -63,15 +64,15 @@ class Runner:
                       
                      predictions = train_context.net.forward( x = batch_x)
                      
-                     loss = train_context.loss(predictions, batch_y ).item()
+                     accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
                      
-                     avg_loss += loss
+                     avg_acc += accuracy
                      
-                     sub_task_loss[task_id] = loss
+                     sub_task_accuracies[task_id] = accuracy
   
-         loss =  avg_loss / ( len(data_manager_obj.task_test_x.keys() ) - 1 ) 
+         accuracy =  avg_acc / ( len(data_manager_obj.task_test_x.keys() ) - 1 ) 
          
-         return loss
+         return accuracy
          
             
     def train(self, train_context, data_manager_obj, checkpoint_obj):
@@ -80,7 +81,7 @@ class Runner:
     
         train_context.net.train()
         
-        train_loss, prequential_loss = [], []
+        train_accuracy, train_loss, prequential_accuracy = [], [], []
             
         train_x = data_manager_obj.task_train_x[data_manager_obj.current_task_id]
         
@@ -90,7 +91,7 @@ class Runner:
             
             batch_x, batch_y = train_x[ i : i + self.num_datapoints_per_timestep], train_y[ i : i + self.num_datapoints_per_timestep] 
             
-            prequential_loss.append(  self.prequential_testing(train_context, batch_x, batch_y) )
+            prequential_accuracy.append(  self.prequential_testing(train_context, batch_x, batch_y) )
             
             train_context.net.train()
             
@@ -99,38 +100,32 @@ class Runner:
             
             predictions = train_context.net.forward( x = batch_x)
                
-            loss_1 = train_context.loss(predictions, batch_y )
-            
-            loss_2 = train_context.net.ewc_loss()
-            
-            current_reg_loss = loss_1 + self.ewc_lambda * loss_2
+            current_reg_loss = train_context.loss(predictions, batch_y )
             
             current_reg_loss.backward()
             
             train_context.opt.step()
+        
+            train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
             
-            self.full_counter = self.full_counter + self.num_datapoints_per_timestep 
-            
-            if self.full_counter % 1000 == 0: #was 1000, 50000
-                train_context.net.update_fisher(batch_x, batch_y)
-
-            if self.full_counter % 20000   == 0: #was 20000, 800000
-                train_context.net.update_prev_params()
-                
             train_loss.append( current_reg_loss)
+        
         
         train_loss= torch.stack(train_loss).mean().item()
 
-        prequential_loss = np.mean(prequential_loss)
+        train_accuracy= torch.stack(train_accuracy).mean().item()
         
-        forward_loss =  self.forward_testing(train_context, data_manager_obj)
+        prequential_accuracy = np.mean(prequential_accuracy)
         
-        backward_loss =  self.backward_testing(train_context, data_manager_obj)
+        forward_accuracy= self.forward_testing(train_context, data_manager_obj) 
+        
+        backward_accuracy =  self.backward_testing(train_context, data_manager_obj)
         
         print("task id ", data_manager_obj.current_task_id, 
-              "Train Loss: ", train_loss,  "Prequential loss", prequential_loss, "Forward loss", forward_loss,  "Backward loss: ", backward_loss )
+              "Train Loss: ", train_loss,  "Train accuracy: ", train_accuracy,
+              "Prequential accuracy", prequential_accuracy, "Forward accuracy: ", forward_accuracy,  "Backward accuracy: ", backward_accuracy )
         
-        return train_loss, prequential_loss, forward_loss, backward_loss
+        return train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy
             
             
     
@@ -146,11 +141,11 @@ class Runner:
             
             if  ( data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window ) :
                 
-                train_loss, prequential_loss, forward_loss, backward_loss = self.train( train_context, data_manager_obj, checkpoint_obj)
+                train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy = self.train( train_context, data_manager_obj, checkpoint_obj)
                 
                 checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
                 
-                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, prequential_loss, forward_loss, backward_loss)
+                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy)
                 
             if data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window: 
                 

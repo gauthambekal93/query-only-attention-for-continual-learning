@@ -46,7 +46,7 @@ def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, averag
     for seed_id in seed_ids:
         p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
         out = _load_pickle(p)
-        arr = np.array([v for k, v in out[key].items()])   [ 100: num_tasks] 
+        arr = np.array([v for k, v in out[key].items()])   [ : num_tasks] 
         runs.append(arr)
         
     runs = np.stack(runs, axis=1)  # [T, R]
@@ -132,7 +132,7 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 5
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 1
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "bp")
 
 train_loss_bp, train_loss_std_bp  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
@@ -152,7 +152,7 @@ plot_graph({
 
 
 """ ===============CBP============"""
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 50
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 1
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "cbp")
 
 train_loss_cbp, train_loss_std_cbp  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
@@ -171,8 +171,9 @@ plot_graph({
 '''
 
 
+
 """ ===============EWC============"""
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 50
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 1
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "ewc")
 
 train_loss_ewc, train_loss_std_ewc  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
@@ -182,6 +183,27 @@ bwd_loss_ewc, bwd_loss_std_ewc  = calculate_curve(base_path,  config_id, seed_id
 
 
 
+
+plot_graph({ 
+            
+            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            #"CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"brown", "linestyle": "-",  "marker": "s"}),
+          
+            },
+             title="Slowly Changing Regression - Prequential Loss",
+             ylabel = "Loss")
+
+plot_graph({ 
+            
+            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            #"CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"brown", "linestyle": "-",  "marker": "s"}),
+            },
+             title="Slowly Changing Regression - Forward Loss",
+             ylabel = "Loss")
+
+'''
 
 """ ===============Query Based CL============"""
 
@@ -217,3 +239,4 @@ plot_graph({
             },
              title="Slowly Changing Regression - Forward Loss",
              ylabel = "Loss")
+'''
