@@ -12,12 +12,13 @@
 },
 
 "model_config":{
-"seed": 20,
+"seed": 30,
 "use_gpu":0,
-"model_dir": "results//tiny_imagenet/augmentation/concat_relu\\0\\0",
+"model_dir": "results//tiny_imagenet/augmentation/ewc/0/1",
 "step_size":0.0001,
 "momentum": 0.9, 
-"weight_decay": 0.0
+"weight_decay": 0.0,
+"ewc_lambda": 1000
 }
 
 }

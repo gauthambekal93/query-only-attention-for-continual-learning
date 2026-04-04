@@ -1,0 +1,28 @@
+{ 
+"experiment_discription":"cifar 100 with data augmentation, generates 5 label at neural net output with reservoir replay algorithm",
+
+"data_config":{ 
+   "num_tasks": 10000,
+   "total_classes":200,
+   "initial_num_classes":5,
+   "classes_per_task":5,
+   "num_old_task_window":5,
+   "num_datapoints_per_timestep": 10,
+   "data_dir": "datasets/tiny-imagenet-200/"
+},
+
+"model_config":{
+"seed": 40,
+"use_gpu":0,
+"model_dir": "results//tiny_imagenet/augmentation/dark_experience_replay/reservoir_replay/0/2",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0,
+"buffer_size": 2000,
+"samples_from_buffer":10,
+"alpha":0.5, 
+"beta":0.5 
+
+}
+
+}
