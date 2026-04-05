@@ -60,7 +60,7 @@ def import_modules():
 class TrainContext:
     def __init__(self, step_size, momentum, weight_decay, classes_per_task, replacement_rate, utility_function, maturity_threshold):
         
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
         
         self.net = build_resnet18(num_classes=classes_per_task, norm_layer=torch.nn.BatchNorm2d)
         
@@ -192,7 +192,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    config_path = os.path.join( experiment_dir, "configuration_2.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     

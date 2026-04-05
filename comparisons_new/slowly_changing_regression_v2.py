@@ -43,36 +43,36 @@ def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, averag
     num_tasks: optional truncate length
     """
     
-    try:
+    #try:
         
         
-        runs = []
-        for seed_id in seed_ids:
-            p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
-            out = _load_pickle(p)
-            arr = np.array([v for k, v in out[key].items()])   [ : num_tasks] 
-            runs.append(arr)
-        min_len = min(len(runs[0]), len(runs[1]), len(runs[2]))
-        runs[0] = runs[0][:min_len]
-        runs[1] = runs[1][:min_len]
-        runs[2] = runs[2][:min_len]
-        
-               
-        runs = np.stack(runs, axis=1)  # [T, R]
-        mean_curve = runs.mean(axis=1)  # [T]
-        std  = runs.std(axis = 1)  
-        
-        
-        """Block avg """
-        mean_curve = np.array( [np.mean(mean_curve[i: i+ average_over]) for i in range (0, len (mean_curve), average_over )])
-        std = np.array([np.mean(std[i: i+ average_over]) for i in range (0, len (std), average_over )])
-        "Running avg """
-                #mean_curve = np.array( [np.mean(mean_curve[i:i+average_over]) for i in range(0, len(mean_curve), average_over)])
-                #std = np.array( [np.mean(std[i:i+average_over]) for i in range(0, len(std), average_over)])
+    runs = []
+    for seed_id in seed_ids:
+        p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
+        out = _load_pickle(p)
+        arr = np.array([v for k, v in out[key].items()])   [ : num_tasks] 
+        runs.append(arr)
+    #min_len = min(len(runs[0]), len(runs[1]), len(runs[2]))
+    #runs[0] = runs[0][:min_len]
+    #runs[1] = runs[1][:min_len]
+    #runs[2] = runs[2][:min_len]
     
-    except:
-        print("debug")
-        print("debug")
+           
+    runs = np.stack(runs, axis=1)  # [T, R]
+    mean_curve = runs.mean(axis=1)  # [T]
+    std  = runs.std(axis = 1)  
+    
+    
+    """Block avg """
+    mean_curve = np.array( [np.mean(mean_curve[i: i+ average_over]) for i in range (0, len (mean_curve), average_over )])
+    std = np.array([np.mean(std[i: i+ average_over]) for i in range (0, len (std), average_over )])
+    "Running avg """
+            #mean_curve = np.array( [np.mean(mean_curve[i:i+average_over]) for i in range(0, len(mean_curve), average_over)])
+            #std = np.array( [np.mean(std[i:i+average_over]) for i in range(0, len(std), average_over)])
+    
+    #except:
+    #    print("debug")
+    #    print("debug")
             
     
     return mean_curve, std
@@ -209,6 +209,7 @@ forward_loss_exp_rep, forward_loss_std_exp_rep = calculate_curve(base_path, conf
 prequential_loss_exp_rep, prequential_loss_std_exp_rep = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
 bwd_loss_exp_rep, bwd_loss_std_exp_rep  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
+
 # ===============Dark Experience Replay============
 
 config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
@@ -237,13 +238,13 @@ bwd_loss_query_based_fifo, bwd_loss_std_query_based_fifo  = calculate_curve(base
 
 plot_graph({ 
             
-            #"BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            #"CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"purple", "linestyle": "-",  "marker": "s"}),
             "Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
-            #"Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"orange", "linestyle": "-",  "marker": "s"}),
             "Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
           
             },
@@ -252,13 +253,13 @@ plot_graph({
 
 plot_graph({ 
             
-            #"BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            #"CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"green", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"purple", "linestyle": "-",  "marker": "s"}),
             "Regen_Reg: Prequential Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Prequential Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
-            #"Exp_Rep: Prequential Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Dark_Exp_Rep: Prequential Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Prequential Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Prequential Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Prequential Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"orange", "linestyle": "-",  "marker": "s"}),
             "Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
 
             },
