@@ -20,12 +20,12 @@ class Runner:
         self.test_batch_size = test_batch_size
         
     
-    def prequential_testing(self, train_context, data_manager_obj, batch_x, batch_y, fifo_id):
+    def prequential_testing(self, train_context, data_manager_obj, batch_x, batch_y):
         
         train_context.net.eval()
         
         with torch.no_grad():
-            predictions = train_context.net.forward_prediction(data_manager_obj, batch_x, fifo_id)
+            predictions = train_context.net.prediction(data_manager_obj, batch_x)
         
         accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
         
@@ -39,7 +39,7 @@ class Runner:
         batch_x, batch_y = data_manager_obj.task_test_x[data_manager_obj.current_task_id], data_manager_obj.task_test_y[ data_manager_obj.current_task_id ]
         
         with torch.no_grad():
-            predictions = train_context.net.forward_prediction(data_manager_obj, batch_x, fifo_id = 1)
+            predictions = train_context.net.prediction(data_manager_obj, batch_x)
         
         accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
         
@@ -49,6 +49,8 @@ class Runner:
  
     def backward_testing(self, train_context, data_manager_obj):
          
+         return 0
+    
          train_context.net.eval()
          
          avg_acc = 0.0
@@ -62,9 +64,7 @@ class Runner:
                  
                      batch_x, batch_y = data_manager_obj.task_test_x[ task_id ], data_manager_obj.task_test_y[ task_id ]
                       
-                     predictions = train_context.net.backward_prediction( data_manager_obj,  batch_x)
-                     
-                     #accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
+                     predictions = train_context.net.prediction( data_manager_obj,  batch_x)
                      
                      accuracy = 100 * torch.mean((predictions == batch_y).to(torch.float32)).item()
                      
@@ -89,7 +89,7 @@ class Runner:
         
         train_y = data_manager_obj.task_train_y[data_manager_obj.current_task_id]
         
-        threshold_diff = 30
+        #threshold_diff = 30
         
         for i in range(0, train_x.shape[0], self.num_datapoints_per_timestep ):
             
@@ -97,36 +97,38 @@ class Runner:
             
             batch_y = train_y[ i : i + self.num_datapoints_per_timestep]
             
-            #data_manager_obj.fill_buffer(  batch_x , batch_y)
             
-            data_manager_obj.fill_fifo_buffer( batch_x, batch_y, idx = 1 )
+            data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
             
+            '''
             if data_manager_obj.fifo_y[0].sum()>0:
                 acc0 = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y, fifo_id = 0)
             else:
                 acc0 = 100 * ( 1/ data_manager_obj.classes_per_task)
-                
-            acc1 = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y, fifo_id = 1)
+            '''
             
-            prequential_accuracy.append( acc1  )
+            acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
             
+            prequential_accuracy.append( acc  )
+            
+            '''
             if ( np.abs( acc1- acc0) > threshold_diff ):
                 
                 data_manager_obj.fill_fifo_buffer( batch_x, batch_y, idx = 0 )
                 
                 data_manager_obj.buffer_counter = data_manager_obj.buffer_counter + 1
-                    
     
             buffer_id = data_manager_obj.buffer_counter  % data_manager_obj.num_old_task_window
 
             data_manager_obj.fill_balaced_task_buffer(batch_x, batch_y , buffer_id)
+            '''
             
             train_context.net.train()
             
             for param in train_context.net.parameters(): 
                 param.grad = None   # apparently faster than optim.zero_grad()
             
-            predictions = train_context.net.forward_prediction( data_manager_obj, batch_x , fifo_id = 1)
+            predictions = train_context.net.prediction( data_manager_obj, batch_x )
                
             current_reg_loss = train_context.loss(predictions, batch_y )
             

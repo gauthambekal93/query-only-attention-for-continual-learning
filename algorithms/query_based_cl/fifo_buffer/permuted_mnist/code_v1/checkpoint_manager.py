@@ -51,9 +51,6 @@ class CheckpointManager:
             
             self.results_dict["task_test_x"] = copy.deepcopy ( data_manager_obj.task_test_x )
             self.results_dict["task_test_y"] = copy.deepcopy ( data_manager_obj.task_test_y)
-
-            self.results_dict["buffer_x"] = copy.deepcopy(data_manager_obj.buffer_x)
-            self.results_dict["buffer_y"] = copy.deepcopy(data_manager_obj.buffer_y)
             
             self.results_dict["fifo_x"] = copy.deepcopy(data_manager_obj.fifo_x)
             self.results_dict["fifo_y"] = copy.deepcopy(data_manager_obj.fifo_y)
@@ -102,11 +99,6 @@ class CheckpointManager:
             data_manager_obj.task_test_x  = self.results_dict["task_test_x"]
             
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
-            
-
-            data_manager_obj.buffer_x =  self.results_dict["buffer_x"]
-            
-            data_manager_obj.buffer_y =  self.results_dict["buffer_y"]
             
             
             data_manager_obj.fifo_x =  self.results_dict["fifo_x"]

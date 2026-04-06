@@ -80,12 +80,13 @@ class ERNetwork(nn.Module):
     
 
     
-    def forward_prediction(self, data_manager_obj, query_x, fifo_id ):
+    def prediction(self, data_manager_obj, query_x ):
         
-        support_x , support_y = data_manager_obj.get_fifo_data( fifo_id = fifo_id )
+        support_x , support_y = data_manager_obj.get_fifo_data( )
         return self.classify_images(query_x, support_x, support_y )
     
     
+    '''
     def backward_prediction(self, data_manager_obj, query_x):
         
         predictions = []
@@ -108,7 +109,7 @@ class ERNetwork(nn.Module):
         predictions = predictions % data_manager_obj.classes_per_task
         
         return predictions
-    
+    '''
     
     
     

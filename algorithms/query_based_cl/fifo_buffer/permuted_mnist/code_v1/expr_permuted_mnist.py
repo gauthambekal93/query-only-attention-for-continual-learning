@@ -8,7 +8,7 @@ Created on Fri Dec 19 11:06:35 2025
 import os
 import sys
 from pathlib import Path
-
+experiment_dir = Path(__file__).resolve().parent
 ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.query_based_cl.task_balanced_replay.permuted_mnist.code_v1.data_manager import DataManager 
-    from algorithms.query_based_cl.task_balanced_replay.permuted_mnist.code_v1.runner import Runner 
-    from algorithms.query_based_cl.task_balanced_replay.permuted_mnist.code_v1.checkpoint_manager import CheckpointManager 
-    from algorithms.query_based_cl.task_balanced_replay.permuted_mnist.code_v1.neural_networks import ERNetwork
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v1.data_manager import DataManager 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v1.runner import Runner 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v1.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
@@ -73,7 +73,9 @@ class TrainContext:
     
 class PermutedMNISTExperiment:
     
-    def __init__(self, data_params, model_params):
+    def __init__(self,config_params):
+        
+        data_params = config_params["data_config"]
         
         self.data_dir = data_params["data_dir"]
         
@@ -89,6 +91,8 @@ class PermutedMNISTExperiment:
         
         self.change_after = data_params["change_after"]
         
+        
+        model_params = config_params["model_config"]
         
         self.model_dir = model_params["model_dir"]
         
@@ -106,7 +110,7 @@ class PermutedMNISTExperiment:
                 
         self.test_batch_size = model_params["test_batch_size"]
         
-        self.samples_from_buffer = model_params["samples_from_buffer"]
+        self.samples_per_label = model_params["samples_per_label"]
 
         
 
@@ -117,7 +121,7 @@ class PermutedMNISTExperiment:
       
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, 
-                                             self.num_old_task_window, self.buffer_size, self.num_datapoints_per_timestep, self.samples_from_buffer, self.num_tasks)
+                                             self.num_old_task_window, self.buffer_size, self.num_datapoints_per_timestep, self.samples_per_label, self.num_tasks)
          
     
     def initialize_runner(self):
@@ -139,16 +143,13 @@ def main(arguments):
    args = parser.parse_args(arguments)
   
    with open(args.c1, 'r') as f:
-      model_params = json.load(f)
-  
-   with open(args.c2, 'r') as f:
-      data_params = json.load(f)
+      config_params = json.load(f)
       
-   set_seed(model_params["seed"])
+   set_seed(config_params["model_config"]["seed"])
     
    import_modules()
        
-   exp_obj = PermutedMNISTExperiment(data_params, model_params)
+   exp_obj = PermutedMNISTExperiment(config_params)
 
    exp_obj.initialize_model()  
     
@@ -169,11 +170,10 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    model_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "models", "query_based_cl", "task_balanced_replay","0.json") 
-    
-    data_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "data", "0.json")
-    
-    sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
+    config_path = os.path.join( experiment_dir, "configuration.json") 
+
+    sys.exit( main ( ['-c1', config_path ] ) )
+  
     
     
        
