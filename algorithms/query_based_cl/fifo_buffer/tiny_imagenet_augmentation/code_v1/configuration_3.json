@@ -13,9 +13,9 @@
 
 "model_config":
 {
-"seed": 30,
+"seed": 20,
 "use_gpu":0,
-"model_dir": "results//tiny_imagenet/augmentation/query_based_cl/fifo_buffer/0/1",
+"model_dir": "results//tiny_imagenet/augmentation/query_based_cl/fifo_buffer/0/3",
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,
