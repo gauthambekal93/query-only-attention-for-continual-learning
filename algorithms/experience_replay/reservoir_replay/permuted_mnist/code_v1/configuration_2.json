@@ -4,7 +4,7 @@
 "data_config":
 {
 "data_dir": "datasets/permuted_mnist/0",        
-"num_tasks": 50000,
+"num_tasks": 10000,
 "total_classes": 10,
 "classes_per_task":10,
 "num_old_task_window" : 5,
@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 40,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/experience_replay/reservoir_replay\\0\\2",
+"model_dir": "results/permuted_mnist/experience_replay/reservoir_replay/0/2",
 "input_size": 49,    
 "num_features":200,
 "num_hidden_layers": 4,

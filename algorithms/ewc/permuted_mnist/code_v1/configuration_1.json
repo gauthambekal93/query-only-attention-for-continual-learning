@@ -14,17 +14,17 @@
 ,
 
 "model_config":{
-"seed": 20,
+"seed": 30,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/query_based_cl/fifo_buffer\\0\\0",
+"model_dir": "results/permuted_mnist/ewc/0/1",
 "input_size": 49,    
 "num_features":200,
 "num_hidden_layers": 4,
 "step_size":0.0001,
 "weight_decay": 0.0,
-"buffer_size":800,
-"samples_per_label":20, 
-"test_batch_size": 1000
+"samples_from_buffer":400, 
+"test_batch_size": 1000,
+"ewc_lambda": 100000
 }
 
 }

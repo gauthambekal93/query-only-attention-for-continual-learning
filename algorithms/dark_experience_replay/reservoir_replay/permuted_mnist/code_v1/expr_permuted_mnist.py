@@ -184,7 +184,7 @@ if __name__ == '__main__':
     
     #sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    config_path = os.path.join( experiment_dir, "configuration_0.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     

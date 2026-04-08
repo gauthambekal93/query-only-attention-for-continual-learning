@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 30,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/experience_replay/reservoir_replay/0/1",
+"model_dir": "results/permuted_mnist/concat_relu/0/1",
 "input_size": 49,    
 "num_features":200,
 "num_hidden_layers": 4,

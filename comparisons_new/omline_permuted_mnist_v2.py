@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr  3 09:02:41 2026
+Created on Sun Mar 29 17:57:48 2026
 
 @author: gauthambekal93
 """
@@ -122,11 +122,12 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
     
     
     
+
 """==============Vanilla Backprop ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "bp",)
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "bp",)
 
 fwd_bp_acc, fwd_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_bp_acc, prequential_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -137,8 +138,8 @@ bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, config_id, seed_ids, "backw
 """==============Continual Backprop ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "cbp",)
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "cbp",)
 
 fwd_cbp_acc, fwd_cbp_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -148,8 +149,8 @@ bwd_cbp_acc, bwd_cbp_std  = calculate_curve(base_path, config_id, seed_ids, "bac
 """==============Elastic Weight Consolidation==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "ewc",)
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "ewc",)
 
 fwd_ewc_acc, fwd_ewc_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_ewc_acc, prequential_ewc_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -158,8 +159,8 @@ bwd_ewc_acc, bwd_ewc_std  = calculate_curve(base_path, config_id, seed_ids, "bac
 """==============Regenerative Regularisation==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "regenerative_regularization",)
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "regenerative_regularization",)
 
 fwd_regen_reg_acc, fwd_regen_reg_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_regen_reg_acc, prequential_regen_reg_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -169,8 +170,8 @@ bwd_regen_reg_acc, bwd_regen_reg_std  = calculate_curve(base_path, config_id, se
 """==============Concat ReLU ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "concat_relu",)
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "concat_relu",)
 
 fwd_concat_relu_acc, fwd_concat_relu_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_concat_relu_acc, prequential_concat_relu_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -181,8 +182,8 @@ bwd_concat_relu_acc, bwd_concat_relu_std  = calculate_curve(base_path, config_id
 """ ===============Experience replay with reservoir============"""
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "experience_replay", "reservoir_replay")
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "experience_replay", "reservoir_replay")
 
 fwd_er_replay, fwd_er_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_er_replay, prequential_er_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
@@ -191,65 +192,52 @@ bwd_er_replay, bwd_er_std  = calculate_curve(base_path, config_id, seed_ids, "ba
 """==============Dark Experience Replay==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "dark_experience_replay", "reservoir_replay")
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "dark_experience_replay", "reservoir_replay")
 
 fwd_dark_exp_acc, fwd_dark_exp_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_dark_exp_acc, prequential_dark_exp_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 bwd_dark_exp_acc, bwd_dark_exp_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
-"""==============query-based cl==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["1", "2", "3"] , 9500, 100
-base_path = os.path.join(project_root, "results", "tiny_imagenet", "augmentation", "query_based_cl", "fifo_buffer")
-
-fwd_qcl_acc, fwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
-prequential_qcl_acc, prequential_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
-bwd_qcl_acc, bwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
 
 plot_graph({ 
             "BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
             "CBP: Forward Accuracy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
             "Regern_Reg: Forward Accuracy":  (fwd_regen_reg_acc, fwd_regen_reg_std, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
             "Concat_ReLU: Forward Accuracy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
             "ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Forward Accuracy":  (fwd_dark_exp_acc, fwd_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Forward Accuracy":  (fwd_qcl_acc, fwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-
 
             },
-             title="Augmented Tiny Imagenet - Forward Accuracy ",
+             title="Augmented CIFAR 100 - Forward Accuracy ",
              ylabel = "Accuracy")
 
 plot_graph({ 
             "BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
             "CBP: Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
             "Regern_Reg: Prequential Accuracy":  (prequential_regen_reg_acc, prequential_regen_reg_std, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
             "Concat_ReLU: Prequential Accuracy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
             "ER: Prequential Accurcy":  (prequential_er_replay, prequential_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Prequential Accuracy":  (prequential_dark_exp_acc, prequential_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-
             },
-             title="Augmented Tiny Imagenet - Prequential Accuracy",
+             title="Augmented CIFAR 100 - Prequential Accuracy",
              ylabel = "Accuracy")
 
 plot_graph({ 
             "BP: Backward Accurcy":  (bwd_bp_acc, bwd_bp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
             "CBP: Backward Accuracy":  (bwd_cbp_acc, bwd_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Backward Accuracy":  (bwd_ewc_acc, bwd_ewc_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "EWC: Backward Accuracy":  (bwd_ewc_acc, bwd_ewc_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
             "Regern_Reg: Backward Accuracy":  (bwd_regen_reg_acc, bwd_regen_reg_std, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
             "Concat_ReLU: Backward Accuracy":  (bwd_concat_relu_acc, bwd_concat_relu_std, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
             "ER: Backward Accurcy":  (bwd_er_replay, bwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Backward Accuracy":  (bwd_dark_exp_acc, bwd_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Backward Accuracy":  (bwd_qcl_acc, bwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-
             },
-             title="Augmented Tiny Imagenet - Backward Accuracy",
+             title="Augmented CIFAR 100 - Backward Accuracy",
              ylabel = "Accuracy")
 
 
@@ -258,4 +246,4 @@ plot_graph({
 
 
 
-
+    

@@ -58,7 +58,7 @@ def import_modules():
 class TrainContext:
     def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, step_size, weight_decay, total_classes):
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
         
         beta_1, beta_2 = 0.9,  0.999
         
@@ -199,7 +199,7 @@ if __name__ == '__main__':
     
     #sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    config_path = os.path.join( experiment_dir, "configuration_2.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     

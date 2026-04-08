@@ -225,7 +225,7 @@ bwd_loss_dark_exp_rep, bwd_loss_std_dark_exp_rep  = calculate_curve(base_path,  
 # ===============Query Based CL============
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "0" , [ "3"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "query_based_cl","fifo_buffer")
 
