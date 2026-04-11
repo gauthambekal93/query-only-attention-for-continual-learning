@@ -209,6 +209,16 @@ fwd_qcl_acc, fwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "for
 prequential_qcl_acc, prequential_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 bwd_qcl_acc, bwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
+"""==============full attention==================== """
+
+
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
+base_path = os.path.join(project_root, "results", "cifar_100", "augmentation", "full_attention")
+
+fwd_fatt_acc, fwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_fatt_acc, bwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
+
 
 
 
@@ -221,6 +231,8 @@ plot_graph({
             "ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Forward Accuracy":  (fwd_dark_exp_acc, fwd_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
             "Q_CL: Forward Accuracy":  (fwd_qcl_acc, fwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Forward Accuracy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+
             
             },
              title="Augmented CIFAR 100 - Forward Accuracy ",
@@ -235,6 +247,8 @@ plot_graph({
             "ER: Prequential Accurcy":  (prequential_er_replay, prequential_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Prequential Accuracy":  (prequential_dark_exp_acc, prequential_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
             "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+
 
             },
              title="Augmented CIFAR 100 - Prequential Accuracy",
@@ -249,6 +263,9 @@ plot_graph({
             "ER: Backward Accurcy":  (bwd_er_replay, bwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Backward Accuracy":  (bwd_dark_exp_acc, bwd_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
             "Q_CL: Backward Accuracy":  (bwd_qcl_acc, bwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Backward Accuracy":  (bwd_fatt_acc, bwd_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+
+            
             },
              title="Augmented CIFAR 100 - Backward Accuracy",
              ylabel = "Accuracy")
