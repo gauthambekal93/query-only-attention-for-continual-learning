@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader
 
 class DataManager:
      
-     def __init__(self, device, root, data_dir, classes_per_task, total_classes, num_old_task_window, num_datapoints_per_timestep, num_tasks, fifo_buffer_size, fifo_samples): 
+     def __init__(self, device, root, data_dir, classes_per_task, total_classes, num_old_task_window, num_datapoints_per_timestep, num_tasks, fifo_buffer_size, fifo_samples_per_label): 
          
           
          self.device = device
@@ -36,7 +36,7 @@ class DataManager:
          
          self.fifo_x = torch.zeros(fifo_buffer_size , 3, 32, 32).to(self.device) 
          self.fifo_y = torch.zeros(fifo_buffer_size).to(self.device).long()  
-         self.fifo_samples = fifo_samples
+         self.fifo_samples_per_label = fifo_samples_per_label
          
          self.fifo_counter= 0 
         
@@ -212,7 +212,7 @@ class DataManager:
                 matched_ids = (Y == label).nonzero(as_tuple=True)[0]
                 
                 # handle edge case (less than k samples)
-                num_samples = min(self.fifo_samples, matched_ids.size(0))
+                num_samples = min(self.fifo_samples_per_label, matched_ids.size(0))
                 
                 rand_ids = matched_ids[torch.randperm(matched_ids.size(0))[:num_samples]]
                 
@@ -227,28 +227,6 @@ class DataManager:
  
             return support_x, support_y
         
-            
-     def get_balaced_task_data(self, X, Y, unique_labels):
-         
-         support_x, support_y = [], []
-             # samples per label
-         for label in unique_labels:
-            ids = (Y == label).nonzero(as_tuple=True)[0]
-            
-            # handle edge case (less than k samples)
-            num_samples = min(self.balanced_task_samples, ids.size(0))
-            
-            rand_ids = ids[torch.randperm(ids.size(0))[:num_samples]]
-            
-            support_x.append(X[rand_ids])
-            support_y.append(Y[rand_ids])
-                 
-         support_x = torch.cat(support_x, dim=0)
-         support_y = torch.cat(support_y, dim=0)
-         support_y = F.one_hot( support_y, num_classes = self.classes_per_task  ).to(self.device)      
-             
-         return support_x, support_y    
-             
              
         
      def delete_data(self):

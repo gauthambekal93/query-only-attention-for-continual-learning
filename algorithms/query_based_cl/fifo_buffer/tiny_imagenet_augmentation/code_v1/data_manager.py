@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader
 
 class DataManager:
      
-     def __init__(self, device, root, data_dir, classes_per_task, total_classes, num_old_task_window, num_datapoints_per_timestep, num_tasks, per_task_buffer_size, fifo_buffer_size, fifo_samples, balanced_task_samples): 
+     def __init__(self, device, root, data_dir, classes_per_task, total_classes, num_old_task_window, num_datapoints_per_timestep, num_tasks, fifo_buffer_size, fifo_samples): 
          
           
          self.device = device
@@ -36,9 +36,9 @@ class DataManager:
          self.task_train_x, self.task_train_y ,self.task_test_x, self.task_test_y = {}, {}, {}, {}
          
          
-         self.balanced_task_buffer_x = { i: torch.empty( per_task_buffer_size , 3, 32, 32).to(self.device) for i in range(self.num_old_task_window )}  
-         self.balanced_task_buffer_y = { i: torch.empty( per_task_buffer_size).to(self.device).long() for i in range(self.num_old_task_window ) }
-         self.balanced_task_samples = balanced_task_samples
+         #self.balanced_task_buffer_x = { i: torch.empty( per_task_buffer_size , 3, 32, 32).to(self.device) for i in range(self.num_old_task_window )}  
+         #self.balanced_task_buffer_y = { i: torch.empty( per_task_buffer_size).to(self.device).long() for i in range(self.num_old_task_window ) }
+         #self.balanced_task_samples = balanced_task_samples
                                                  
          self.fifo_x = torch.zeros(2, fifo_buffer_size , 3, 32, 32).to(self.device) 
          self.fifo_y = torch.zeros(2, fifo_buffer_size).to(self.device).long()  
@@ -205,7 +205,7 @@ class DataManager:
             
             self.fifo_counter_0 = self.fifo_counter_0 + x.shape[0]
            
-            
+     '''       
      def fill_fifo_buffer_0(self, x, y ):
            
            j = self.fifo_counter_1 % len(self.fifo_x[0])
@@ -213,8 +213,9 @@ class DataManager:
            self.fifo_x[0, j : j + x.shape[0]], self.fifo_y[0, j: j + x.shape[0]]  = x.clone(), y.clone()
            
            self.fifo_counter_1 = self.fifo_counter_1 + x.shape[0]
-           
-           
+     '''
+      
+     '''      
      def fill_balaced_task_buffer(self, x, y, buffer_key):
          
          i = self.buffer_counter % self.balanced_task_buffer_x[0].shape[0]
@@ -224,7 +225,8 @@ class DataManager:
          
          self.buffer_counter = self.buffer_counter + x.shape[0]
 
-
+     '''
+     
      def get_fifo_data(self, fifo_id = 1):
             
             #if self.current_task_id==19 and i>=1230:
@@ -261,7 +263,7 @@ class DataManager:
             
             return support_x, support_y
         
-            
+     '''       
      def get_balaced_task_data(self, X, Y, unique_labels):
          
          support_x, support_y = [], []
@@ -282,7 +284,7 @@ class DataManager:
          support_y = F.one_hot( support_y, num_classes = self.classes_per_task  ).to(self.device)      
              
          return support_x, support_y    
-             
+     '''        
              
         
      def delete_data(self):

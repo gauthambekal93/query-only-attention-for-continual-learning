@@ -16,15 +16,19 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/full_attention/0/0",
+"model_dir": "results/permuted_mnist/maml/task_balanced_buffer\\0\\0",
 "input_size": 49,    
-"num_features":100,
-"num_attention_layers": 3,
+"num_features":200,
+"num_hidden_layers": 4,
 "step_size":0.0001,
 "weight_decay": 0.0,
-"buffer_size":800,
-"samples_per_label":10, 
-"test_batch_size": 1000
+"supports_per_task":10,
+"queries_per_task":10,
+"buffer_size_per_task":100,
+"num_tasks_in_buffer":20, 
+"test_batch_size": 1000,
+"num_iterations":1,
+"num_tasks_per_update":5
 }
 
 }

@@ -130,6 +130,7 @@ class ResNet(nn.Module):
         width_per_group: int = 64,
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
+        hidden_layer_size = 80
     ) -> None:
         super().__init__()
         _log_api_usage_once(self)
@@ -159,32 +160,23 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.output_pool = nn.AdaptiveAvgPool2d((1, 1))
         
-        '''
-        self.fc1 = nn.Linear(512 * 2 + num_classes , 100)
-        self.fc2 = nn.Linear(100, 100)
-        self.fc3 = nn.Linear(100, 100)
-        self.fc4 = nn.Linear(100, 100)
-        self.fc5 = nn.Linear(100, 1)
-        '''
         
-        self.fc1  = nn.Linear(512 + num_classes, 80)
+        self.fc1  = nn.Linear(512 + num_classes, hidden_layer_size)
     
-        self.query_1 = nn.Linear(80, 80)
-        self.key_1 = nn.Linear(80, 80)
-        self.value_1 = nn.Linear(80, 80)
+        self.query_1 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.key_1 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.value_1 = nn.Linear(hidden_layer_size, hidden_layer_size)
         
-        self.query_2 = nn.Linear(80, 80)
-        self.key_2 = nn.Linear(80, 80)
-        self.value_2 = nn.Linear(80, 80)
+        self.query_2 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.key_2 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.value_2 = nn.Linear(hidden_layer_size, hidden_layer_size)
         
-        self.query_3 = nn.Linear(80, 80)
-        self.key_3 = nn.Linear(80, 80)
-        self.value_3 = nn.Linear(80, 80)
+        self.query_3 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.key_3 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.value_3 = nn.Linear(hidden_layer_size, hidden_layer_size)
       
-        self.fc2 =  nn.Linear(80, num_classes)
+        self.fc2 =  nn.Linear(hidden_layer_size, num_classes)
     
-    
-        
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
@@ -398,13 +390,13 @@ class ResNet(nn.Module):
     
     
     
-def build_resnet18(num_classes: int, norm_layer):
+def build_resnet18(num_classes: int, norm_layer, hidden_layer_size):
      """
      :param num_classes: number of classes for the classification problem
      :param norm_layer: type of normalization. Options: [torch.nn.BatchNorm2d, torch.nn.Identity]
      :return: an instance of ResNet with the correct number of layers for ResNet34
      """
-     return ResNet(BasicBlock, layers=[2, 2, 2, 2], norm_layer=norm_layer, num_classes=num_classes)
+     return ResNet(BasicBlock, layers=[2, 2, 2, 2], norm_layer=norm_layer, num_classes=num_classes, hidden_layer_size = hidden_layer_size)
 
 
 def kaiming_init_resnet_module(nn_module: torch.nn.Module):

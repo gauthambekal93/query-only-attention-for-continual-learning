@@ -1,0 +1,14 @@
+{
+    "_comment_2_": "Learner parameters",
+    "agent": "maml",
+    "num_runs": 100,
+    "opt": "adam",
+    "num_features": 2000,
+    "num_hidden_layers": 3,
+    "step_size": 0.0001,
+    "weight_decay": 0,
+    "run_time_config_dir": "runtime_config/models/permuted_mnist/maml",
+    "model_dir": "results/permuted_mnist/maml\\5\\2",
+    "run_time_config_path": "runtime_config/models/permuted_mnist/maml\\205.json",
+    "seed":40
+}

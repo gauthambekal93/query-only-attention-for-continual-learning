@@ -130,6 +130,7 @@ class ResNet(nn.Module):
         width_per_group: int = 64,
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
+        num_features = 100
     ) -> None:
         super().__init__()
         _log_api_usage_once(self)
@@ -158,11 +159,11 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.output_pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc1 = nn.Linear(512 * 2 + num_classes , 100)
-        self.fc2 = nn.Linear(100, 100)
-        self.fc3 = nn.Linear(100, 100)
-        self.fc4 = nn.Linear(100, 100)
-        self.fc5 = nn.Linear(100, 1)
+        self.fc1 = nn.Linear(512 * 2 + num_classes , num_features)
+        self.fc2 = nn.Linear(num_features, num_features)
+        self.fc3 = nn.Linear(num_features, num_features)
+        self.fc4 = nn.Linear(num_features, num_features)
+        self.fc5 = nn.Linear(num_features, 1)
         
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -345,13 +346,13 @@ class ResNet(nn.Module):
     
     
     
-def build_resnet18(num_classes: int, norm_layer):
+def build_resnet18(num_classes: int, norm_layer, num_features):
      """
      :param num_classes: number of classes for the classification problem
      :param norm_layer: type of normalization. Options: [torch.nn.BatchNorm2d, torch.nn.Identity]
      :return: an instance of ResNet with the correct number of layers for ResNet34
      """
-     return ResNet(BasicBlock, layers=[2, 2, 2, 2], norm_layer=norm_layer, num_classes=num_classes)
+     return ResNet(BasicBlock, layers=[2, 2, 2, 2], norm_layer=norm_layer, num_classes=num_classes, num_features = num_features)
 
 
 def kaiming_init_resnet_module(nn_module: torch.nn.Module):

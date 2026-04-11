@@ -16,7 +16,11 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
+<<<<<<<< HEAD:algorithms/full_attention/permuted_mnist/code_v1/configuration_0.json
 "model_dir": "results/permuted_mnist/full_attention/0/0",
+========
+"model_dir": "results/permuted_mnist/full_attention\\1\\0",
+>>>>>>>> main:algorithms/full_attention/permuted_mnist/code_v1/configuration-1.json
 "input_size": 49,    
 "num_features":100,
 "num_attention_layers": 3,
