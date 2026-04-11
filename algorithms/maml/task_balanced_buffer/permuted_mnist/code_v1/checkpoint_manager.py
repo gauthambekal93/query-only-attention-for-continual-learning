@@ -51,16 +51,9 @@ class CheckpointManager:
             
             self.results_dict["task_test_x"] = copy.deepcopy ( data_manager_obj.task_test_x )
             self.results_dict["task_test_y"] = copy.deepcopy ( data_manager_obj.task_test_y)
-
-            #self.results_dict["balanced_task_buffer_x"] = copy.deepcopy(data_manager_obj.balanced_task_buffer_x)
-            #self.results_dict["balanced_task_buffer_y"] = copy.deepcopy(data_manager_obj.balanced_task_buffer_y)
             
-            self.results_dict["fifo_x"] = copy.deepcopy(data_manager_obj.fifo_x)
-            self.results_dict["fifo_y"] = copy.deepcopy(data_manager_obj.fifo_y)
-            
-            self.results_dict["buffer_counter"] = data_manager_obj.buffer_counter
-            self.results_dict["fifo_counter_0"] = data_manager_obj.fifo_counter_0
-            self.results_dict["fifo_counter_1"] = data_manager_obj.fifo_counter_1
+            self.results_dict["buffer_x"] = copy.deepcopy(data_manager_obj.buffer_x)
+            self.results_dict["buffer_y"] = copy.deepcopy(data_manager_obj.buffer_y)
             
             with open(self.result_path , 'wb+') as f:
                  pickle.dump(self.results_dict, f) 
@@ -107,21 +100,11 @@ class CheckpointManager:
             
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
             
-
-            data_manager_obj.balanced_task_buffer_x =  self.results_dict["balanced_task_buffer_x"]
             
-            data_manager_obj.balanced_task_buffer_y =  self.results_dict["balanced_task_buffer_y"]
+            data_manager_obj.buffer_x =  self.results_dict["buffer_x"]
             
+            data_manager_obj.buffer_y =  self.results_dict["buffer_y"]
             
-            data_manager_obj.fifo_x =  self.results_dict["fifo_x"]
-            
-            data_manager_obj.fifo_y =  self.results_dict["fifo_y"]
-            
-            
-            data_manager_obj.buffer_counter = self.results_dict["buffer_counter"]
-            
-            data_manager_obj.fifo_counter_0 = self.results_dict["fifo_counter_0"] 
-            data_manager_obj.fifo_counter_1 = self.results_dict["fifo_counter_1"] 
             
             data_manager_obj.train_loss =  self.results_dict["train_loss"]
             
@@ -140,26 +123,7 @@ class CheckpointManager:
             
             
             return self.results_dict["train_loss"][task_id]
-'''        
-for i in self.results_dict["task_test_x"].keys():
-    print(self.results_dict["task_test_x"][i].shape, self.results_dict["task_test_x"][i].dtype)
-    
-    
-    
-    
-for i in self.results_dict["buffer_x"].keys():
-    x = self.results_dict["buffer_x"][i]
-    print(
-        i,
-        "shape =", x.shape,
-        "visible_bytes =", x.numel() * x.element_size(),
-        "storage_bytes =", x.untyped_storage().nbytes(),
-        "is_view =", x._base is not None,
-        "is_contiguous =", x.is_contiguous()
-    )    
-    
-'''    
-    
+
     
     
     

@@ -43,35 +43,39 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.query_based_cl.fifo_buffer.tiny_imagenet_augmentation.code_v1.data_manager import DataManager 
-    from algorithms.query_based_cl.fifo_buffer.tiny_imagenet_augmentation.code_v1.runner import Runner 
-    from algorithms.query_based_cl.fifo_buffer.tiny_imagenet_augmentation.code_v1.checkpoint_manager import CheckpointManager 
-    from algorithms.query_based_cl.fifo_buffer.tiny_imagenet_augmentation.code_v1.torchvision_modified_resnet import build_resnet18, kaiming_init_resnet_module
+    from algorithms.maml.task_balanced_buffer.permuted_mnist.code_v1.data_manager import DataManager 
+    from algorithms.maml.task_balanced_buffer.permuted_mnist.code_v1.runner import Runner 
+    from algorithms.maml.task_balanced_buffer.permuted_mnist.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.maml.task_balanced_buffer.permuted_mnist.code_v1.neural_networks import ERNetwork
     
-    global build_resnet18, kaiming_init_resnet_module, DataManager, Runner, CheckpointManager
+    global ERNetwork, DataManager, Runner, CheckpointManager
     
     
     
 class TrainContext:
-    def __init__(self, step_size, momentum, weight_decay, classes_per_task, num_features):
-        
+    def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, step_size, weight_decay, total_classes):
+
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        
-        self.net = build_resnet18(num_classes=classes_per_task, norm_layer=torch.nn.BatchNorm2d, num_features = num_features)
-        
-        self.net.apply(kaiming_init_resnet_module)
+
+        self.net = ERNetwork(input_size=input_size, num_features=num_features, num_outputs=classes_per_task)
         
         self.net.to(self.device)
         
-        self.opt = torch.optim.SGD(self.net.parameters(), lr = step_size, momentum= momentum, weight_decay= weight_decay)
-     
+        beta_1, beta_2 = 0.9,  0.999
+        
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
+        
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
         
-
+        self.step_size = step_size
+        
+        
     
-class Incremental_Tiny_Imagenet_Experiment:
+       
     
-    def __init__(self, config_params):
+class PermutedMNISTExperiment:
+    
+    def __init__(self,config_params):
         
         data_params = config_params["data_config"]
         
@@ -86,47 +90,56 @@ class Incremental_Tiny_Imagenet_Experiment:
         self.num_old_task_window = data_params["num_old_task_window"]
         
         self.num_datapoints_per_timestep =  data_params['num_datapoints_per_timestep']   
-
-
-         
+        
+        self.change_after = data_params["change_after"]
+        
+        
         model_params = config_params["model_config"]
-         
+        
         self.model_dir = model_params["model_dir"]
+        
+        self.input_size =  model_params["input_size"] 
+        
+        self.num_features = model_params["num_features"]
+        
+        self.num_hidden_layers = model_params["num_hidden_layers"]
         
         self.step_size = model_params["step_size"]
                 
         self.weight_decay = model_params['weight_decay']
+    
+        self.test_batch_size = model_params["test_batch_size"]
         
-        self.momentum = model_params["momentum"]
+        self.supports_per_task = model_params["supports_per_task"]
         
-        self.fifo_buffer_size = model_params["fifo_buffer_size"]
+        self.queries_per_task = model_params["queries_per_task"]
         
-        self.fifo_samples = model_params["fifo_samples"]
+        self.num_tasks_in_buffer = model_params["num_tasks_in_buffer"]
+         
+        self.buffer_size_per_task = model_params["buffer_size_per_task"]
         
-        self.num_features = model_params["num_features"]
+        self.num_train_iterations = model_params["num_train_iterations"]
         
+        self.num_tasks_per_update = model_params["num_tasks_per_update"]
 
         
     def initialize_model(self):
-         self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.classes_per_task, self.num_features)
+         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.step_size, self.weight_decay, self.total_classes)
         
       
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, 
-                                             self.total_classes, self.num_old_task_window, self.num_datapoints_per_timestep,
-                                             self.num_tasks, self.fifo_buffer_size, 
-                                             self.fifo_samples )
-         
-
+                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.supports_per_task, self.queries_per_task, self.buffer_size_per_task, 
+                                             self.num_tasks_in_buffer, self.num_tasks)
          
     
     def initialize_runner(self):
-        self.runner_obj = Runner(self.num_datapoints_per_timestep )
+        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size, self.num_train_iterations, self.num_tasks_per_update)
     
     
 
     def initialize_checkpoint_manager(self):
-        self.checkpoint_obj = CheckpointManager(self.data_manager_obj, self.runner_obj, root = ROOT, model_dir = self.model_dir )
+        self.checkpoint_obj = CheckpointManager(self.data_manager_obj, self.runner_obj, root = ROOT ,  model_dir = self.model_dir )
     
 
 
@@ -140,13 +153,12 @@ def main(arguments):
   
    with open(args.c1, 'r') as f:
       config_params = json.load(f)
-  
       
    set_seed(config_params["model_config"]["seed"])
     
    import_modules()
        
-   exp_obj = Incremental_Tiny_Imagenet_Experiment(config_params)
+   exp_obj = PermutedMNISTExperiment(config_params)
 
    exp_obj.initialize_model()  
     
@@ -156,9 +168,9 @@ def main(arguments):
 
    exp_obj.initialize_checkpoint_manager()
    
-   #exp_obj.data_manager_obj.create_tiny_imagenet_data()
-
-   exp_obj.data_manager_obj.load_tiny_imagenet_data()
+   exp_obj.data_manager_obj.create_permute_mnist_data()
+   
+   #exp_obj.checkpoint_obj.load_experiment_checkpoint(exp_obj.train_context, exp_obj.data_manager_obj)
    
    exp_obj.runner_obj.run(exp_obj.train_context, exp_obj.data_manager_obj, exp_obj.checkpoint_obj)
    
@@ -167,9 +179,10 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-2.json") 
+    config_path = os.path.join( experiment_dir, "configuration-3.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
+  
     
     
        

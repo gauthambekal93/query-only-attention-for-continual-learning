@@ -7,8 +7,10 @@ Created on Wed Jul 30 12:56:39 2025
 
 import os
 import sys
-sys.path.append("C:/Users/gauthambekal93/Research/continual_learning/loss_of_plasticity_and_forgetting/common/codes")
-sys.path.append("C:/Users/gauthambekal93/Research/continual_learning/loss_of_plasticity_and_forgetting/algorithms/maml/Code")
+
+#sys.path.append("C:/Users/gauthambekal93/Research/continual_learning/loss_of_plasticity_and_forgetting/algorithms/maml/Code")
+sys.path.append("C:/Users/gauthambekal93/Research/query-only-attention-for-continual-learning/algorithms/maml/single_buffer/permuted_mnist")
+
 from pathlib import Path
 import json
 import torch
@@ -35,8 +37,11 @@ import time
 
 
 
-def expr(model_params , data_params):
-    agent_type = model_params['agent']
+def expr(config_params ):
+    data_params = config_params["data_config"]
+    model_params = config_params["model_config"]
+    
+    #agent_type = model_params['agent']
     num_tasks = 200
     if 'num_tasks' in data_params.keys():
         num_tasks = data_params['num_tasks']
@@ -45,55 +50,39 @@ def expr(model_params , data_params):
 
     step_size = model_params['step_size']
     opt = model_params['opt']
-    weight_decay = 0
+    #weight_decay = 0
     use_gpu = 0
     #dev = 'cpu'
     dev = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     
-    to_log = False
-    num_features = 2000
+    #to_log = False
+    #num_features = 2000
     change_after = 10 * 6000
-    to_perturb = False
-    perturb_scale = 0.1
+    #to_perturb = False
+    #perturb_scale = 0.1
     num_hidden_layers = 1
     mini_batch_size = 400 #10
-    replacement_rate = 0.0001
-    decay_rate = 0.99
-    maturity_threshold = 100
-    util_type = 'adaptable_contribution'
-    if 'to_log' in model_params.keys():
-        to_log = model_params['to_log']
-    if 'weight_decay' in model_params.keys():
-        weight_decay = model_params['weight_decay']
-    if 'num_features' in model_params.keys():
-        num_features = model_params['num_features']
-    if 'change_after' in model_params.keys():
-        change_after = model_params['change_after']
+    #replacement_rate = 0.0001
+    #decay_rate = 0.99
+    #maturity_threshold = 100
+    #util_type = 'adaptable_contribution'
+
+    
     if 'use_gpu' in model_params.keys():
         if model_params['use_gpu'] == 1:
             use_gpu = 1
             dev = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
             if dev == torch.device("cuda"):    torch.set_default_tensor_type('torch.cuda.FloatTensor')
-    if 'to_perturb' in model_params.keys():
-        to_perturb = model_params['to_perturb']
-    if 'perturb_scale' in model_params.keys():
-        perturb_scale = model_params['perturb_scale']
+
     if 'num_hidden_layers' in model_params.keys():
         num_hidden_layers = model_params['num_hidden_layers']
     if 'mini_batch_size' in model_params.keys():
         mini_batch_size = model_params['mini_batch_size']
-    if 'replacement_rate' in model_params.keys():
-        replacement_rate = model_params['replacement_rate']
-    if 'decay_rate' in model_params.keys():
-        decay_rate = model_params['decay_rate']
-    if 'maturity_threshold' in model_params.keys():
-        maturity_threshold = model_params['mt']
-    if 'util_type' in model_params.keys():
-        util_type = model_params['util_type']
+ 
 
     classes_per_task = 10
     images_per_class = 6000
-    input_size = 49 #784
+    #input_size = 49 #784
     num_hidden_layers = num_hidden_layers
 
     #accuracy = nll_accuracy
@@ -120,11 +109,11 @@ def expr(model_params , data_params):
 
     prev_tasks_x , prev_tasks_y_one_hot = deque(maxlen = past_task_offset), deque(maxlen = past_task_offset)
     
-    backward_task_samples = 1
+    #backward_task_samples = 1
     
     num_support, num_query , buffer_tasks= 10, 10, 5 #was 10, 10, 50 
     
-    buffer_depth = 60000 #(was 1200
+    buffer_depth = 60000
     
     mini_batch_size = 1
     
@@ -139,15 +128,15 @@ def expr(model_params , data_params):
     
     train_accuracies = torch.zeros(total_iters, dtype=torch.float)
     
-    backward_accuracies =  torch.zeros( num_tasks, dtype=torch.float)  
+    #backward_accuracies =  torch.zeros( num_tasks, dtype=torch.float)  
     
     forward_accuracies =  torch.zeros( num_tasks , dtype=torch.float)
         
-    overall_accuracies =  torch.zeros( num_tasks , dtype=torch.float)
+    #overall_accuracies =  torch.zeros( num_tasks , dtype=torch.float)
     
-    forward_effective_ranks = torch.zeros( num_tasks , dtype=torch.float)
+    #forward_effective_ranks = torch.zeros( num_tasks , dtype=torch.float)
     
-    backward_effective_ranks = torch.zeros( num_tasks , dtype=torch.float)
+    #backward_effective_ranks = torch.zeros( num_tasks , dtype=torch.float)
     
     for task_idx in (range(num_tasks)):
         
@@ -196,6 +185,7 @@ def expr(model_params , data_params):
                 
                 """Test on previous task """   
                 
+                '''
                 for t in range( backward_task_samples ):
                   
                     support_x_backward, support_y_backward = prev_tasks_x[t][train_end_point - num_support : train_end_point] , prev_tasks_y_one_hot[t][train_end_point - num_support : train_end_point]
@@ -210,6 +200,7 @@ def expr(model_params , data_params):
    
                 
                 backward_accuracies[test_iter] = backward_accuracies[test_iter] / backward_task_samples
+                '''
                 
                 
                 """Test on current task """
@@ -221,10 +212,11 @@ def expr(model_params , data_params):
         
                 forward_accuracies[test_iter] =  forward_accuracy
                 
-                overall_accuracies[test_iter] =  overall_accuracies[test_iter] + forward_accuracy
+                #overall_accuracies[test_iter] =  overall_accuracies[test_iter] + forward_accuracy
                 
-                overall_accuracies[test_iter] =  overall_accuracies[test_iter] / ( backward_task_samples + 1 )
-            
+                #overall_accuracies[test_iter] =  overall_accuracies[test_iter] / ( backward_task_samples + 1 )
+                
+                '''
                 if ( task_idx % 5 == 0) or ( task_idx == past_task_offset):
                     
                     forward_effective_ranks[test_iter] =  maml.calculate_hessian( support_x_forward, support_y_forward, queries_x_forward, queries_y_forward)
@@ -235,6 +227,7 @@ def expr(model_params , data_params):
                     
                     backward_effective_ranks[test_iter] = backward_effective_ranks[test_iter - 1]
                 
+                '''
                 
                 test_iter += 1
                 
@@ -246,11 +239,11 @@ def expr(model_params , data_params):
                 
         
         print('Train accuracy: ', train_accuracies[new_iter_start:iter - 1].mean().item(), 
-       'Backward accuracy: ', backward_accuracies[ test_iter -1 ].item(),
+       #'Backward accuracy: ', backward_accuracies[ test_iter -1 ].item(),
        'Forward accuracy: ',  forward_accuracies[ test_iter -1 ].item(),
-       'Overall accuracy: ', overall_accuracies[ test_iter -1 ].item(),
-       'forward_effective_ranks: ', forward_effective_ranks[ test_iter -1 ].item(),
-       'backward_effective_ranks: ', backward_effective_ranks[ test_iter -1 ].item(),
+       #'Overall accuracy: ', overall_accuracies[ test_iter -1 ].item(),
+       #'forward_effective_ranks: ', forward_effective_ranks[ test_iter -1 ].item(),
+       #'backward_effective_ranks: ', backward_effective_ranks[ test_iter -1 ].item(),
              )
         
         
@@ -260,11 +253,11 @@ def expr(model_params , data_params):
         if task_idx % save_after_every_n_tasks == 0:
             data = {
                    'train_accuracies': train_accuracies.cpu(),
-                   'backward_accuracies': backward_accuracies.cpu(),
+                  # 'backward_accuracies': backward_accuracies.cpu(),
                    'forward_accuracies': forward_accuracies.cpu(),
-                   'overall_accuracies': overall_accuracies.cpu(),
-                   'forward_effective_ranks': forward_effective_ranks.cpu(),
-                  'backward_effective_ranks': backward_effective_ranks.cpu()
+                  # 'overall_accuracies': overall_accuracies.cpu()
+                  # 'forward_effective_ranks': forward_effective_ranks.cpu(),
+                 # 'backward_effective_ranks': backward_effective_ranks.cpu()
 
                  }
             result_path = os.path.join( project_root, model_params['model_dir'], 'output.pkl' )
@@ -305,28 +298,34 @@ def main(arguments):
    args = parser.parse_args(arguments)
   
    with open(args.c1, 'r') as f:
-      model_params = json.load(f)
-  
-   with open(args.c2, 'r') as f:
-      data_params = json.load(f)
+      config_params = json.load(f)
       
-   set_seed(model_params["seed"])
+      
+   set_seed(config_params["model_config"]["seed"])
     
    import_modules()
     
-   expr(model_params , data_params)
+   expr(config_params)
 
 
 
 if __name__ == '__main__':
 
     
-    project_root = os.path.abspath( os.path.join(os.getcwd(), "..","..", ".."))
+    #project_root = os.path.abspath( os.path.join(os.getcwd(), "..","..", ".."))
+    experiment_dir = Path(__file__).resolve().parent
     
-    model_config_path = os.path.join(project_root, "runtime_config","models", "permuted_mnist", "maml","205.json") 
+    project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
     
-    data_config_path = os.path.join(project_root, "runtime_config","data", "permuted_mnist", "0.json")
+    #model_config_path = os.path.join(project_root, "runtime_config","models", "permuted_mnist", "maml","205.json") 
     
-    sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
+    #data_config_path = os.path.join(project_root, "runtime_config","data", "permuted_mnist", "0.json")
+    
+    #sys.exit( main ( ['-c1', model_config_path, '-c2', data_config_path ] ) )
+    
+    config_path = os.path.join( experiment_dir, "configuration.json") 
+
+    sys.exit( main ( ['-c1', config_path ] ) )
+   
      
     

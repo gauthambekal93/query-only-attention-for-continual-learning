@@ -53,11 +53,11 @@ def import_modules():
     
     
 class TrainContext:
-    def __init__(self, step_size, momentum, weight_decay, classes_per_task):
+    def __init__(self, step_size, momentum, weight_decay, classes_per_task, hidden_layer_size):
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         
-        self.net = build_resnet18(num_classes=classes_per_task, norm_layer=torch.nn.BatchNorm2d)
+        self.net = build_resnet18(num_classes=classes_per_task, norm_layer=torch.nn.BatchNorm2d, hidden_layer_size = hidden_layer_size)
         
         self.net.apply(kaiming_init_resnet_module)
         
@@ -69,7 +69,7 @@ class TrainContext:
         
 
     
-class IncrementalCIFARExperiment:
+class IncrementalTinyImageNetExperiment:
     
     def __init__(self, config_params):
         
@@ -101,20 +101,20 @@ class IncrementalCIFARExperiment:
         
         self.fifo_buffer_size = model_params["fifo_buffer_size"]
         
-        self.fifo_samples = model_params["fifo_samples"]
+        self.fifo_samples_per_label = model_params["fifo_samples_per_label"]
         
-
+        self.hidden_layer_size = model_params["hidden_layer_size"]
         
 
         
     def initialize_model(self):
-         self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.classes_per_task)
+         self.train_context = TrainContext(self.step_size, self.momentum, self.weight_decay, self.classes_per_task, self.hidden_layer_size)
         
       
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, 
                                              self.total_classes, self.num_old_task_window, self.num_datapoints_per_timestep,
-                                             self.num_tasks, self.fifo_buffer_size, self.fifo_samples)
+                                             self.num_tasks, self.fifo_buffer_size, self.fifo_samples_per_label)
          
 
          
@@ -145,7 +145,7 @@ def main(arguments):
     
    import_modules()
        
-   exp_obj = IncrementalCIFARExperiment(config_params)
+   exp_obj = IncrementalTinyImageNetExperiment(config_params)
 
    exp_obj.initialize_model()  
     
@@ -166,7 +166,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    config_path = os.path.join( experiment_dir, "configuration-4.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     
