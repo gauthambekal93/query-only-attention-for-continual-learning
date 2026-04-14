@@ -38,7 +38,7 @@ class ERNetwork(nn.Module):
 
         
             
-    def classify_images(self, query_x, support_x, support_y):
+    def classify_images(self, query_x, query_y, support_x, support_y):
         
         query_shape = query_x.shape 
         
@@ -66,24 +66,26 @@ class ERNetwork(nn.Module):
         x = self.relu (self.fc4(x))
         x = self.fc5(x)
         
-        #rand_idx = torch.randperm(support_y.shape[0])  
+
+        #x = x * support_y
+        #x = x.sum(dim = 1)
         
-        #support_y = support_y[rand_idx,:]
+        label_specific_theta_prime = {}
         
-        #x = x[:, rand_idx, :]
+        for label in range(10):
+            idx = torch.where( query_y == label)[0][0].item()
+            
+            label_specific_theta_prime[label] = x[idx]/ x[idx].sum()
+        
     
-        x = x * support_y
-        
-        x = x.sum(dim = 1)
-        
-        return x
+        return label_specific_theta_prime
     
 
     
-    def prediction(self, data_manager_obj, query_x ):
+    def prediction(self, data_manager_obj, query_x, query_y ):
         
         support_x , support_y = data_manager_obj.get_fifo_data( )
-        return self.classify_images(query_x, support_x, support_y )
+        return self.classify_images(query_x, query_y, support_x, support_y )
     
     
     '''

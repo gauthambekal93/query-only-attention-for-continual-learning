@@ -38,7 +38,7 @@ class ERNetwork(nn.Module):
 
         
             
-    def classify_images(self, query_x, query_y, support_x, support_y):
+    def classify_images(self, query_x, support_x, support_y):
         
         query_shape = query_x.shape 
         
@@ -66,11 +66,11 @@ class ERNetwork(nn.Module):
         x = self.relu (self.fc4(x))
         x = self.fc5(x)
         
-        #rand_idx = torch.randperm(support_y.shape[0])  
+        rand_idx = torch.randperm(support_y.shape[0])  
         
-        #support_y = support_y[rand_idx,:]
+        support_y = support_y[rand_idx,:]
         
-        #x = x[:, rand_idx, :]
+        x = x[:, rand_idx, :]
     
         x = x * support_y
         
@@ -80,10 +80,10 @@ class ERNetwork(nn.Module):
     
 
     
-    def prediction(self, data_manager_obj, query_x, query_y ):
+    def prediction(self, data_manager_obj, query_x ):
         
         support_x , support_y = data_manager_obj.get_fifo_data( )
-        return self.classify_images(query_x, query_y, support_x, support_y )
+        return self.classify_images(query_x, support_x, support_y )
     
     
     '''

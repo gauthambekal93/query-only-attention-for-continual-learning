@@ -100,29 +100,12 @@ class Runner:
             
             data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
             
-            '''
-            if data_manager_obj.fifo_y[0].sum()>0:
-                acc0 = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y, fifo_id = 0)
-            else:
-                acc0 = 100 * ( 1/ data_manager_obj.classes_per_task)
-            '''
             
             acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
             
             prequential_accuracy.append( acc  )
             
-            '''
-            if ( np.abs( acc1- acc0) > threshold_diff ):
-                
-                data_manager_obj.fill_fifo_buffer( batch_x, batch_y, idx = 0 )
-                
-                data_manager_obj.buffer_counter = data_manager_obj.buffer_counter + 1
-    
-            buffer_id = data_manager_obj.buffer_counter  % data_manager_obj.num_old_task_window
 
-            data_manager_obj.fill_balaced_task_buffer(batch_x, batch_y , buffer_id)
-            '''
-            
             train_context.net.train()
             
             for param in train_context.net.parameters(): 
@@ -161,7 +144,58 @@ class Runner:
     def run(self, train_context, data_manager_obj, checkpoint_obj):
         
         checkpoint_obj.load_experiment_checkpoint(train_context, data_manager_obj)
+        
+        train_context.net.eval()
+        
+        pair_wise_attentions = []
+        
+        distance_metric = { i: [] for i in range (0, 10)}
+        #distance_metric = []
+        
+        for task_id in range(1, 100):
+            
+            data_manager_obj.create_task_data(task_id)
+            
+            train_x = data_manager_obj.task_train_x[task_id]
+            
+            train_y = data_manager_obj.task_train_y[task_id]
+            
+            batch_x  = train_x[ : self.num_datapoints_per_timestep] 
+            
+            batch_y = train_y[ : self.num_datapoints_per_timestep]
+            
+            data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
     
+            label_specific_generated_params = train_context.net.prediction( data_manager_obj, batch_x , batch_y)
+               
+            pair_wise_attentions.append(label_specific_generated_params)
+                       
+            if len(pair_wise_attentions) ==2 :
+        
+                for ( label1, att1 ), (label2, att2) in zip(pair_wise_attentions[0].items(), pair_wise_attentions[1].items()):
+                    distance_metric[label1].append( torch.norm(att1 - att2, p=2 ).item() )
+                
+         
+                #distance_metric.append( torch.norm(pair_wise_attentions[0] - pair_wise_attentions[1], p=2 ).item() )
+                     
+                pair_wise_attentions = []
+                
+                data_manager_obj.delete_data(task_id)
+                
+        num_pairs = len(distance_metric[0])
+        
+        task_avg_distance_metric = []
+        
+        for i in range(num_pairs):
+            temp = []
+            
+            for j in range(10):
+                temp.append( distance_metric[j][i] )
+            task_avg_distance_metric.append( np.mean(temp) )
+             
+        print("Distance metric ", task_avg_distance_metric)    
+        
+        '''
         while data_manager_obj.current_task_id < data_manager_obj.num_tasks: 
             
             start = time.perf_counter()
@@ -172,9 +206,9 @@ class Runner:
                 
                 train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy = self.train( train_context, data_manager_obj, checkpoint_obj)
                 
-                #checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
+                checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
                 
-                #checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy)
+                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy)
                 
             if data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window: 
                 
@@ -187,5 +221,5 @@ class Runner:
             
             print("===========================================================================================")
             
-           
+        '''   
 

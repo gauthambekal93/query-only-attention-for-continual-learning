@@ -61,7 +61,8 @@ class DataManager:
             self.train_x = self.train_x.to(self.device)
             self.train_y = self.train_y.to(self.device).long()
             
-           
+            self.test_x = self.test_x.to(self.device)
+            self.test_y = self.test_y.to(self.device).long()
      
             
      def create_task_data(self):
@@ -75,8 +76,12 @@ class DataManager:
             
         self.task_train_y[self.current_task_id] = self.train_y[data_permutation]
            
-  
+        self.task_test_x[self.current_task_id] = self.test_x[:, pixel_permutation]
+            
+        self.task_test_y[self.current_task_id] = self.test_y
+   
      
+
      def fill_fifo_buffer(self, x, y ):
             
             i = self.fifo_counter % len(self.fifo_x)
@@ -116,9 +121,15 @@ class DataManager:
             
              
         
-     def delete_data(self, task_id):
-       
-       del self.task_train_x[task_id], self.task_train_y[task_id], self.task_train_x[task_id -1 ], self.task_train_y[task_id -1]
+     def delete_data(self):
+         
+         del self.task_train_x[self.current_task_id - self.num_old_task_window]
+         
+         del self.task_train_y[self.current_task_id - self.num_old_task_window] 
+
+         del self.task_test_x[self.current_task_id - self.num_old_task_window]
+        
+         del self.task_test_y[self.current_task_id - self.num_old_task_window] 
         
   
    

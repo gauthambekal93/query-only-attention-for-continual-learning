@@ -89,40 +89,39 @@ class Runner:
         
         train_y = data_manager_obj.task_train_y[data_manager_obj.current_task_id]
         
-        #threshold_diff = 30
-        
         for i in range(0, train_x.shape[0], self.num_datapoints_per_timestep ):
             
             batch_x  = train_x[ i : i + self.num_datapoints_per_timestep] 
             
             batch_y = train_y[ i : i + self.num_datapoints_per_timestep]
             
+            #data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
             
+            if data_manager_obj.fifo_counter > 0 :
+                
+                acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
+                
+                prequential_accuracy.append( acc  )
+    
+                train_context.net.train()
+                
+                for param in train_context.net.parameters(): 
+                    param.grad = None   # apparently faster than optim.zero_grad()
+                
+                predictions = train_context.net.prediction( data_manager_obj, batch_x )
+                   
+                current_reg_loss = train_context.loss(predictions, batch_y )
+                
+                current_reg_loss.backward()
+                
+                train_context.opt.step()
+            
+                train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
+                
+                train_loss.append( current_reg_loss)
+                
             data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
-            
-            
-            acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
-            
-            prequential_accuracy.append( acc  )
-            
-
-            train_context.net.train()
-            
-            for param in train_context.net.parameters(): 
-                param.grad = None   # apparently faster than optim.zero_grad()
-            
-            predictions = train_context.net.prediction( data_manager_obj, batch_x )
-               
-            current_reg_loss = train_context.loss(predictions, batch_y )
-            
-            current_reg_loss.backward()
-            
-            train_context.opt.step()
-        
-            train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
-            
-            train_loss.append( current_reg_loss)
-            
+    
     
         train_loss= torch.stack(train_loss).mean().item()
         
@@ -144,59 +143,7 @@ class Runner:
     def run(self, train_context, data_manager_obj, checkpoint_obj):
         
         checkpoint_obj.load_experiment_checkpoint(train_context, data_manager_obj)
-        
-        
-        train_context.net.eval()
-        
-        pair_wise_attentions = []
-        
-        distance_metric = { i: [] for i in range (0, 10)}
-        #distance_metric = []
-        
-        for task_id in range(1, 100):
-            
-            data_manager_obj.create_task_data(task_id)
-            
-            train_x = data_manager_obj.task_train_x[task_id]
-            
-            train_y = data_manager_obj.task_train_y[task_id]
-            
-            batch_x  = train_x[ : self.num_datapoints_per_timestep] 
-            
-            batch_y = train_y[ : self.num_datapoints_per_timestep]
-            
-            data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
     
-            label_specific_generated_params = train_context.net.prediction( data_manager_obj, batch_x , batch_y)
-               
-            pair_wise_attentions.append(label_specific_generated_params)
-                       
-            if len(pair_wise_attentions) ==2 :
-        
-                for ( label1, att1 ), (label2, att2) in zip(pair_wise_attentions[0].items(), pair_wise_attentions[1].items()):
-                    distance_metric[label1].append( torch.norm(att1 - att2, p=2 ).item() )
-                
-         
-                #distance_metric.append( torch.norm(pair_wise_attentions[0] - pair_wise_attentions[1], p=2 ).item() )
-                     
-                pair_wise_attentions = []
-                
-                data_manager_obj.delete_data(task_id)
-                
-        num_pairs = len(distance_metric[0])
-        
-        task_avg_distance_metric = []
-        
-        for i in range(num_pairs):
-            temp = []
-            
-            for j in range(10):
-                temp.append( distance_metric[j][i] )
-            task_avg_distance_metric.append( np.mean(temp) )
-             
-        print("Distance metric ", task_avg_distance_metric)    
-        
-        
         while data_manager_obj.current_task_id < data_manager_obj.num_tasks: 
             
             start = time.perf_counter()

@@ -50,7 +50,7 @@ class Runner:
     def backward_testing(self, train_context, data_manager_obj):
          
          return 0
-    
+     
          train_context.net.eval()
          
          avg_acc = 0.0
@@ -66,7 +66,7 @@ class Runner:
                       
                      predictions = train_context.net.prediction( data_manager_obj,  batch_x)
                      
-                     accuracy = 100 * torch.mean((predictions == batch_y).to(torch.float32)).item()
+                     accuracy = 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)).item()
                      
                      avg_acc += accuracy
                      
@@ -89,57 +89,36 @@ class Runner:
         
         train_y = data_manager_obj.task_train_y[data_manager_obj.current_task_id]
         
-        #threshold_diff = 30
-        
         for i in range(0, train_x.shape[0], self.num_datapoints_per_timestep ):
             
             batch_x  = train_x[ i : i + self.num_datapoints_per_timestep] 
             
             batch_y = train_y[ i : i + self.num_datapoints_per_timestep]
             
+            if data_manager_obj.fifo_counter > 0 :
+                    
+                acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
+                
+                prequential_accuracy.append( acc  )
+                
+                train_context.net.train()
+                
+                for param in train_context.net.parameters(): 
+                    param.grad = None   # apparently faster than optim.zero_grad()
+                
+                predictions = train_context.net.prediction( data_manager_obj, batch_x )
+                   
+                current_reg_loss = train_context.loss(predictions, batch_y )
+                
+                current_reg_loss.backward()
+                
+                train_context.opt.step()
+            
+                train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
+                
+                train_loss.append( current_reg_loss)
             
             data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
-            
-            '''
-            if data_manager_obj.fifo_y[0].sum()>0:
-                acc0 = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y, fifo_id = 0)
-            else:
-                acc0 = 100 * ( 1/ data_manager_obj.classes_per_task)
-            '''
-            
-            acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
-            
-            prequential_accuracy.append( acc  )
-            
-            '''
-            if ( np.abs( acc1- acc0) > threshold_diff ):
-                
-                data_manager_obj.fill_fifo_buffer( batch_x, batch_y, idx = 0 )
-                
-                data_manager_obj.buffer_counter = data_manager_obj.buffer_counter + 1
-    
-            buffer_id = data_manager_obj.buffer_counter  % data_manager_obj.num_old_task_window
-
-            data_manager_obj.fill_balaced_task_buffer(batch_x, batch_y , buffer_id)
-            '''
-            
-            train_context.net.train()
-            
-            for param in train_context.net.parameters(): 
-                param.grad = None   # apparently faster than optim.zero_grad()
-            
-            predictions = train_context.net.prediction( data_manager_obj, batch_x )
-               
-            current_reg_loss = train_context.loss(predictions, batch_y )
-            
-            current_reg_loss.backward()
-            
-            train_context.opt.step()
-        
-            train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
-            
-            train_loss.append( current_reg_loss)
-            
     
         train_loss= torch.stack(train_loss).mean().item()
         
@@ -172,9 +151,9 @@ class Runner:
                 
                 train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy = self.train( train_context, data_manager_obj, checkpoint_obj)
                 
-                #checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
+                checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
                 
-                #checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy)
+                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy)
                 
             if data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window: 
                 

@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 # Get current file's directory
