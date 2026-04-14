@@ -54,6 +54,9 @@ class CheckpointManager:
 
             self.results_dict["buffer_x"] = copy.deepcopy(data_manager_obj.buffer_x)
             self.results_dict["buffer_y"] = copy.deepcopy(data_manager_obj.buffer_y)
+            
+            self.results_dict["step"] = copy.deepcopy ( data_manager_obj.step ) 
+            self.results_dict["buffer_counter"] = copy.deepcopy ( data_manager_obj.buffer_counter ) 
           
             with open(self.result_path , 'wb+') as f:
                  pickle.dump(self.results_dict, f) 
@@ -116,6 +119,8 @@ class CheckpointManager:
             
             data_manager_obj.backward_accuracy =  self.results_dict["backward_accuracy"]
             
+            data_manager_obj.step = self.results_dict["step"] 
+            data_manager_obj.buffer_counter = self.results_dict["buffer_counter"]
             
             task_id =  self.results_dict["task_id"]
             

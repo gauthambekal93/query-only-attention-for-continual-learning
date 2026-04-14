@@ -24,7 +24,9 @@
 "weight_decay": 0.0,
 "buffer_size":2000,
 "samples_from_buffer":400, 
-"test_batch_size": 1000
+"test_batch_size": 1000,
+"alpha":0.5, 
+"beta":0.5 
 }
 
 }

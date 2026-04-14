@@ -14,11 +14,12 @@ import numpy as np
 
 class Runner:
     
-    def __init__(self, num_datapoints_per_timestep, test_batch_size):
+    def __init__(self, num_datapoints_per_timestep, test_batch_size, alpha, beta):
         
         self.num_datapoints_per_timestep = num_datapoints_per_timestep
         self.test_batch_size = test_batch_size
-        
+        self.alpha = alpha
+        self.beta = beta
     
     def prequential_testing(self, train_context, batch_x, batch_y):
         
@@ -97,28 +98,54 @@ class Runner:
             
             train_context.net.train()
             
+            '''
             data_manager_obj.fill_buffer(  batch_x , batch_y)
             
             replay_x, replay_y =  data_manager_obj.get_data()
-            
+
+                
             X, Y = torch.cat([batch_x, replay_x]), torch.cat([batch_y,replay_y])
             
             rand_ids = torch.randperm(len(X))
             
             X, Y = X[rand_ids], Y[rand_ids]
+            '''
             
+            if data_manager_obj.buffer_counter>0:
+                
+                replay_x1, replay_z1, replay_y1 =  data_manager_obj.get_data()
+                
+                replay_x2, replay_z2, replay_y2  = data_manager_obj.get_data()
+                
             for param in train_context.net.parameters(): 
                 param.grad = None   # apparently faster than optim.zero_grad()
             
-            predictions = train_context.net.forward( X )
+            '''predictions = train_context.net.forward( X )'''
                
-            current_reg_loss = train_context.loss(predictions, Y )
+            predictions = train_context.net.forward( batch_x )
             
+            if data_manager_obj.buffer_counter>0:
+                
+                predictions_1 = train_context.net.forward( replay_x1 )
+                
+                predictions_2 = train_context.net.forward( replay_x2 )
+                
+            '''current_reg_loss = train_context.loss(predictions, Y )'''
+            
+            if data_manager_obj.buffer_counter>0:   
+                current_reg_loss = train_context.loss(predictions, batch_y ) + self.alpha * F.mse_loss(predictions_1, replay_z1) + self.beta * train_context.loss(predictions_2, replay_y2 )
+            else:
+                current_reg_loss = train_context.loss(predictions, batch_y ) 
+                
             current_reg_loss.backward()
             
             train_context.opt.step()
-        
-            train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == Y).to(torch.float32)) )
+            
+            data_manager_obj.fill_buffer(  batch_x , predictions, batch_y )
+            
+            '''train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == Y).to(torch.float32)) )'''
+            
+            train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
             
             train_loss.append( current_reg_loss)
             
