@@ -248,15 +248,15 @@ bwd_loss_fatt, bwd_loss_std_fatt  = calculate_curve(base_path, config_id, seed_i
 
 plot_graph({ 
             
-            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
             "Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Prequential Loss":  (prequential_loss_fatt, prequential_loss_std_fatt, {"color":"brown", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Prequential Loss":  (prequential_loss_fatt, prequential_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - Prequential Loss",
@@ -264,15 +264,15 @@ plot_graph({
 
 plot_graph({ 
             
-            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
             "Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Forward Accuracy":  (forward_loss_fatt, forward_loss_std_fatt, {"color":"brown", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Forward Accuracy":  (forward_loss_fatt, forward_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - Forward Loss",

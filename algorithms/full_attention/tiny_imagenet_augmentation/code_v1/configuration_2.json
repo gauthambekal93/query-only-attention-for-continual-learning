@@ -19,10 +19,11 @@
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,
-"fifo_buffer_size": 20,
+"fifo_buffer_size": 100,
 "per_task_buffer_size": 100,
-"fifo_samples":10,
-"balanced_task_samples":10
+"fifo_samples_per_label":10,
+"balanced_task_samples":10,
+"hidden_layer_size" : 80
 }
 
 }

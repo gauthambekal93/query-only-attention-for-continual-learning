@@ -213,7 +213,7 @@ bwd_qcl_acc, bwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "bac
 # ==============full_attention====================
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1"] , 5500, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 9500, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "full_attention")
 
 fwd_fatt_acc, fwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
@@ -224,15 +224,15 @@ bwd_fatt_acc, bwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "b
 
 
 plot_graph({ 
-            "BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
-            "CBP: Forward Accuracy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "Regern_Reg: Forward Accuracy":  (fwd_regen_reg_acc, fwd_regen_reg_std, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Forward Accuracy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
-            "ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
-            "Dark_Exp: Forward Accuracy":  (fwd_dark_exp_acc, fwd_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Forward Accuracy":  (fwd_qcl_acc, fwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Forward Accuracy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
+            #"CBP: Forward Accuracy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            #"EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            #"Regern_Reg: Forward Accuracy":  (fwd_regen_reg_acc, fwd_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            #"Concat_ReLU: Forward Accuracy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
+            "Dark_Exp: Forward Accuracy":  (fwd_dark_exp_acc, fwd_dark_exp_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Q_CL: Forward Accuracy":  (fwd_qcl_acc, fwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"Full_attention: Forward Accuracy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             
             },
@@ -240,15 +240,15 @@ plot_graph({
              ylabel = "Accuracy")
 
 plot_graph({ 
-            "BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
-            "CBP: Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"green", "linestyle": "-",  "marker": "s"}),
-            "EWC: Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "Regern_Reg: Prequential Accuracy":  (prequential_regen_reg_acc, prequential_regen_reg_std, {"color":"hotpink", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Prequential Accuracy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
-            "ER: Prequential Accurcy":  (prequential_er_replay, prequential_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
-            "Dark_Exp: Prequential Accuracy":  (prequential_dark_exp_acc, prequential_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
+            #"CBP: Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            #"EWC: Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            #"Regern_Reg: Prequential Accuracy":  (prequential_regen_reg_acc, prequential_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            #"Concat_ReLU: Prequential Accuracy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"ER: Prequential Accurcy":  (prequential_er_replay, prequential_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
+            "Dark_Exp: Prequential Accuracy":  (prequential_dark_exp_acc, prequential_dark_exp_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
 
             },
@@ -263,8 +263,8 @@ plot_graph({
             #"Concat_ReLU: Backward Accuracy":  (bwd_concat_relu_acc, bwd_concat_relu_std, {"color":"peachpuff", "linestyle": "-",  "marker": "s"}),
             #"ER: Backward Accurcy":  (bwd_er_replay, bwd_er_std, {"color":"blue", "linestyle": "-",  "marker": "x"}),
             #"Dark_Exp: Backward Accuracy":  (bwd_dark_exp_acc, bwd_dark_exp_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Backward Accuracy":  (bwd_qcl_acc, bwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Backward Accuracy":  (bwd_fatt_acc, bwd_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"Q_CL: Backward Accuracy":  (bwd_qcl_acc, bwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"Full_attention: Backward Accuracy":  (bwd_fatt_acc, bwd_fatt_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Augmented Permuted_MNIST - Backward Accuracy",
