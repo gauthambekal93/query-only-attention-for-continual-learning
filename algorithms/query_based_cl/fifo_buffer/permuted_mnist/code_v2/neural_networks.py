@@ -66,11 +66,11 @@ class ERNetwork(nn.Module):
         x = self.relu (self.fc4(x))
         x = self.fc5(x)
         
-        rand_idx = torch.randperm(support_y.shape[0])  
+        #rand_idx = torch.randperm(support_y.shape[0])  
         
-        support_y = support_y[rand_idx,:]
+        #support_y = support_y[rand_idx,:]
         
-        x = x[:, rand_idx, :]
+        #x = x[:, rand_idx, :]
     
         x = x * support_y
         

@@ -177,7 +177,7 @@ class Runner:
         
     def run(self, train_context, data_manager_obj, checkpoint_obj):
         
-        checkpoint_obj.load_experiment_checkpoint(train_context, data_manager_obj)
+        #checkpoint_obj.load_experiment_checkpoint(train_context, data_manager_obj)
     
         while data_manager_obj.current_task_id < data_manager_obj.num_tasks: 
             

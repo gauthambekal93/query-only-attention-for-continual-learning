@@ -30,7 +30,8 @@ class DataManager:
          self.task_train_x, self.task_train_y = {}, {}
          self.task_test_x, self.task_test_y = {}, {}
          
-         self.buffer_x = torch.empty(buffer_size, 49).to(self.device)  
+         self.buffer_x = torch.empty(buffer_size, 49).to(self.device) 
+         self.buffer_z = torch.empty(buffer_size, classes_per_task).to(self.device)
          self.buffer_y = torch.empty(buffer_size).to(self.device).long() 
          
          self.step = 0
@@ -76,7 +77,7 @@ class DataManager:
 
          
          
-         
+     '''    
      def fill_buffer(self, x, y):
         
          B = x.size(0)
@@ -95,15 +96,47 @@ class DataManager:
                      self.buffer_x[j].copy_(x[i])
                      self.buffer_y[j] = y[i]
                      
-                     
-
+     '''
+                
+     def fill_buffer(self, x, z, y):
+              
+              z = z.detach()
+              B = x.size(0)
+              for i in range(B):
+                  self.step += 1
+          
+                  if self.buffer_counter < self.buffer_size:
+                      # fill phase
+                      self.buffer_x[self.buffer_counter].copy_(x[i].clone())
+                      self.buffer_y[self.buffer_counter] = y[i].clone()
+                      self.buffer_z [self.buffer_counter].copy_(z[i].clone())
+                      self.buffer_counter += 1
+                  else:
+                      # reservoir step
+                      j = torch.randint(0, self.step, () ).item()  
+                      if j < self.buffer_size:
+                          self.buffer_x[j].copy_(x[i].clone())
+                          self.buffer_z[j].copy_(z[i].clone())
+                          self.buffer_y[j] = y[i].clone()                     
+                          
+     '''                     
      def get_data(self):
          
          sample_ids = torch.randperm(self.buffer_size)[: self.samples_from_buffer]
          
          return self.buffer_x[sample_ids], self.buffer_y[sample_ids]
+     '''
+     
+     def get_data(self):
          
+         if self.buffer_counter < self.buffer_size:
+             sample_ids = torch.randperm(self.buffer_counter)[: self.samples_from_buffer]
+         else:
+             sample_ids = torch.randperm(self.buffer_size)[: self.samples_from_buffer]
          
+         return self.buffer_x[sample_ids], self.buffer_z[sample_ids], self.buffer_y[sample_ids]    
+     
+        
      def delete_data(self):
          
          del self.task_train_x[self.current_task_id - self.num_old_task_window]

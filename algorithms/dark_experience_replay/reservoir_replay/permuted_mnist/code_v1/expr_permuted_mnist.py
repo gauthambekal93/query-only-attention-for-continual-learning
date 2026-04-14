@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.experience_replay.reservoir_replay.permuted_mnist.code_v1.data_manager import DataManager 
-    from algorithms.experience_replay.reservoir_replay.permuted_mnist.code_v1.runner import Runner 
-    from algorithms.experience_replay.reservoir_replay.permuted_mnist.code_v1.checkpoint_manager import CheckpointManager 
-    from algorithms.experience_replay.reservoir_replay.permuted_mnist.code_v1.neural_networks import ERNetwork
+    from algorithms.dark_experience_replay.reservoir_replay.permuted_mnist.code_v1.data_manager import DataManager 
+    from algorithms.dark_experience_replay.reservoir_replay.permuted_mnist.code_v1.runner import Runner 
+    from algorithms.dark_experience_replay.reservoir_replay.permuted_mnist.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.dark_experience_replay.reservoir_replay.permuted_mnist.code_v1.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
@@ -112,7 +112,9 @@ class PermutedMNISTExperiment:
         
         self.samples_from_buffer = model_params["samples_from_buffer"]
 
+        self.alpha = model_params["alpha"]
         
+        self.beta = model_params["beta"]
 
         
     def initialize_model(self):
@@ -125,7 +127,7 @@ class PermutedMNISTExperiment:
          
     
     def initialize_runner(self):
-        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size)
+        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size, self.alpha, self.beta)
     
     
 
@@ -178,7 +180,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    #model_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "models", "experience_replay", "reservoir_replay","0.json") 
+    #model_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "models", "dark_experience_replay", "reservoir_replay","0.json") 
     
     #data_config_path = os.path.join( ROOT, "configuration_files","permuted_mnist", "data", "0.json")
     
