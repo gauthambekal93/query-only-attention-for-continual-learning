@@ -328,7 +328,7 @@ plot_graph({
 
 
 
-lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 100
+lr_index, runs, NUM_TASKS, average_over = "0" , ["0"] , 50000, 10
 
 fwd_query_acc, fwd_query_std  = calculate_curve("query_based_cl", runs, lr_index, "forward_accuracy",  NUM_TASKS, average_over, sub_model_type  = "task_balanced_replay")
 

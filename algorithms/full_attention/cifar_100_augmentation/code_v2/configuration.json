@@ -1,0 +1,27 @@
+{ 
+"experiment_discription":"cifar 100 with data augmentation, generates 5 label at neural net output with reservoir replay algorithm",
+
+"data_config":{ 
+   "num_tasks": 50000,
+   "total_classes":100,
+   "initial_num_classes":5,
+   "classes_per_task":5,
+   "num_old_task_window":5,
+   "num_datapoints_per_timestep": 10,
+   "data_dir": "datasets/cifar_100/"
+},
+
+"model_config":
+{
+"seed": 20,
+"use_gpu":0,
+"model_dir": "results//cifar_100/augmentation/full_attention\\1\\0",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0,
+"fifo_buffer_size": 100,
+"fifo_samples_per_label":2,
+"hidden_layer_size": 100
+}
+
+}
