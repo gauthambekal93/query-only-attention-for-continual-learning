@@ -25,28 +25,15 @@ class ERNetwork(nn.Module):
         self.key_2 = nn.Linear(num_features, num_features)
         self.value_2 = nn.Linear(num_features, num_features)
         
-        self.query_3 = nn.Linear(num_features, num_features)
-        self.key_3 = nn.Linear(num_features, num_features)
-        self.value_3 = nn.Linear(num_features, num_features)
-          
         self.fc2 =  nn.Linear(num_features, num_outputs)
-        '''
-        self.fc1  = nn.Linear(input_size + num_outputs, num_features)
- 
-        self.query_1 = nn.Linear(num_features, num_features)
-        self.key_1 = nn.Linear(num_features, num_features)
-        self.value_1 = nn.Linear(num_features, num_features)
-         
-        self.query_2 = nn.Linear(num_features, num_features)
-        self.key_2 = nn.Linear(num_features, num_features)
-        self.value_2 = nn.Linear(num_features, num_features)
-         
-        self.fc2 =  nn.Linear(num_features, num_outputs)
-         
+        
         self.query_3 = nn.Linear(num_outputs, num_outputs)
         self.key_3 = nn.Linear(num_outputs, num_outputs)
         self.value_3 = nn.Linear(num_outputs, num_outputs)
-        '''
+          
+       
+  
+    
         # Initialization
         nn.init.kaiming_uniform_(self.fc1.weight, nonlinearity='linear')
         nn.init.zeros_(self.fc1.bias)
@@ -76,7 +63,7 @@ class ERNetwork(nn.Module):
         nn.init.zeros_(self.fc2.bias)
         
             
-    def get_attention(self, query_x, query_y, support_x, support_y):
+    def classify_images(self, query_x, support_x, support_y):
         
         supports =  torch.cat([support_x, support_y], dim = 1)
         
@@ -105,8 +92,7 @@ class ERNetwork(nn.Module):
         value_output_1 = self.value_1(embedding)
            
         attention_matrix = F.softmax( torch.matmul(query_output_1, key_output_1.transpose(-2, -1) ) / math.sqrt( self.key_1.in_features ) , dim = -1 )
-        
-        
+           
         output = torch.matmul( attention_matrix, value_output_1)
         
         "----Residual Connection---"
@@ -127,7 +113,7 @@ class ERNetwork(nn.Module):
         "----Residual Connection---"
         layer2_output =  layer1_output + output
         
-        #layer2_output = self.fc2(layer2_output)
+        layer2_output = self.fc2(layer2_output)
         
         "----Attention Layer 3----"
         query_output_3 = self.query_3(layer2_output)
@@ -137,43 +123,18 @@ class ERNetwork(nn.Module):
         value_output_3 = self.value_3(layer2_output)
           
         attention_matrix = F.softmax( torch.matmul(query_output_3, key_output_3.transpose(-2, -1) ) / math.sqrt( self.key_3.in_features ) , dim = -1 )
+          
+        output = torch.matmul( attention_matrix, value_output_3)
+          
+        predictions = output[:, -1, :]
         
-        
-        attention_matrix = attention_matrix.detach()
-        label_specific_attention = {}
-        for label in range(10):
-            idx = torch.where( query_y == label)[0][0].item()
-            #normalized_attention = attention_matrix[idx]/ attention_matrix[idx].sum().item()
-            #label_specific_attention[label] = normalized_attention[-1] #[: -1]
-            label_specific_attention[label] = attention_matrix[idx][-1]#[: -1]
-            
-        '''
-        value_output_3 = value_output_3.detach()
-        label_specific_value= {}
-        for label in range(10):
-            idx = torch.where( query_y == label)[0][0].item()
-            normalized_value = value_output_3[idx]/ value_output_3[idx].sum().item()
-            label_specific_value[label] = normalized_value[-1]
-        
-        '''
-        
-        return label_specific_attention
-        
+        return predictions
+    
 
 
     
-    def prediction(self, data_manager_obj, query_x, query_y = None ):
+    def prediction(self, data_manager_obj, query_x ):
         
         support_x , support_y = data_manager_obj.get_fifo_data()
         
-        #label_specific_attention =  self.get_attention(query_x, query_y, support_x, support_y )
-        
-        #return label_specific_attention
-     
-        label_specific_attention =  self.get_attention(query_x, query_y, support_x, support_y )
-        
-        return label_specific_attention
-    
-    
-    
-    
+        return self.classify_images(query_x, support_x, support_y )

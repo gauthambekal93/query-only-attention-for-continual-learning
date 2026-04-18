@@ -155,25 +155,26 @@ class Runner:
             
             batch_y = train_y[ i : i + self.num_datapoints_per_timestep]
             
-            data_manager_obj.fill_fifo_buffer( batch_x, batch_y )
+            if data_manager_obj.fifo_counter>0:   
+                
+                acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
+                
+                prequential_accuracy.append( acc  )
+                
+                train_context.net.train()
+                
+                for param in train_context.net.parameters(): 
+                    param.grad = None   # apparently faster than optim.zero_grad()
+                
+                theta_prime = self.obtain_theta_prime( train_context, data_manager_obj)
+                
+                current_reg_loss, predictions = self.update_theta(train_context, data_manager_obj, batch_x, batch_y, theta_prime)
+                
+                train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
             
-            acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
-            
-            prequential_accuracy.append( acc  )
-            
-            train_context.net.train()
-            
-            for param in train_context.net.parameters(): 
-                param.grad = None   # apparently faster than optim.zero_grad()
-            
-            theta_prime = self.obtain_theta_prime( train_context, data_manager_obj)
-            
-            current_reg_loss, predictions = self.update_theta(train_context, data_manager_obj, batch_x, batch_y, theta_prime)
-            
-            train_accuracy.append( 100 * torch.mean((predictions.argmax(axis=1) == batch_y).to(torch.float32)) )
-            
-            train_loss.append( current_reg_loss)
-            
+                train_loss.append( current_reg_loss)
+          
+            data_manager_obj.fill_fifo_buffer( batch_x, batch_y )  
     
         train_loss= torch.stack(train_loss).mean().item()
         

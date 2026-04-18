@@ -14,11 +14,11 @@ class ERNetwork(nn.Module):
     def __init__(self, input_size, num_features, num_outputs):
         super().__init__()
         self.relu = nn.ReLU()
-        self.fc1  = nn.Linear(input_size * 2 + num_outputs, num_features)
+        self.fc1  = nn.Linear(input_size , num_features)
         self.fc2 =  nn.Linear(num_features, num_features)
         self.fc3 =  nn.Linear(num_features, num_features)
         self.fc4 =  nn.Linear(num_features, num_features)
-        self.fc5 =  nn.Linear(num_features, 1)
+        self.fc5 =  nn.Linear(num_features, num_outputs )
         
         # Initialization
         nn.init.kaiming_uniform_(self.fc1.weight, nonlinearity='relu')
@@ -38,7 +38,7 @@ class ERNetwork(nn.Module):
 
         
             
-    def classify_images(self, query_x, query_y, support_x, support_y):
+    def classify_images(self, query_x, support_x, support_y):
         
         query_shape = query_x.shape 
         
@@ -66,28 +66,24 @@ class ERNetwork(nn.Module):
         x = self.relu (self.fc4(x))
         x = self.fc5(x)
         
-
-        #x = x * support_y
-        #x = x.sum(dim = 1)
+        rand_idx = torch.randperm(support_y.shape[0])  
         
-        #x = F.softmax(x, dim=1) 
+        support_y = support_y[rand_idx,:]
         
-        label_specific_theta_prime = {}
-        
-        for label in range(10):
-            idx = torch.where( query_y == label)[0][0].item()
-            
-            label_specific_theta_prime[label] = x[idx] #x[idx]/ x[idx].sum()
-        
+        x = x[:, rand_idx, :]
     
-        return label_specific_theta_prime
+        x = x * support_y
+        
+        x = x.sum(dim = 1)
+        
+        return x
     
 
     
-    def prediction(self, data_manager_obj, query_x, query_y ):
+    def prediction(self, data_manager_obj, query_x ):
         
         support_x , support_y = data_manager_obj.get_fifo_data( )
-        return self.classify_images(query_x, query_y, support_x, support_y )
+        return self.classify_images(query_x, support_x, support_y )
     
     
     '''

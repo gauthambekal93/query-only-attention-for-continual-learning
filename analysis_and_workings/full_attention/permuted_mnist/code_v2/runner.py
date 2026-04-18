@@ -31,7 +31,7 @@ class Runner:
         distance_metric = { i: [] for i in range (0, 10)}
         #distance_metric = []
         
-        for task_id in range(1, 100):
+        for task_id in range(1, 1000):
             
             data_manager_obj.create_task_data(task_id)
             
@@ -53,15 +53,23 @@ class Runner:
             if len(pair_wise_attentions) ==2 :
         
                 for ( label1, att1 ), (label2, att2) in zip(pair_wise_attentions[0].items(), pair_wise_attentions[1].items()):
+                    #att1 = torch.tensor( [att1[i:i+10].sum().item() for i in range(0, len(att1), 10)])
+                    #att2 = torch.tensor( [att2[i:i+10].sum().item() for i in range(0, len(att2), 10)])
+                    
+                    att1 = torch.tensor( [att1[i:i+10].mean().item() for i in range(0, len(att1), 10)])
+                    att2 = torch.tensor( [att2[i:i+10].mean().item() for i in range(0, len(att2), 10)])
+                    
                     distance_metric[label1].append( torch.norm(att1 - att2, p=2 ).item() )
-                
+                    #distance_metric[label1].append( F.cosine_similarity(att1, att2, dim=0) .item())
          
-                #distance_metric.append( torch.norm(pair_wise_attentions[0] - pair_wise_attentions[1], p=2 ).item() )
-                     
                 pair_wise_attentions = []
                 
                 data_manager_obj.delete_data(task_id)
         
+        for i in range(10):
+            print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+            
+        '''    
         num_pairs = len(distance_metric[0])
         
         task_avg_distance_metric = []
@@ -74,5 +82,5 @@ class Runner:
             task_avg_distance_metric.append( np.mean(temp) )
              
         print("Distance metric ", task_avg_distance_metric)    
-        
+        '''
         

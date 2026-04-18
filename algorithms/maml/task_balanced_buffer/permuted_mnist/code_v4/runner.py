@@ -155,14 +155,6 @@ class Runner:
         train_context.opt.step()
          
         train_context.opt.zero_grad()
-
-        '''
-        with torch.no_grad():
-            
-            for p, g in zip( train_context.net.parameters(), grads):
-                
-                p -=  train_context.step_size * g 
-        '''
         
         return theta_prime_loss, train_accuracies
     
@@ -186,8 +178,7 @@ class Runner:
             
             batch_y = train_y[ i : i + self.num_datapoints_per_timestep]
             
-            #if random.random() >0.90:
-            data_manager_obj.fill_buffer(  batch_x, batch_y )
+            #data_manager_obj.fill_buffer(  batch_x, batch_y )
             
             if data_manager_obj.current_task_id <= data_manager_obj.num_tasks_in_buffer + data_manager_obj.num_old_task_window :
                 
@@ -196,7 +187,7 @@ class Runner:
             
             """We added this line so that we dont calculate prequential every time step, since we have 60k time steps per task here and will take lot of time """
             
-            #if random.random() >0.90:
+   
             acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
             
             prequential_accuracy.append( acc  )
@@ -221,8 +212,9 @@ class Runner:
             train_loss.append( current_reg_loss)
         
             train_accuracy.append( acc )
-            
-        #if len(data_manager_obj.buffer_x.keys()) == data_manager_obj.num_tasks_in_buffer:
+        
+        data_manager_obj.fill_buffer(  batch_x, batch_y )
+    
         if data_manager_obj.current_task_id > data_manager_obj.num_tasks_in_buffer + data_manager_obj.num_old_task_window :
              
             train_loss= torch.stack(train_loss).mean().item()

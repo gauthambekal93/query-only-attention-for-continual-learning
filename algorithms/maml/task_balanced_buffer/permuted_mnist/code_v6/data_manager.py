@@ -33,15 +33,20 @@ class DataManager:
          self.num_tasks_in_buffer = num_tasks_in_buffer
          self.buffer_size_per_task = buffer_size_per_task
          
-         self.buffer_x = { }  
-         self.buffer_y = { }
-          
+         self.buffer_x = { i: torch.empty( buffer_size_per_task, 49).to(self.device) for i in range(num_tasks_in_buffer )}  
+         self.buffer_y = { i: torch.empty( buffer_size_per_task).to(self.device).long() for i in range(num_tasks_in_buffer ) }
+         
+         #self.buffer_x = { }  
+         #self.buffer_y = { }
+         
          self.num_datapoints_per_timestep = num_datapoints_per_timestep
          
          self.supports_per_task = supports_per_task
          
          self.queries_per_task = queries_per_task
-        
+         
+         self.fifo_counter = 0
+         self.buffer_key = 0
          
      def create_permute_mnist_data(self):
                     
@@ -71,14 +76,32 @@ class DataManager:
         self.task_test_y[self.current_task_id] = self.test_y
    
      
+     '''   
+     def fill_buffer(self, x, y ):
+            
+            
+            if self.fifo_counter < self.buffer_size_per_task:
+                
+                self.buffer_x[self.buffer_key][self.fifo_counter] = x.clone()
+                
+                self.buffer_y[self.buffer_key][self.fifo_counter] = y.clone()
+                
+                self.fifo_counter = self.fifo_counter + 1
+     '''
      
      def fill_buffer(self, x, y ):
-    
-        self.buffer_x[self.current_task_id] = x[ : self.buffer_size_per_task].clone()
         
-        self.buffer_y[self.current_task_id]= y[ : self.buffer_size_per_task].clone()
+        i = self.fifo_counter % self.buffer_size_per_task
+         
+        self.buffer_x[self.buffer_key][i: i + x.shape[0] ] = x[ : self.buffer_size_per_task].clone()
         
-    
+        self.buffer_y[self.buffer_key][i: i + x.shape[0]] = y[ : self.buffer_size_per_task].clone()
+        
+        
+        if x.shape[0]<=self.buffer_size_per_task:
+            self.fifo_counter = self.fifo_counter + x.shape[0]
+        else:
+            self.fifo_counter = 0
             
              
              
@@ -104,7 +127,7 @@ class DataManager:
         
             
              
-     '''   
+        
      def delete_data(self):
          
          del self.task_train_x[self.current_task_id - self.num_old_task_window]
@@ -116,7 +139,7 @@ class DataManager:
          del self.task_test_y[self.current_task_id - self.num_old_task_window] 
         
   
-     '''
+   
      
 
 
