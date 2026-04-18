@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.full_attention.permuted_mnist.code_v2.data_manager import DataManager 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v2.runner import Runner 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v2.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v2.neural_networks import ERNetwork
+    from analysis_and_workings.full_attention.permuted_mnist.exp_code.data_manager import DataManager 
+    from analysis_and_workings.full_attention.permuted_mnist.exp_code.runner import Runner 
+    from analysis_and_workings.full_attention.permuted_mnist.exp_code.checkpoint_manager import CheckpointManager 
+    from analysis_and_workings.full_attention.permuted_mnist.exp_code.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
@@ -170,7 +170,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-4.json") 
+    config_path = os.path.join( experiment_dir, "configuration.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   

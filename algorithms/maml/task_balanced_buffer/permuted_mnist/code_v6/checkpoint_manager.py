@@ -77,26 +77,55 @@ class CheckpointManager:
         
     def load_experiment_checkpoint(self, train_context, data_manager_obj):
         
-        '''
         if os.path.exists(self.model_path):
-                
+            
             checkpoint = torch.load(self.model_path,  map_location = train_context.device)
             
             train_context.net.load_state_dict(checkpoint["model_state"])
             
             train_context.opt.load_state_dict(checkpoint["optimizer_state"])
         
-        '''
         
-        model_path = r"C:/Users/gauthambekal93/Research/continual_learning/loss_of_plasticity_and_forgetting/results/permuted_mnist/maml/4/2/model.pth"
-              
-        model = torch.load(model_path,  map_location = train_context.device)
-          
-        train_context.net.load_state_dict(model)
-        
+        if os.path.exists(self.result_path):        
+            
+            with open(self.result_path, "rb") as f:
+                self.results_dict = pickle.load(f)
+            
+            data_manager_obj.task_train_x  = self.results_dict["task_train_x"]
+            
+            data_manager_obj.task_train_y  = self.results_dict["task_train_y"]
+            
+            
+            data_manager_obj.task_test_x  = self.results_dict["task_test_x"]
+            
+            data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
+            
+            
+            data_manager_obj.buffer_x =  self.results_dict["buffer_x"]
+            
+            data_manager_obj.buffer_y =  self.results_dict["buffer_y"]
+            
+            
+            data_manager_obj.train_loss =  self.results_dict["train_loss"]
+            
+            data_manager_obj.train_accuracy =  self.results_dict["train_accuracy"]
+            
+            data_manager_obj.prequential_accuracy =  self.results_dict["prequential_accuracy"]
+            
+            data_manager_obj.forward_accuracy =  self.results_dict["forward_accuracy"]
+            
+            data_manager_obj.backward_accuracy =  self.results_dict["backward_accuracy"]
+            
+            
+            task_id =  self.results_dict["task_id"]
+            
+            data_manager_obj.current_task_id =  task_id + 1
+            
+            
+            return self.results_dict["train_loss"][task_id]
 
-          
-
+    
+    
     
     
     

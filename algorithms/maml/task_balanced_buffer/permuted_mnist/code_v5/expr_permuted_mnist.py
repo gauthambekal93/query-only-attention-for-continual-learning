@@ -53,7 +53,7 @@ def import_modules():
     
     
 class TrainContext:
-    def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, step_size, weight_decay, total_classes):
+    def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, inner_step_size, step_size, weight_decay, total_classes):
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -66,6 +66,8 @@ class TrainContext:
         self.opt = torch.optim.Adam(self.net.parameters(), lr=step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
         
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
+        
+        self.inner_step_size = inner_step_size
         
         self.step_size = step_size
         
@@ -104,6 +106,8 @@ class PermutedMNISTExperiment:
         
         self.num_hidden_layers = model_params["num_hidden_layers"]
         
+        self.inner_step_size = model_params["inner_step_size"]
+        
         self.step_size = model_params["step_size"]
                 
         self.weight_decay = model_params['weight_decay']
@@ -124,7 +128,7 @@ class PermutedMNISTExperiment:
 
         
     def initialize_model(self):
-         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.step_size, self.weight_decay, self.total_classes)
+         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.inner_step_size , self.step_size, self.weight_decay, self.total_classes)
         
       
     def initialize_data_manager(self):
@@ -179,7 +183,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-9.json") 
+    config_path = os.path.join( experiment_dir, "configuration.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   

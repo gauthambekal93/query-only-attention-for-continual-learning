@@ -174,30 +174,28 @@ class Runner:
         
         for i in tqdm(range(0, train_x.shape[0], self.num_datapoints_per_timestep )):  #range(0, train_x.shape[0], self.num_datapoints_per_timestep ):
             
-            batch_x  = train_x[ : self.num_datapoints_per_timestep] 
+            batch_x  = train_x[ i : i + self.num_datapoints_per_timestep] 
             
-            batch_y = train_y[ : + self.num_datapoints_per_timestep]
+            batch_y = train_y[ i : i + self.num_datapoints_per_timestep]
             
-            data_manager_obj.fill_buffer(  batch_x, batch_y )
+            #data_manager_obj.fill_buffer(  batch_x, batch_y )
             
-            if data_manager_obj.current_task_id <= data_manager_obj.num_tasks_in_buffer + data_manager_obj.num_old_task_window :
+            if data_manager_obj.current_task_id > data_manager_obj.num_tasks_in_buffer + data_manager_obj.num_old_task_window :
                 
-                train_loss, train_accuracy, prequential_accuracy,forward_accuracy, backward_accuracy  = 10, 0, 0, 0, 0
-                continue
-            
-            """We added this line so that we dont calculate prequential every time step, since we have 60k time steps per task here and will take lot of time """
-            
-            #if random.random() >0.90:
-            acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
-            
-            prequential_accuracy.append( acc  )
-            
-            train_context.net.train()
-            
-            for epoch in range(100000):
+                #train_loss, train_accuracy, prequential_accuracy,forward_accuracy, backward_accuracy  = 10, 0, 0, 0, 0
+                #continue
+                
+                """We added this line so that we dont calculate prequential every time step, since we have 60k time steps per task here and will take lot of time """
+                
+       
+                acc = self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y)
+                
+                prequential_accuracy.append( acc  )
+                
+                train_context.net.train()
                 
                 selected_task_ids = np.random.permutation(data_manager_obj.num_tasks_in_buffer)[:self.num_tasks_per_update]
-                
+                    
                 supports_x , supports_y, queries_x, queries_y = data_manager_obj.get_buffer_data(selected_task_ids)
                 
                 theta_primes = self.obtain_theta_prime( train_context, data_manager_obj, supports_x , supports_y)
@@ -207,16 +205,13 @@ class Runner:
                 train_loss.append( current_reg_loss)
             
                 train_accuracy.append( acc )
-                
-                if epoch %100==0:
-                    print("Epoch ", epoch, "Train loss ",train_loss[-1].item() , "Train acc ",train_accuracy[-1]. item())
-                    
-                    checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss[-1].item(), data_manager_obj.current_task_id)
-                    
+         
+            else:                
+                train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy = 10, 0, 0, 0, 0
             
-        #if len(data_manager_obj.buffer_x.keys()) == data_manager_obj.num_tasks_in_buffer:
-        if data_manager_obj.current_task_id > data_manager_obj.num_tasks_in_buffer + data_manager_obj.num_old_task_window :
-             
+            data_manager_obj.fill_buffer(  batch_x, batch_y )
+       
+        if data_manager_obj.current_task_id > data_manager_obj.num_tasks_in_buffer + data_manager_obj.num_old_task_window :   
             train_loss= torch.stack(train_loss).mean().item()
             
             train_accuracy= torch.stack(train_accuracy).mean().item()
@@ -226,58 +221,50 @@ class Runner:
             forward_accuracy= self.forward_testing(train_context, data_manager_obj) 
             
             backward_accuracy =  self.backward_testing(train_context, data_manager_obj)
-            
-            
+                
         print("task id ", data_manager_obj.current_task_id, 
-                  "Train Loss: ", train_loss,  "Train accuracy: ", train_accuracy,
-                  "Prequential accuracy", prequential_accuracy, "Forward accuracy: ", forward_accuracy,  "Backward accuracy: ", backward_accuracy )
-            
+                          "Train Loss: ", train_loss,  "Train accuracy: ", train_accuracy,
+                          "Prequential accuracy", prequential_accuracy, "Forward accuracy: ", forward_accuracy,  "Backward accuracy: ", backward_accuracy )
+                
+
+                
+           
+                
         return train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy
     
         
     def run(self, train_context, data_manager_obj, checkpoint_obj):
         
         checkpoint_obj.load_experiment_checkpoint(train_context, data_manager_obj)
-        
-        while data_manager_obj.current_task_id < data_manager_obj.num_tasks_in_buffer :
-                
-                data_manager_obj.create_task_data()
-                
-                train_x = data_manager_obj.task_train_x[data_manager_obj.current_task_id]
-                
-                train_y = data_manager_obj.task_train_y[data_manager_obj.current_task_id]
-                
-                data_manager_obj.fill_buffer(  train_x ,  train_y )
-                
-                data_manager_obj.current_task_id += 1
+    
+        while data_manager_obj.current_task_id < data_manager_obj.num_tasks: 
             
+            start = time.perf_counter()
         
-        train_accuracy, train_loss = [], []    
-        
-        train_context.net.train()
-        
-        for epoch in range(100000):
-            
-            selected_task_ids = np.random.permutation(data_manager_obj.num_tasks_in_buffer)[:self.num_tasks_per_update]
-            
-            supports_x , supports_y, queries_x, queries_y = data_manager_obj.get_buffer_data(selected_task_ids)
-            
-            theta_primes = self.obtain_theta_prime( train_context, data_manager_obj, supports_x , supports_y)
-        
-            current_reg_loss, acc = self.update_theta(train_context, data_manager_obj, theta_primes, queries_x, queries_y )
-        
-            train_loss.append( current_reg_loss.item())
-        
-            train_accuracy.append( acc.item() )
-            
-            if epoch %100==0:
-                print("Epoch ", epoch, "Train loss ",np.mean(train_loss) , "Train acc ",np.mean(train_accuracy))
-                
-                checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, np.mean(train_loss), data_manager_obj.current_task_id)
+            data_manager_obj.create_task_data()
 
-        
-        
-        print("===========================================================================================")
-        
+            if  ( data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window ) :
+                
+                train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy = self.train( train_context, data_manager_obj, checkpoint_obj)
+                
+                checkpoint_obj.save_model_checkpoint( train_context, data_manager_obj, train_loss, data_manager_obj.current_task_id)
+                
+                checkpoint_obj.save_result_checkpoint(data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy)
+                
+            if data_manager_obj.current_task_id >= data_manager_obj.num_old_task_window: 
+                
+                data_manager_obj.delete_data()
+                
+                 
+            data_manager_obj.current_task_id += 1
+            
+            data_manager_obj.buffer_key = data_manager_obj.current_task_id % data_manager_obj.num_tasks_in_buffer
+            
+            data_manager_obj.fifo_counter  = 0
+            
+            print("Loop time ", time.perf_counter() -  start)
+            
+            print("===========================================================================================")
+            
            
 

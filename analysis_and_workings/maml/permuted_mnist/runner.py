@@ -49,7 +49,7 @@ class Runner:
     
         theta_prime = [p.clone() for p in train_context.net.parameters()]
         
-        for _ in range(self.num_train_iterations):
+        for _ in range(100): #range(self.num_train_iterations):
             
             loss, _ = self.compute_on_theta_prime( train_context, theta_prime, support_x, support_y  )
             
@@ -94,19 +94,29 @@ class Runner:
             pair_wise_theta_primes.append(theta_prime)  
             
             if len(pair_wise_theta_primes) ==2 :
-              distance_measure = 0
+              #distance_measure = 0
               
+              theta_prime1 = torch.cat([p.reshape(-1) for p in pair_wise_theta_primes[0]])
+              theta_prime2 = torch.cat([p.reshape(-1) for p in pair_wise_theta_primes[1]])
+              
+              '''
               for  theta_prime1, theta_prime2 in zip(pair_wise_theta_primes[0], pair_wise_theta_primes[1]):
                   distance_measure += torch.norm(theta_prime1 - theta_prime2, p=2 ).item() 
                   
               distance_metric.append( distance_measure /  len(pair_wise_theta_primes[0] ))
-                  
+              '''
+              
+              #distance_metric.append( F.cosine_similarity(theta_prime1, theta_prime2, dim=0) )
+              distance_metric.append( torch.norm(theta_prime1 - theta_prime2, p=2 ).item() ) 
+              
               pair_wise_theta_primes = []
               
               data_manager_obj.delete_data(task_id)
-        
-        print("Distance metric ", distance_metric)    
-        
+                
+        for i in range(10):
+            print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+            
+
             
             
            
