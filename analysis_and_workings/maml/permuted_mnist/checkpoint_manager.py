@@ -77,7 +77,7 @@ class CheckpointManager:
         
     def load_experiment_checkpoint(self, train_context, data_manager_obj):
         
-        '''
+        
         if os.path.exists(self.model_path):
                 
             checkpoint = torch.load(self.model_path,  map_location = train_context.device)
@@ -86,14 +86,14 @@ class CheckpointManager:
             
             train_context.opt.load_state_dict(checkpoint["optimizer_state"])
         
-        '''
         
+        '''
         model_path = r"C:/Users/gauthambekal93/Research/continual_learning/loss_of_plasticity_and_forgetting/results/permuted_mnist/maml/4/2/model.pth"
               
         model = torch.load(model_path,  map_location = train_context.device)
           
         train_context.net.load_state_dict(model)
-        
+        '''
 
           
 

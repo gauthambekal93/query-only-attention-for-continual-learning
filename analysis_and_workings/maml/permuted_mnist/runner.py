@@ -114,7 +114,7 @@ class Runner:
               data_manager_obj.delete_data(task_id)
                 
         for i in range(10):
-            print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+            print( "Label ", i, "distance", np.mean(distance_metric[i]))
             
 
             

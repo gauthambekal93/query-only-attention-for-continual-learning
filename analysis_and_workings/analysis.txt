@@ -1,0 +1,104 @@
+MAML IN Ideal cl setting (achived high accuracy)
+IPdb [1]: 
+     ...: for i in range(10):
+     ...:     print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+Label  0 similarity 0.06384332478046417
+Label  1 similarity 0.1335865706205368
+Label  2 similarity 0.04036697745323181
+Label  3 similarity 0.06584019213914871
+Label  4 similarity 0.06017573922872543
+Label  5 similarity 0.06263965368270874
+Label  6 similarity 0.1694050282239914
+Label  7 similarity 0.13393908739089966
+Label  8 similarity 0.058880921453237534
+Label  9 similarity 0.11834651231765747
+
+MAML IN Real cl setting (achieved low accuracy) (configuration-2.json)
+for i in range(10):
+    print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+Label  0 similarity 0.010990931652486324
+Label  1 similarity 0.021994933485984802
+Label  2 similarity 0.010819613002240658
+Label  3 similarity 0.008581088855862617
+Label  4 similarity 0.020875494927167892
+Label  5 similarity 0.010865418240427971
+Label  6 similarity 0.02265467680990696
+Label  7 similarity 0.014026792719960213
+Label  8 similarity 0.01213349960744381
+Label  9 similarity 0.013085804879665375
+
+MAML in Ideal setting(need to rerun this)(configuration-1.json)
+Label  0 similarity 0.03723364323377609
+Label  1 similarity 0.035228926688432693
+Label  2 similarity 0.051320880651474
+Label  3 similarity 0.033862192183732986
+Label  4 similarity 0.03155537694692612
+Label  5 similarity 0.029610995203256607
+Label  6 similarity 0.035773616284132004
+Label  7 similarity 0.042706817388534546
+Label  8 similarity 0.039604730904102325
+Label  9 similarity 0.02849038876593113
+
+
+
+Attention network
+IPdb [1]: for i in range(10):
+     ...:     print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+Label  0 similarity 0.0198955026180866
+Label  1 similarity 0.017573277359615586
+Label  2 similarity 0.019370651014432878
+Label  3 similarity 0.01914371754451541
+Label  4 similarity 0.018456683016357896
+Label  5 similarity 0.01864374541903366
+Label  6 similarity 0.019243853764873527
+Label  7 similarity 0.01831470274054753
+Label  8 similarity 0.019622737196514865
+Label  9 similarity 0.018665005961518908
+
+
+
+Query based without softmax
+IPdb [6]: for i in range(10):
+     ...:     print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+Label  0 similarity 3.277390576746999
+Label  1 similarity 2.469469061919621
+Label  2 similarity 1.6418868315463164
+Label  3 similarity 1.7629405734490375
+Label  4 similarity 1.5397566903610618
+Label  5 similarity 1.7579490347784392
+Label  6 similarity 2.2299166966457755
+Label  7 similarity 1.5866091744023927
+Label  8 similarity 2.926696187379409
+Label  9 similarity 2.366523869183599
+
+
+
+Query based with SoftMax and summed over labels
+IPdb [1]: for i in range(10):
+     ...:     print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+Label  0 similarity 0.43830548398789093
+Label  1 similarity 0.35533852943656397
+Label  2 similarity 0.24788846543096765
+Label  3 similarity 0.22632009900954306
+Label  4 similarity 0.20287210874411524
+Label  5 similarity 0.22590188735297748
+Label  6 similarity 0.274602349191828
+Label  7 similarity 0.25748894257204874
+Label  8 similarity 0.36894501122284906
+Label  9 similarity 0.33417837010050305
+
+
+Query based with SoftMax and averaged over labels
+
+IPdb [3]: for i in range(10):
+     ...:     print( "Label ", i, "similarity", np.mean(distance_metric[i]))
+Label  0 similarity 0.03432305258869821
+Label  1 similarity 0.02589045733935675
+Label  2 similarity 0.016363464485929936
+Label  3 similarity 0.014594205759693774
+Label  4 similarity 0.011639270275755197
+Label  5 similarity 0.014880820068207627
+Label  6 similarity 0.020509892380891407
+Label  7 similarity 0.014603228925974394
+Label  8 similarity 0.02663702998614433
+Label  9 similarity 0.01987817479601624
