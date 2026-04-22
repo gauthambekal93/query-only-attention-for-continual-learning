@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/maml/task_balanced_buffer\\8\\0",
+"model_dir": "results/permuted_mnist/maml/task_balanced_buffer\\10\\0",
 "input_size": 49,    
 "num_features":100,
 "num_hidden_layers": 4,
@@ -25,12 +25,11 @@
 "weight_decay": 0.0,
 "supports_per_task":10,
 "queries_per_task":10,
-"buffer_size_per_task":50,
-"num_tasks_in_buffer":200, 
+"buffer_size_per_task":1200,
+"num_tasks_in_buffer":1, 
 "test_batch_size": 1000,
-"num_train_iterations":5,
-"num_tasks_per_update":5,
-"mode": "train"
+"num_train_iterations":10,
+"num_tasks_per_update":1
 }
 
 }
