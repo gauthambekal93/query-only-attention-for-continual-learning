@@ -20,7 +20,7 @@
 "momentum": 0.9, 
 "weight_decay": 0.0,
 "fifo_buffer_size": 100,
-"fifo_samples_per_label":2,
+"fifo_samples_per_label":10,
 "hidden_layer_size": 100
 }
 
