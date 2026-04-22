@@ -1,0 +1,118 @@
+
+Distance metric: Euclidian distance 
+Metric Config: averaged over label space and then SoftMax
+Algorithm: model query based 
+Algo Config: support size is 5 
+Algo performance: Sub Optimal (60 % accuracy)
+Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\query_based_cl\fifo_buffer\permuted_mnist\code_v3\configuration-2.json"
+
+Label  0 distance 0.26902834181578794
+Label  1 distance 0.2679563908248532
+Label  2 distance 0.18312936276197433
+Label  3 distance 0.18500492379677538
+Label  4 distance 0.14460312438254452
+Label  5 distance 0.18715424303497588
+Label  6 distance 0.19429866171308927
+Label  7 distance 0.2010169251232731
+Label  8 v 0.24122720067294276
+Label  9 distance 0.20994402361767633
+
+
+==============================================================================================================================================================================================================================
+
+Distance metric: Euclidian distance 
+Metric Config: averaged over label space and then SoftMax
+Algorithm: model query based 
+Algo Config: support size is 60 
+Algo performance: Optimal (88% accuracy)
+Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\query_based_cl\fifo_buffer\permuted_mnist\code_v3\configuration.json"
+Label  0 distance 0.03432305258869821
+Label  1 distance 0.02589045733935675
+Label  2 distance 0.016363464485929936
+Label  3 distance 0.014594205759693774
+Label  4 distance 0.011639270275755197
+Label  5 distance 0.014880820068207627
+Label  6 distance 0.020509892380891407
+Label  7 distance 0.014603228925974394
+Label  8 distance 0.02663702998614433
+Label  9 distance 0.01987817479601624
+
+
+===============================================================================================================================================================================================================================
+Distance metric: Euclidian distance 
+Metric Config: averaged over label space and used only the last row of attention matrix(interaction of query and all supports)
+Algorithm: Attention network 
+Algorithm: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\full_attention\permuted_mnist\exp_code
+Config path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\full_attention\permuted_mnist\code_v2\configuration-4.json"
+Label  0 distance 0.002153353772955743
+Label  1 distance 0.0018355514607364255
+Label  2 distance 0.002055234102885013
+Label  3 distance 0.002007878741729101
+Label  4 distance 0.0019423026055655627
+Label  5 distance 0.0019537040732571396
+Label  6 distance 0.0020375204562323394
+Label  7 distance 0.0019262109954051958
+Label  8 distance 0.0020603480086734665
+Label  9 distance 0.001955282844076743
+
+
+================================================================================================================================================================================================================================
+
+Distance metric: Euclidian distance 
+Metric Config: 
+Algorithm: MAML 
+Algo Config: Ran on permuted mnist with 60k buffer size and batch size reduced to 1 datapoint, trained once in 10 incoming sample. Hence 6k training updates per task. (Used old code) 
+Algo performance: Optimal (80% accuracy)
+Path: "C:\Users\gauthambekal93\Research\continual_learning\loss_of_plasticity_and_forgetting\algorithms\maml\Code\expr_permuted_mnist_3.py"
+Label  0 distance 0.06384332478046417
+Label  1 distance 0.1335865706205368
+Label  2 distance 0.04036697745323181
+Label  3 distance 0.06584019213914871
+Label  4 distance 0.06017573922872543
+Label  5 distance 0.06263965368270874
+Label  6 distance 0.1694050282239914
+Label  7 distance 0.13393908739089966
+Label  8 distance 0.058880921453237534
+Label  9 distance 0.11834651231765747
+
+
+================================================================================================================================================================================================================================
+
+Distance metric: Euclidian distance 
+Metric Config: 
+Algorithm: MAML 
+Algo Config: We first store 500 tasks offline in buffer and do 100k epochs of meta learning style training on this dataset. Ideal meta learning style training.
+Algo performance: Sub optimal (50 %)
+Algorithm Path: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\maml\task_balanced_buffer\permuted_mnist\code_v5
+Analysis Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\maml\permuted_mnist\configuration-1.json"
+Label  0 distance 0.03723364323377609
+Label  1 distance 0.035228926688432693
+Label  2 distance 0.051320880651474
+Label  3 distance 0.033862192183732986
+Label  4 distance 0.03155537694692612
+Label  5 distance 0.029610995203256607
+Label  6 distance 0.035773616284132004
+Label  7 distance 0.042706817388534546
+Label  8 distance 0.039604730904102325
+Label  9 distance 0.02849038876593113
+
+
+=================================================================================================================================================================================================================================
+
+Distance metric: Euclidian distance 
+Metric Config: 
+Algorithm: MAML 
+Algo Config: We do full online meta learning on permuted mnist with same experiment config as all other algo. Basically batch size 400, so 150 updates per task. The buffer size is 1200.
+Algorithm Path: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\maml\task_balanced_buffer\permuted_mnist\code_v6
+Analysis Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\maml\permuted_mnist\configuration-2.json"
+Label  0 distance 0.010990931652486324
+Label  1 distance 0.021994933485984802
+Label  2 distance 0.010819613002240658
+Label  3 distance 0.008581088855862617
+Label  4 distance 0.020875494927167892
+Label  5 distance 0.010865418240427971
+Label  6 distance 0.02265467680990696
+Label  7 distance 0.014026792719960213
+Label  8 distance 0.01213349960744381
+Label  9 distance 0.013085804879665375
+

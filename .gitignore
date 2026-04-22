@@ -7,7 +7,7 @@ datasets/split_image_net
 datasets/slowly_changing_regression
 datasets/tiny_image_net
 datasets/tiny-imagenet-200
-
+datasets/imagenet_1k
 
 results/cifar_100
 results/permuted_mnist
@@ -15,3 +15,4 @@ results/split_image_net
 results/slowly_changing_regression
 results/tiny_image_net
 tiny_imagenet
+results/imagenet_1k_augmentation
