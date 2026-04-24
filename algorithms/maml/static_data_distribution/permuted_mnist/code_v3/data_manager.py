@@ -96,9 +96,9 @@ class DataManager:
              
              supports_y[task_id] = Y[rand_ids][:self.supports_per_task]
              
-             queries_x[task_id]  =  X[rand_ids][-self.queries_per_task:]
+             queries_x[task_id]  = X[rand_ids][-self.queries_per_task:]
              
-             queries_y[task_id]  =  Y[rand_ids][-self.queries_per_task:]
+             queries_y[task_id]  = Y[rand_ids][-self.queries_per_task:]
              
          return supports_x , supports_y, queries_x, queries_y
         

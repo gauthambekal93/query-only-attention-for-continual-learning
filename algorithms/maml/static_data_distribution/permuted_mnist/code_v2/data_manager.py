@@ -45,6 +45,8 @@ class DataManager:
          
          self.buffer_key = 0
          
+         self.buffer_id = 0
+         
      def create_permute_mnist_data(self):
                     
         with open( self.data_path , 'rb') as f:
@@ -76,10 +78,11 @@ class DataManager:
    
      def fill_buffer(self, x, y ):
             
-            self.buffer_x[self.buffer_key][: self.buffer_size_per_task] = x[: self.buffer_size_per_task].clone()
+            self.buffer_x[self.buffer_key][self.buffer_id: self.buffer_id + len(x)] = x.clone()
             
-            self.buffer_y[self.buffer_key][: self.buffer_size_per_task] = y[:self.buffer_size_per_task].clone()
+            self.buffer_y[self.buffer_key][self.buffer_id: self.buffer_id + len(x)] = y.clone()
             
+            self.buffer_id = (self.buffer_id + len(x) ) % self.buffer_size_per_task
             
 
      def get_buffer_data(self, selected_task_ids):

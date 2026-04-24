@@ -75,6 +75,20 @@ Label  7 distance 0.13393908739089966
 Label  8 distance 0.058880921453237534
 Label  9 distance 0.11834651231765747
 
+Algo Path: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\maml\slowly_changing_stream\permuted_mnist\code_v1
+Config Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\maml\permuted_mnist\configuration-3.json"
+
+Label  0 distance 0.010455512441694736
+Label  1 distance 0.027380581945180893
+Label  2 distance 0.029237674549221992
+Label  3 distance 0.0020072530023753643
+Label  4 distance 0.022931735962629318
+Label  5 distance 0.012746050022542477
+Label  6 distance 0.013659896329045296
+Label  7 distance 0.003024438163265586
+Label  8 distance 0.0017398754134774208
+Label  9 distance 0.0017083269776776433
+
 
 ================================================================================================================================================================================================================================
 
@@ -97,14 +111,32 @@ Label  8 distance 0.039604730904102325
 Label  9 distance 0.02849038876593113
 
 
+Algo Path: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\maml\static_data_distribution\permuted_mnist\code_v1
+Config Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\maml\permuted_mnist\configuration-4.json"
+
+Label  0 distance 0.033444594591856
+Label  1 distance 0.050206199288368225
+Label  2 distance 0.06500182300806046
+Label  3 distance 0.025438401848077774
+Label  4 distance 0.025856196880340576
+Label  5 distance 0.034864943474531174
+Label  6 distance 0.02476324327290058
+Label  7 distance 0.039655134081840515
+Label  8 distance 0.04254314303398132
+Label  9 distance 0.029334530234336853
+
+
+
 =================================================================================================================================================================================================================================
 
 Distance metric: Euclidian distance 
 Metric Config: 
 Algorithm: MAML 
 Algo Config: We do full online meta learning on permuted mnist with same experiment config as all other algo. Basically batch size 400, so 150 updates per task. The buffer size is 1200.
-Algorithm Path: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\maml\task_balanced_buffer\permuted_mnist\code_v6
-Analysis Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\maml\permuted_mnist\configuration-2.json"
+Algorithm Path: C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\algorithms\maml\normal_changing_stream\permuted_mnist\code_v1
+Config Path: "C:\Users\gauthambekal93\Research\query-only-attention-for-continual-learning\analysis_and_workings\maml\permuted_mnist\configuration-5.json""
+
+
 Label  0 distance 0.010990931652486324
 Label  1 distance 0.021994933485984802
 Label  2 distance 0.010819613002240658
@@ -115,4 +147,5 @@ Label  6 distance 0.02265467680990696
 Label  7 distance 0.014026792719960213
 Label  8 distance 0.01213349960744381
 Label  9 distance 0.013085804879665375
+
 

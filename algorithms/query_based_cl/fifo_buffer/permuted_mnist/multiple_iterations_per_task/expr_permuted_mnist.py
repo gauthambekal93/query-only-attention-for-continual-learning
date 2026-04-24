@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 # Get current file's directory
@@ -43,12 +43,12 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.maml.permuted_mnist.data_manager import DataManager 
-    from analysis_and_workings.maml.permuted_mnist.runner import Runner 
-    from analysis_and_workings.maml.permuted_mnist.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.maml.permuted_mnist.neural_networks import ERNetwork
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.multiple_iterations_per_task.data_manager import DataManager 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.multiple_iterations_per_task.runner import Runner 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.multiple_iterations_per_task.checkpoint_manager import CheckpointManager 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.multiple_iterations_per_task.neural_networks import ERNetwork
     
-    global ERNetwork, DataManager, Runner, CheckpointManager
+    global  ERNetwork, DataManager, Runner, CheckpointManager
     
     
     
@@ -66,8 +66,6 @@ class TrainContext:
         self.opt = torch.optim.Adam(self.net.parameters(), lr=step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
         
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
-        
-        self.step_size = step_size
         
         
     
@@ -108,19 +106,13 @@ class PermutedMNISTExperiment:
                 
         self.weight_decay = model_params['weight_decay']
     
+        self.buffer_size = model_params["buffer_size"]
+                
         self.test_batch_size = model_params["test_batch_size"]
         
-        self.supports_per_task = model_params["supports_per_task"]
+        self.samples_per_label = model_params["samples_per_label"]
+
         
-        self.queries_per_task = model_params["queries_per_task"]
-        
-        self.num_tasks_in_buffer = model_params["num_tasks_in_buffer"]
-         
-        self.buffer_size_per_task = model_params["buffer_size_per_task"]
-        
-        self.num_train_iterations = model_params["num_train_iterations"]
-        
-        self.num_tasks_per_update = model_params["num_tasks_per_update"]
 
         
     def initialize_model(self):
@@ -129,12 +121,11 @@ class PermutedMNISTExperiment:
       
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, 
-                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.supports_per_task, self.queries_per_task, self.buffer_size_per_task, 
-                                             self.num_tasks_in_buffer, self.num_tasks)
+                                             self.num_old_task_window, self.buffer_size, self.num_datapoints_per_timestep, self.samples_per_label, self.num_tasks)
          
     
     def initialize_runner(self):
-        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size, self.num_train_iterations, self.num_tasks_per_update)
+        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size)
     
     
 
@@ -179,7 +170,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-4.json") 
+    config_path = os.path.join( experiment_dir, "configuration.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   

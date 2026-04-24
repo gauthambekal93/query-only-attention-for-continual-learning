@@ -260,6 +260,8 @@ class Runner:
             
             data_manager_obj.buffer_key = data_manager_obj.current_task_id % data_manager_obj.num_tasks_in_buffer
             
+            data_manager_obj.buffer_id = 0
+            
             print("Loop time ", time.perf_counter() -  start)
             
             print("===========================================================================================")

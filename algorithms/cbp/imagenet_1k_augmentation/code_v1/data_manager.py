@@ -12,17 +12,16 @@ from torchvision import datasets, transforms
 import torch
 import torch.nn.functional as F
 from augmentations import get_task_params, augment_batch
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader
 import random
-
-
+from torch.utils.data import DataLoader, Subset
 
 class DataManager:
      
      def __init__(self, device, root, data_dir, classes_per_task, total_classes, num_old_task_window, num_datapoints_per_timestep, num_tasks): 
          
          self.device = device
-         #self.data_path = os.path.join( root, data_dir)
+         self.data_path = os.path.join( root, data_dir)
          self.classes_per_task = classes_per_task
          self.total_classes = total_classes
          self.num_old_task_window = num_old_task_window
@@ -35,16 +34,14 @@ class DataManager:
         
          self.num_datapoints_per_timestep = num_datapoints_per_timestep
          
-         self.data_path = os.path.join( root, data_dir)
          self.batch_size = 256
          self.img_size = 128
          self.num_workers = 1
      
          self._build_dataset()
          self._build_class_index()
-        
-          
-
+         
+         
      def _build_dataset(self):
 
         normalize = transforms.Normalize(
@@ -91,10 +88,10 @@ class DataManager:
      
      def sample_task(self ):
 
-        
+        import time
         samples_per_class = 500
         chosen_classes = random.sample(range(self.num_classes), self.classes_per_task)
-
+        start = time.time() 
         # collect indices
         all_indices = []
         class_counts = {}   # track counts per class
@@ -160,20 +157,22 @@ class DataManager:
     
         test_x = torch.cat(test_x).to(self.device)
         test_y = torch.cat(test_y).to(self.device)
-
+        print(time.time() - start)
        
         return train_x, train_y, test_x, test_y, chosen_classes
                      
-        
+            
+            
      def relable_data(self, Y, task_labels):
+         
+            Y_new = torch.empty_like(Y)
         
-           Y_new = torch.empty_like(Y)
-       
-           for new_label, old_label in enumerate(task_labels):
-               Y_new[Y == old_label] = new_label
-       
-           return Y_new
-       
+            for new_label, old_label in enumerate(task_labels):
+                Y_new[Y == old_label] = new_label
+        
+            return Y_new
+                 
+                  
      def create_task_data(self):
             
              train_x, train_y, test_x, test_y, task_labels = self.sample_task()
@@ -198,7 +197,7 @@ class DataManager:
              
              self.task_test_x[self.current_task_id] = test_x
             
-             self.task_test_y[self.current_task_id] = self.relable_data(test_y, task_labels)    
+             self.task_test_y[self.current_task_id] = self.relable_data(test_y, task_labels)     
 
 
      def delete_data(self):

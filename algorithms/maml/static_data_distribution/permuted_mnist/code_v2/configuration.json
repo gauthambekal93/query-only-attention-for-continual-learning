@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/maml/static_data_distribution\\0\\0",
+"model_dir": "results/permuted_mnist/maml/static_data_distribution\\1\\0",
 "input_size": 49,    
 "num_features":200,
 "num_hidden_layers": 4,
@@ -24,8 +24,8 @@
 "weight_decay": 0.0,
 "supports_per_task":10,
 "queries_per_task":10,
-"buffer_size_per_task":100,
-"num_tasks_in_buffer":500, 
+"buffer_size_per_task":6000,
+"num_tasks_in_buffer":10, 
 "test_batch_size": 1000,
 "num_train_iterations":5,
 "num_tasks_per_update":5
