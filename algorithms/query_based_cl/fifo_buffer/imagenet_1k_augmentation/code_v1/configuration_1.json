@@ -1,0 +1,27 @@
+{ 
+"experiment_discription":"Imagenet 1k with data augmentation, generates 5 label at neural net output with reservoir replay algorithm",
+
+"data_config":{ 
+   "num_tasks": 10000,
+   "total_classes":1000,
+   "initial_num_classes":5,
+   "classes_per_task":2,
+   "num_old_task_window":2,
+   "num_datapoints_per_timestep": 10,
+   "data_dir": "datasets/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC/train/"
+},
+
+"model_config":
+{
+"seed": 30,
+"use_gpu":0,
+"model_dir": "results//imagenet_1k_augmentation/augmentation/query_based_cl/fifo_buffer/0/1",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0,
+"fifo_buffer_size": 100,
+"fifo_samples_per_label":10,
+"hidden_layer_size": 100
+}
+
+}

@@ -106,9 +106,9 @@ class CheckpointManager:
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
             
 
-            data_manager_obj.balanced_task_buffer_x =  self.results_dict["balanced_task_buffer_x"]
+            #data_manager_obj.balanced_task_buffer_x =  self.results_dict["balanced_task_buffer_x"]
             
-            data_manager_obj.balanced_task_buffer_y =  self.results_dict["balanced_task_buffer_y"]
+            #data_manager_obj.balanced_task_buffer_y =  self.results_dict["balanced_task_buffer_y"]
             
             
             data_manager_obj.fifo_x =  self.results_dict["fifo_x"]
@@ -116,7 +116,7 @@ class CheckpointManager:
             data_manager_obj.fifo_y =  self.results_dict["fifo_y"]
             
             
-            data_manager_obj.buffer_counter = self.results_dict["buffer_counter"]
+            #data_manager_obj.buffer_counter = self.results_dict["buffer_counter"]
             
             data_manager_obj.fifo_counter = self.results_dict["fifo_counter"] 
             

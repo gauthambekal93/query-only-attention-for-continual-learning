@@ -205,7 +205,7 @@ bwd_dark_exp_acc, bwd_dark_exp_std  = calculate_curve(base_path, config_id, seed
 # ==============query-based cl====================
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "3" , ["0"] , 9500, 100
+config_id, seed_ids, NUM_TASKS, average_over = "3" , ["0", "1", "2"] , 9500, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "query_based_cl", "fifo_buffer")
 
 fwd_qcl_acc, fwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
@@ -215,7 +215,7 @@ bwd_qcl_acc, bwd_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "bac
 # ==============full_attention====================
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1"] , 9500, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "full_attention")
 
 fwd_fatt_acc, fwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)

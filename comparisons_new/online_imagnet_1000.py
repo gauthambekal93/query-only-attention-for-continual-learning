@@ -126,21 +126,50 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 """==============Vanilla Backprop ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 9500, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 4000, 100
 base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "bp",)
 
 fwd_bp_acc, fwd_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_bp_acc, prequential_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
+"""==============Query-Based Attention ==================== """
+
+
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 4000, 100
+base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "query_based_cl", "fifo_buffer")
+
+fwd_q_cl_acc, fwd_q_cl_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_q_cl_acc, prequential_q_cl_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_q_cl_acc, bwd_q_cl_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
+
+"""==============Full Attention ==================== """
+
+
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 4000, 100
+base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "full_attention",)
+
+fwd_fatt_acc, fwd_fatt_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+bwd_fatt_acc, bwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
+
 
 plot_graph({ 
-            "BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"red", "linestyle": "-",  "marker": "d"}),
-            "BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"green", "linestyle": "-",  "marker": "d"}),
-            #"BP: Backward Accurcy":  (bwd_bp_acc, bwd_bp_std, {"color":"blue", "linestyle": "-",  "marker": "d"}),
+            "BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"green", "linestyle": "-",  "marker": "d"}),
+            "Q_CL: Forward Accurcy":  (fwd_q_cl_acc, fwd_q_cl_std, {"color":"black", "linestyle": "-",  "marker": "d"}),
+            "Attention: Forward Accurcy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"red", "linestyle": "-",  "marker": "d"})
             },
              title="Augmented Imagenet 1000 - Forward Accuracy ",
              ylabel = "Accuracy")
+plot_graph({ 
+            "BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"green", "linestyle": "-",  "marker": "d"}),
+            "Q_CL: Prequential Accurcy":  (prequential_q_cl_acc, prequential_q_cl_std, {"color":"black", "linestyle": "-",  "marker": "d"}),
+            "Attention: Prequential Accurcy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "d"})
+            },
+             title="Augmented Imagenet 1000 - Prequential Accuracy ",
+             ylabel = "Accuracy")
+
+
 
 
 
