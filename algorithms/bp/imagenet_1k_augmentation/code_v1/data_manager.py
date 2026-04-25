@@ -91,10 +91,10 @@ class DataManager:
      
      def sample_task(self ):
 
-        import time
+        
         samples_per_class = 500
         chosen_classes = random.sample(range(self.num_classes), self.classes_per_task)
-        start = time.time() 
+
         # collect indices
         all_indices = []
         class_counts = {}   # track counts per class
@@ -160,7 +160,7 @@ class DataManager:
     
         test_x = torch.cat(test_x).to(self.device)
         test_y = torch.cat(test_y).to(self.device)
-        print(time.time() - start)
+
        
         return train_x, train_y, test_x, test_y, chosen_classes
                      

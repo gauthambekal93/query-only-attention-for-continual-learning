@@ -36,16 +36,13 @@ class DataManager:
          self.buffer_x = { i: torch.empty( buffer_size_per_task, 49).to(self.device) for i in range(num_tasks_in_buffer )}  
          self.buffer_y = { i: torch.empty( buffer_size_per_task).to(self.device).long() for i in range(num_tasks_in_buffer ) }
          
-         #self.buffer_x = { }  
-         #self.buffer_y = { }
-         
+    
          self.num_datapoints_per_timestep = num_datapoints_per_timestep
          
          self.supports_per_task = supports_per_task
          
          self.queries_per_task = queries_per_task
          
-         self.buffer_id = 0
          self.buffer_key = 0
          
      def create_permute_mnist_data(self):
@@ -79,13 +76,11 @@ class DataManager:
    
      def fill_buffer(self, x, y ):
             
-            if self.buffer_id < self.buffer_size_per_task:
-                
-                self.buffer_x[self.buffer_key][self.buffer_id] = x.clone()
-                
-                self.buffer_y[self.buffer_key][self.buffer_id] = y.clone()
-                
-                self.buffer_id = self.buffer_id + 1
+            self.buffer_x[self.buffer_key][: self.buffer_size_per_task] = x[: self.buffer_size_per_task].clone()
+            
+            self.buffer_y[self.buffer_key][: self.buffer_size_per_task] = y[:self.buffer_size_per_task].clone()
+            
+            
 
      def get_buffer_data(self, selected_task_ids):
          
