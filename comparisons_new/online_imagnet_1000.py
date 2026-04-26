@@ -136,7 +136,7 @@ bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, config_id, seed_ids, "backw
 """==============Query-Based Attention ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 4000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 5000, 100
 base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "query_based_cl", "fifo_buffer")
 
 fwd_q_cl_acc, fwd_q_cl_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
@@ -146,7 +146,7 @@ bwd_q_cl_acc, bwd_q_cl_std  = calculate_curve(base_path, config_id, seed_ids, "b
 """==============Full Attention ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 4000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 5000, 100
 base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "full_attention",)
 
 fwd_fatt_acc, fwd_fatt_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
