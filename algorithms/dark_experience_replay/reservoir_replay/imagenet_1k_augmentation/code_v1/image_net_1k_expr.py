@@ -164,11 +164,9 @@ def main(arguments):
    exp_obj.runner_obj.run(exp_obj.train_context, exp_obj.data_manager_obj, exp_obj.checkpoint_obj)
    
 
-
-
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    config_path = os.path.join( experiment_dir, "configuration_0.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     

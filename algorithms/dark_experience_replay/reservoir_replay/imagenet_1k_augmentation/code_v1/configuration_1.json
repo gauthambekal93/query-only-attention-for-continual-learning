@@ -1,0 +1,28 @@
+{ 
+"experiment_discription":"Imagenet-1k",
+
+"data_config":{ 
+   "num_tasks": 10000,
+   "total_classes":1000,
+   "classes_per_task":2,
+   "num_old_task_window":2,
+   "num_datapoints_per_timestep": 10,
+   "data_dir": "datasets/imagenet-object-localization-challenge/ILSVRC/Data/CLS-LOC/train/"
+},
+
+
+"model_config":{
+"seed": 30,
+"use_gpu":0,
+"model_dir": "results//imagenet_1k_augmentation/augmentation/dark_experience_replay/reservoir_replay/0/1",
+"step_size":0.0001,
+"momentum": 0.9, 
+"weight_decay": 0.0,
+"buffer_size": 2000,
+"samples_from_buffer":10,
+"alpha":0.5, 
+"beta":0.5 
+
+}
+
+}
