@@ -56,6 +56,7 @@ class CheckpointManager:
           
             self.results_dict["buffer_x"] = copy.deepcopy ( data_manager_obj.buffer_x ) 
             self.results_dict["buffer_y"] = copy.deepcopy ( data_manager_obj.buffer_y ) 
+            self.results_dict["buffer_z"] = copy.deepcopy ( data_manager_obj.buffer_z ) 
             
             self.results_dict["step"] = copy.deepcopy ( data_manager_obj.step ) 
             self.results_dict["buffer_counter"] = copy.deepcopy ( data_manager_obj.buffer_counter ) 
@@ -110,6 +111,8 @@ class CheckpointManager:
             data_manager_obj.buffer_x =  self.results_dict["buffer_x"]
             
             data_manager_obj.buffer_y =  self.results_dict["buffer_y"]
+            
+            data_manager_obj.buffer_z = self.results_dict["buffer_z"]
             
             
             data_manager_obj.train_loss =  self.results_dict["train_loss"]
