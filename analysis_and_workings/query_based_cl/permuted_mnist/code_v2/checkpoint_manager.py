@@ -118,6 +118,8 @@ class CheckpointManager:
             
             data_manager_obj.backward_accuracy =  self.results_dict["backward_accuracy"]
             
+            data_manager_obj.deltas = self.results_dict["deltas"]
+            
             
             task_id =  self.results_dict["task_id"]
             
@@ -125,26 +127,7 @@ class CheckpointManager:
             
             
             return self.results_dict["train_loss"][task_id]
-'''        
-for i in self.results_dict["task_test_x"].keys():
-    print(self.results_dict["task_test_x"][i].shape, self.results_dict["task_test_x"][i].dtype)
-    
-    
-    
-    
-for i in self.results_dict["buffer_x"].keys():
-    x = self.results_dict["buffer_x"][i]
-    print(
-        i,
-        "shape =", x.shape,
-        "visible_bytes =", x.numel() * x.element_size(),
-        "storage_bytes =", x.untyped_storage().nbytes(),
-        "is_view =", x._base is not None,
-        "is_contiguous =", x.is_contiguous()
-    )    
-    
-'''    
-    
+
     
     
     
