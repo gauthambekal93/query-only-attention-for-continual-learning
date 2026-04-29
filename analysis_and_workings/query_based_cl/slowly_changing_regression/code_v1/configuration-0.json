@@ -15,7 +15,7 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/query_based_cl/fifo_buffer\\2\\0",
+"model_dir": "results//slowly_changing_regression/query_based_cl/fifo_buffer/2/0",
 "num_inputs": 41,
 "num_outputs":1, 
 "num_features": 20,

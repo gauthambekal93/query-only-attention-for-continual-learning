@@ -15,7 +15,7 @@
 "model_config":{
 "seed": 40,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/full_attention\\2\\0",
+"model_dir": "results//slowly_changing_regression/full_attention/2/2",
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 14,
