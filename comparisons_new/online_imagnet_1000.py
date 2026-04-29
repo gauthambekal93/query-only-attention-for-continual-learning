@@ -146,13 +146,22 @@ prequential_cbp_acc, prequential_cbp_std  = calculate_curve(base_path,  config_i
 
 """==============EWC ==================== """
 
-
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1"] , 5000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 5000, 100
 base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "ewc",)
 
 fwd_ewc_acc, fwd_ewc_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_ewc_acc, prequential_ewc_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 #bwd_ewc_acc, bwd_ewc_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
+
+"""==============Regenerative Regularisation ==================== """
+
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 5000, 100
+base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "regenerative_regularization",)
+
+fwd_regen_acc, fwd_regen_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_regen_acc, prequential_regen_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+#bwd_regen_acc, bwd_regen_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
+
 
 """==============Concat_ReLU ==================== """
 
@@ -164,10 +173,21 @@ fwd_concat_relu_acc, fwd_concat_relu_std  = calculate_curve(base_path,  config_i
 prequential_concat_relu_acc, prequential_concat_relu_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 #bwd_concat_relu_acc, bwd_concat_relu_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
+"""============= Experience Replay ==================== """
+
+
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 5000, 100
+base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "experience_replay","reservoir_replay")
+
+fwd_ex_rep_acc, fwd_ex_rep_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+prequential_ex_rep_acc, prequential_ex_rep_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+#bwd_ex_rep_acc, bwd_ex_rep_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
+
+
 """==============Dark Experience Replay ==================== """
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1"] , 3500, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 5000, 100
 base_path = os.path.join(project_root, "results", "imagenet_1k_augmentation", "augmentation", "dark_experience_replay","reservoir_replay")
 
 fwd_darker_acc, fwd_darker_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
@@ -200,7 +220,9 @@ plot_graph({
             "BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
             "CBP: Forward Accurcy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "d"}),
             "EWC: Forward Accurcy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "d"}),
+            "Regenerative Regularisation: Forward Accurcy":  (fwd_regen_acc, fwd_regen_std, {"color":"orange", "linestyle": "-",  "marker": "d"}),
             "Concat_ReLU: Forward Accurcy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "d"}),
+            "Experience Replay: Forward Accurcy":  (fwd_ex_rep_acc, fwd_ex_rep_std, {"color":"chocolate", "linestyle": "-",  "marker": "d"}),
             "Dark Experience Replay: Forward Accurcy":  (fwd_darker_acc, fwd_darker_std, {"color":"magenta", "linestyle": "-",  "marker": "d"}),
             "Q_CL: Forward Accurcy":  (fwd_q_cl_acc, fwd_q_cl_std, {"color":"black", "linestyle": "-",  "marker": "d"}),
             "Attention: Forward Accurcy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"red", "linestyle": "-",  "marker": "d"})
@@ -211,7 +233,9 @@ plot_graph({
             "BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
             "CBP: Prequential Accurcy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "d"}),
             "EWC: Prequential Accurcy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "d"}),
+            "Regenerative Regularisation: Prequential Accurcy":  (prequential_regen_acc, prequential_regen_std, {"color":"orange", "linestyle": "-",  "marker": "d"}),
             "Concat_ReLU: Prequential Accurcy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "d"}),
+            "Experience Replay: Prequential Accurcy":  (prequential_ex_rep_acc, prequential_ex_rep_std, {"color":"chocolate", "linestyle": "-",  "marker": "d"}),
             "Dark Experience Replay: Prequential Accurcy":  (prequential_darker_acc, prequential_darker_std, {"color":"magenta", "linestyle": "-",  "marker": "d"}),
             "Q_CL: Prequential Accurcy":  (prequential_q_cl_acc, prequential_q_cl_std, {"color":"black", "linestyle": "-",  "marker": "d"}),
             "Attention: Prequential Accurcy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "d"})

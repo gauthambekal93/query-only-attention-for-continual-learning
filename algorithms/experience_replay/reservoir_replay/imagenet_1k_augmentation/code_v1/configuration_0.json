@@ -12,9 +12,9 @@
 
 
 "model_config":{
-"seed": 30,
+"seed": 20,
 "use_gpu":0,
-"model_dir": "results//imagenet_1k_augmentation/augmentation/experience_replay/reservoir_replay/0/1",
+"model_dir": "results//imagenet_1k_augmentation/augmentation/experience_replay/reservoir_replay/0/0",
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,
