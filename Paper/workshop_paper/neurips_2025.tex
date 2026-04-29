@@ -1,0 +1,1322 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+\PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+
+% The authors should use one of these tracks.
+% Before accepting by the NeurIPS conference, select one of the options below.
+% 0. "default" for submission
+% \usepackage{neurips_2025}
+% the "default" option is equal to the "main" option, which is used for the Main Track with double-blind reviewing.
+% 1. "main" option is used for the Main Track
+%  \usepackage[main]{neurips_2025}
+% 2. "position" option is used for the Position Paper Track
+%  \usepackage[position]{neurips_2025}
+% 3. "dandb" option is used for the Datasets & Benchmarks Track
+ % \usepackage[dandb]{neurips_2025}
+% 4. "creativeai" option is used for the Creative AI Track
+%  \usepackage[creativeai]{neurips_2025}
+% 5. "sglblindworkshop" option is used for the Workshop with single-blind reviewing
+ % \usepackage[sglblindworkshop]{neurips_2025}
+% 6. "dblblindworkshop" option is used for the Workshop with double-blind reviewing
+\usepackage[dblblindworkshop, final]{neurips_2025}
+
+% After being accepted, the authors should add "final" behind the track to compile a camera-ready version.
+% 1. Main Track
+ % \usepackage[main, final]{neurips_2025}
+% 2. Position Paper Track
+%  \usepackage[position, final]{neurips_2025}
+% 3. Datasets & Benchmarks Track
+ % \usepackage[dandb, final]{neurips_2025}
+% 4. Creative AI Track
+%  \usepackage[creativeai, final]{neurips_2025}
+% 5. Workshop with single-blind reviewing
+%  \usepackage[sglblindworkshop, final]{neurips_2025}
+% 6. Workshop with double-blind reviewing
+%  \usepackage[dblblindworkshop, final]{neurips_2025}
+% Note. For the workshop paper template, both \title{} and \workshoptitle{} are required, with the former indicating the paper title shown in the title and the latter indicating the workshop title displayed in the footnote.
+% For workshops (5., 6.), the authors should add the name of the workshop, "\workshoptitle" command is used to set the workshop title.
+\workshoptitle{Socially Responsible and Trustworthy Foundation Models (NeurIPS 2025)}
+
+% "preprint" option is used for arXiv or other preprint submissions
+ % \usepackage[preprint]{neurips_2025}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+%\usepackage{hyperref}       % hyperlinks
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx} 
+\usepackage{float} 
+%\usepackage{needspace}
+
+\usepackage{etoolbox}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+
+% Keep at least N lines with each heading
+%\preto\section{\needspace{3\baselineskip}}
+%\preto\subsection{\needspace{2\baselineskip}}
+%\preto\subsubsection{\needspace{2\baselineskip}}
+%\usepackage[section]{placeins}
+
+\usepackage{placeins}  % adds \FloatBarrier
+% Note. For the workshop paper template, both \title{} and \workshoptitle{} are required, with the former indicating the paper title shown in the title and the latter indicating the workshop title displayed in the footnote. 
+
+% ---------- PREAMBLE ADDITIONS ----------
+% after \usepackage{graphicx}
+\usepackage{subcaption}                 % for subfigures
+\usepackage[font=small]{caption}        % slightly smaller captions
+\captionsetup{skip=4pt}                 % space between figure and caption
+
+% tighten float spacing (safe, lightweight)
+\setlength{\textfloatsep}{8pt plus 1pt minus 2pt}
+\setlength{\intextsep}{6pt plus 1pt minus 2pt}
+\setlength{\floatsep}{8pt plus 1pt minus 2pt}
+
+\title{Query-Only Attention for Trustworthy Continual Adaptation}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+\author{
+  Gautham Udayakumar Bekal \\
+  Independent Researcher \\
+  \texttt{gautham.bekal@enlyte.com} \\
+  \And
+  Ashish Pujari \\
+  University of North Carolina at Charlotte \\
+  \texttt{apujari1@uncc.edu}
+  \And
+  Scott David Kelly \\
+  University of North Carolina at Charlotte \\
+  \texttt{skelly52@charlotte.edu}
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+
+Foundation models deployed in dynamic environments face continual distributional shifts and evolving data conditions, where failure to adapt can erode reliability and fairness. We propose a Query-Only Attention mechanism that discards keys and values while preserving the inductive bias of full-attention architectures. 
+In continual learning scenarios, this simplified mechanism significantly mitigates both loss of plasticity and catastrophic forgetting, outperforming baselines such as selective re-initialization. 
+Query-Only Attention achieves competitive performance to full attention while being more compute-efficient.
+We establish a conceptual link between query-only attention, full transformer attention, and model agnostic meta-learning, framing them as instances of meta-learning. 
+Finally, through Hessian-spectrum analysis, we show that models maintaining higher curvature rank across tasks exhibit sustained adaptability, improving trustworthiness under distribution shift.
+These findings highlight principles relevant to real-world continual learning systems that demand reliability, fairness, and accountability.
+\end{abstract}
+
+\section{Introduction}
+Continual learning remains a fundamental challenge in deep learning \citep{wang2024comprehensive}, where models must learn from non-stationary data streams without succumbing to catastrophic forgetting \citep{kirkpatrick2017overcoming} or loss of plasticity \citep{dohare2024loss}.
+For foundation models deployed in dynamic environments, failure to adapt under distributional shift can silently degrade reliability, fairness, and safety, making continual adaptation central to trustworthy and responsible AI.
+
+While existing approaches mitigate forgetting using replay buffers \citep{zhang2024core} or regularization \citep{kirkpatrick2017overcoming}, preserving plasticity—the ability to acquire new knowledge—remains less explored.
+Recent studies show that transformer attention \citep{vaswani2017attention} inherently supports plasticity across tasks \citep{wang2025replay}. Motivated by this, we ask: Can the core mechanism of attention be simplified for scalable and trustworthy continual adaptation?
+
+We propose Query-Only Attention (QOA), a minimalist mechanism that removes keys and values yet preserves the inductive bias of full attention. QOA maintains stable curvature (high Hessian rank) across tasks, enabling controlled learning and unlearning—a property vital for safe knowledge editing and continual fine-tuning of foundation models.
+Our analysis links QOA, full attention, and Model-Agnostic Meta-Learning \citep{finn2017maml}, showing that both achieve stable, near-constant curvature indicative of robust adaptability.
+
+In safety-critical domains such as healthcare or public policy, responsible foundation models must adapt continually without amplifying bias, compromising privacy, or degrading performance. QOA contributes toward this goal by combining efficient continual adaptation with trustworthy behavior.
+
+Key contributions:
+\begin{itemize}
+\item We introduce \textit{Query-Only Attention}, which is based on attention mechanism and meta-learning that mitigates loss of plasticity more effectively than state-of-the-art methods in fully online continual learning experiments.
+\item As a natural consequence, Query-Only Attention also mitigates catastrophic forgetting when task identity is available, although \textit{forgetting reduction is not the primary focus of this work}.
+\item We provide a conceptual explanation showing that Query-Only Attention mitigates both loss of plasticity and forgetting by converging toward a \textit{global} rather than task-specific \textit{local} solution.
+\item We establish conceptual links between Query-Only Attention, the original attention mechanism \citep{vaswani2017attention}, and meta-learning approaches such as MAML \citep{finn2017maml} in continual learning context.
+\item We analyze the Hessian spectrum and effective rank \citep{lewandowski2023curvature}, demonstrating that decreasing rank across tasks correlates with loss of plasticity.
+\end{itemize}
+
+
+
+\section{Related work}
+Deep neural networks have shown remarkable generalization capabilities on unseen tasks. However, they typically operate under the assumption that the training data is stationary and that all samples are available simultaneously during training. In contrast, online learning assumes that data arrives sequentially in a stream and each data point is observed only once, eliminating the concept of epochs.
+In such a setting, the model must continuously update its parameters to adapt to incoming data. From the model’s perspective, the data distribution is inherently non-stationary, since not all samples are available at the same time. This leads to two major challenges: catastrophic forgetting and loss of plasticity.
+Catastrophic forgetting — the degradation of performance on previously learned tasks after training on new ones — has been extensively studied in the literature \citep{mccloskey1989catastrophic}, \citep{kemker2018measuring}, \citep{ramasesh2021anatomy}.
+A more fundamental and less studied issue is loss of plasticity, the gradual reduction in a model’s ability to learn new tasks altogether \citep{dohare2024loss}, \citep{mirzadeh2020understanding}
+
+Hence, continual learning faces challenge on two fronts, forward performance / mitigating loss of plasticity and backward performance / mitigating catastrophic forgetting. \citep{chen2023stability} showed that
+there exists a tradeoff between the two. We show an alternative view that 
+Query-Only Attention and related architectures attain a global solution which mitigates both loss of plasticity and catastrophic forgetting simultaneously.
+
+
+Most papers, analyze one of the two of above challenges, however very few papers tackle both challenges simultaneously.
+Regularization-based continual learning methods such as Elastic Weight Consolidation (EWC) \citep{kirkpatrick2017overcoming}, \citep{zenke2017si}, and Learning without Forgetting \citep{li2016lwf} were designed primarily to mitigate catastrophic forgetting, i.e., the degradation of previously learned tasks. However, these approaches do not directly address the complementary challenge of loss of plasticity, where the model fails to acquire new tasks altogether. Our focus in this work is specifically on loss of plasticity, where forgetting is a downstream consequence rather than the central phenomenon. For this reason, we compare against baselines that are explicitly targeted at plasticity, including \citep{dohare2024loss} and recent attention-based approaches \citep{wang2025replay}. For completeness, we also evaluate an EWC-style method on one benchmark.
+
+One such paper is \citep{elsayed2024addressing} which uses utility based methodology for handling both catastrophic forgetting and loss of plasticity. Here, the authors are working with unknown task boundaries. However, obtaining the utility is expensive especially in the era of large and very 
+large models. Controlling gradient updates based on weight utility leads to reduced ability to retain old tasks as their number increases. Most importantly, this method is ad-hoc solution for continual learning problem and not a more global solution which can scale to very large number of tasks.
+Our method contrasts in that it obtains a global solution and thus has no reduction in performance irrespective number of tasks.
+
+The core algorithm we developed is most closely related to the paper \citep{wang2025replay} which utilizes attention network and replay buffer to handle this challenge. However, attention network has $O(n^2)$ in compute which can be challenging in continual learning setting where data will come rapidly.  Here, n is the size of replay buffer. 
+We draw our inspiration from this paper on using replay buffer but make a novel hypothesis that query matrix is all that is needed for continual learning. Our method achieves similar or superior performance compare to full attention and can also do the compute in O(n).
+The other aspect being \citep{wang2025replay}  does not explain the intriguing phenomenon.
+Here we carry out a detailed empirical and theoretical analysis on why query-only attention works.
+
+Our work reveals  deep connection between attention network, in-context learning \citep{dong2024survey}, \citep{wu2025why}, \citep{ahn2023transformers} model agnostic meta learning \citep{finn2017maml}, and metric based meta learning \citep{vinyals2016matching}, \citep{koch2015siamese}, \citep{snell2017prototypical} under the paradigm of continual learning.
+
+To analyze plasticity in continual adaptation, we measure the effective Hessian rank \citep{lewandowski2023curvature, roy2007effective}, where higher rank indicates sustained adaptability. Query-Only Attention maintains a stable or non-decreasing rank across tasks, supporting reliable, transparent, and controllable learning dynamics essential for trustworthy foundation models.
+
+\section{Background and preliminaries}
+
+Our theoretical analysis builds on several standard components: attention networks, 
+meta-learning (in particular MAML), and $k$-nearest neighbors (KNN). 
+We briefly review each here to fix notation and highlight the connections 
+that will be used in Section~\ref{sec:theory}.
+
+\subsection{Attention mechanism}
+
+In the standard attention network \citep{vaswani2017attention}, each query vector $q_i$ produces a weighted combination of value vectors $V = \{v_1, \dots, v_n\}$:  
+
+\begin{equation}
+\text{Attn}(q_i, K, V) \;=\; \sum_{j=1}^n \alpha_{ij} \, v_j,
+\label{eq:attention}
+\end{equation}
+
+where the weights $\alpha_{ij}$ are obtained from a softmax over query–key dot products:  
+
+\begin{equation}
+\alpha_{ij} \;=\; \frac{\exp\big( q_i^\top k_j / \sqrt{d} \big)}
+{\sum\limits_{j'=1}^n \exp\big( q_i^\top k_{j'} / \sqrt{d} \big)} .
+\label{eq:attention_weights}
+\end{equation}
+
+Here $K = \{k_1, \dots, k_n\}$ are key vectors and $d$ is the feature dimension.  
+This requires computing all pairwise dot products $q_i^\top k_j$, which scales as $\mathcal{O}(n^2)$ in sequence length $n$.  
+In contrast, our query-only model removes $K$ and $V$, learning task-specific weights $\theta'$ directly, while still preserving the interpretation of predictions as weighted combinations over context points.  
+
+
+
+\subsection{Meta-learning}
+Meta-learning aims to enable rapid adaptation to new tasks from a few support examples \citep{finn2017maml}. 
+Traditional meta-learning assumes task boundaries and episodic training, and is thus non-continual. 
+Recent work \citep{javed2019meta} , \citep{son2023meta} explores meta-learning for continual learning. 
+Our approach draws inspiration from meta-learning while operating fully online.
+
+\paragraph{Model-agnostic meta-learning}\hfill \\ 
+Following \citet{finn2017maml}, MAML optimizes model parameters via alternating \emph{inner-loop} and \emph{outer-loop} updates. 
+The inner loop computes task-specific parameters $\Theta'_i$ using the support set, while the outer loop updates the shared parameters $\Theta$ based on query-set performance:
+
+\begin{align}
+\Theta'_i &= \Theta - \alpha \nabla_\Theta \mathcal{L}_\Theta(\text{support}_i), \label{eq:maml_inner}\\[4pt]
+\Theta &\leftarrow \Theta - \beta \sum_{i=1}^{m} \nabla_\Theta \mathcal{L}_{\Theta'_i}(\text{query}_i). \label{eq:maml_outer}
+\end{align}
+
+Here, Eq.~\ref{eq:maml_inner} defines task-specific adaptation, and Eq.~\ref{eq:maml_outer} updates the meta-parameters shared across tasks.
+
+
+
+\subsection{$k$-Nearest neighbors (KNN)}
+In $k$-nearest neighbors regression, prediction is based on the $k$ closest 
+points in a support set $\mathcal{S} = \{(x_i,y_i)\}_{i=1}^N$ under a distance 
+metric $d(\cdot,\cdot)$ (e.g., Euclidean).  
+
+Given a query input $x$, let $\mathcal{N}_k(x)$ denote the indices of the $k$ 
+nearest neighbors. The kNN prediction is the local average:
+\begin{equation}
+\hat{y}(x) = \frac{1}{k} \sum_{i \in \mathcal{N}_k(x)} y_i.
+\label{eq:knn}
+\end{equation}
+
+Thus, kNN regression is a non-parametric, memory-based method where predictions 
+adapt directly from nearby support examples.
+
+\subsection{In-context learning}
+In-context learning has recently been interpreted as an implicit $k$-nearest-neighbors mechanism that emerges in the forward pass of transformers \citep{olsson2022induction}. 
+This perspective provides a key motivation for our work: by modifying attention, we aim to enable continual adaptation without requiring explicit task identifiers.
+
+
+\section{Problem statement}
+We study the \textit{continual learning (CL)} setting, where a model receives a continuous stream of data. Each data point is observed \textit{once} during training, without repetition or epochs.  
+
+Formally, the stream is generated from a sequence of tasks 
+\(\{T_1, T_2, \dots, T_n\}\). Each task \(T_i\) is associated with a (potentially non-stationary) distribution \(\mathcal{D}_i(x,y)\) over input–label pairs \((x,y)\).  
+
+\textbf{Training.}
+\begin{itemize}
+    \item The model does not observe task boundaries or task identities.
+    \item Samples arrive sequentially, drawn from the evolving distribution.
+    \item The objective is to update the model online while retaining performance across all tasks.
+    \item Based on the task at hand, the model may update on a single data point or a batch of data-points.
+\end{itemize}
+
+
+
+\noindent
+\textbf{Evaluation Protocol.} 
+During inference, the model processes a data stream sequentially. 
+At data point \(m\) of task \(t\), the goal is to predict the next \(n\) points 
+\(\{m+1, \dots, m+n\}\) from the same task. 
+The resulting accuracy (or loss) defines the \textit{forward performance}; 
+its degradation over time indicates \textit{loss of plasticity}. 
+
+After training up to task \(t\), the model is also evaluated on samples from a previous task \(t-j\). 
+The resulting accuracy defines the \textit{backward performance}, 
+and its degradation quantifies \textit{catastrophic forgetting}. 
+
+\begin{itemize}
+    \item \textbf{Forward testing (plasticity):} 
+    Evaluates on upcoming data from the current stream without task identifiers. 
+    A decline in this metric across tasks signals loss of plasticity.
+    
+    \item \textbf{Backward testing (forgetting):} 
+    Evaluates on a small held-out buffer of past-task samples where task identities are known. 
+    A decline in this metric indicates catastrophic forgetting.
+\end{itemize}
+
+
+\section{Method}
+\subsection{Query only model with replay buffer}
+\label{sec:method}
+
+Drawing the connection from  attention networks, meta-learning, KNN and replay buffer we design an architecture which obtains an optimal solution for continual learning task, leading to mitigation 
+of both loss of plasticity and catastrophic forgetting simultaneously.
+A sample data point is $d = (x, y) \in \mathcal{D}$.
+Let, $x \in \mathbb{R}^a$ and  $y \in \mathbb{R}^b$
+We define a buffer $\mathcal{B}$ containing $n$ data-points.
+Every time step we construct a support set $\mathcal{S}$ of size $m$ sampled from $\mathcal{B}$ such that $m \le n$ depending on the problem at hand.
+\\Hence,  $S \in \mathbb{R}^{m* (a+b)}$ 
+
+\[
+S =
+\begin{bmatrix}
+x_{s1} & y_{s1} \\
+x_{s2} & y_{s2} \\
+\vdots & \vdots \\
+x_{sm} & y_{sm}
+\end{bmatrix}
+=
+\begin{bmatrix}
+s_1 \\
+s_2 \\
+\vdots \\
+s_m
+\end{bmatrix}
+\]
+\\Let, the data-point on which we want to make prediction be query $q_i$, such that $q_i=x_i$.
+The neural-net model is a single query-matrix $\mathcal{Q_\theta} \in \mathbb{R}^{(2a + b)*b}$, for illustration purposes and can have multiple layers.
+
+
+\begin{algorithm}[ht]
+\caption{Query-Only Attention with Replay Buffer}
+\label{alg:query_only}
+\begin{algorithmic}[1]
+\Require Stream of tasks $\{T_1, T_2, \ldots\}$; replay buffer $\mathcal{B}$ of size $n$; support size $m$; query-only model $Q_\theta$; learning rate $\eta$
+\Ensure Updated parameters $\theta$
+\State Initialize $\theta$, $\mathcal{B} \gets \emptyset$
+\For{each incoming sample $(x_t,y_t)$}
+    \State Insert $(x_t,y_t)$ into buffer $\mathcal{B}$; evict oldest if $|\mathcal{B}| > n$
+    \State Sample support set $\mathcal{S} = \{(x_j,y_j)\}_{j=1}^m \subset \mathcal{B}$
+    \State Compute scores $d_j \gets Q_\theta(x_t, x_j, y_j)$
+    \State Prediction $\hat{y}_t \gets \sum_{j=1}^m d_j \, y_j$
+    \State Loss $\mathcal{L}_t \gets \ell(\hat{y}_t, y_t)$
+    \State Update $\theta \gets \theta - \eta \nabla_\theta \mathcal{L}_t$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+We can thus write the predictive model as,
+\begin{equation}
+\hat{y_t}(x) = {\sum\limits_{x_i , y_i\in B} Q_\theta(x_t, x_i, y_i) * y_i}
+\label{eq:query_based_model}     
+\end{equation}
+Here, $x_t$ is the query point, $x_i$ is a support input, and $y_i$ is support label.
+$Q_\theta(x_t, x_i, y_i)$ denotes a learned similarity (or distance) function.
+Unlike standard metrics such as dot products or Euclidean distance—which require vectors to be in the same feature space—$Q_\theta$ learns a representation where query–support pairs become directly comparable, allowing flexible weighting even when raw dimensions differ.
+
+\subsection{MAML with replay buffer}
+\paragraph{Note.} 
+The adaptation of MAML with replay buffer is still work in progress. 
+We include it here to illustrate a potential direction for combining meta-learning with large 
+buffers in continual learning, but do not claim it as a finalized or fully validated algorithm. 
+That said, our preliminary results are promising for one of the experiments, and suggest this variant may provide 
+a complementary approach to attention-based or query-only models.  
+
+We adapt MAML to the continual learning setting by introducing a large replay buffer. 
+To minimize interference across tasks, the buffer is evenly partitioned into $t$ sub-buffers, 
+one per sampled task. Without such partitioning, the sampled support and query examples 
+from different tasks would overlap excessively, leading to degraded task separation 
+and unstable meta-updates. Each task provides a small support set ($s$) and query set ($q$), 
+which is sufficient for the MAML inner/outer loops.  
+
+An important property of this setup is that the support/query sizes remain much smaller 
+than those required by attention-based or query-only models. This makes MAML particularly 
+well-suited for backward evaluation (catastrophic forgetting), since only a small set of 
+examples per task is needed to adapt. Standard MAML inner-loop adaptation and outer-loop 
+meta-updates are then applied on these partitioned tasks.  
+The details of the algorithm are presented in the appendix section.
+
+
+
+\begin{algorithm}[t]
+\caption{MAML with Replay Buffer (work in progress)}
+\label{alg:maml_replay}
+\begin{algorithmic}[1]
+\Require Stream $(x_t,y_t)$; replay buffer $\mathcal{B}$ of size $N$; 
+tasks $t$; support $s$; query $q$; learning rates $\alpha,\beta$
+\State Initialize $\theta$, $\mathcal{B} \gets \emptyset$
+\For{each incoming $(x_t,y_t)$}
+    \State Insert $(x_t,y_t)$ into $\mathcal{B}$; evict oldest if $|\mathcal{B}|>N$
+    \State Partition $\mathcal{B}$ into $t$ equal sub-buffers
+    \For{each task $i=1\dots t$}
+        \State Sample $s$ support and $q$ queries from sub-buffer $i$
+        \State Inner update on support with step size $\alpha$
+        \State Outer update on queries with step size $\beta$
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Theoretical discussion}
+\label{sec:theory}
+
+\subsection{Global vs local solution}
+\label{sec:local_global}
+To understand why our algorithm overcomes loss of plasticity and catastrophic forgetting, we
+first define weighted $k$-nearest neighbors
+
+\begin{equation}
+\hat{y}(x) = 
+\frac{\sum\limits_{i \in N_k(x)} w(x, x_i)\, y_i}
+     {\sum\limits_{i \in N_k(x)} w(x, x_i)},
+\label{eq:weighted_knn}     
+\end{equation}
+
+where $w(x, x_i)$ is a weight function that decreases as the distance $d(x, x_i)$ increases.  
+Common choices include:
+
+\begin{align}
+w(x, x_i) &= \frac{1}{d(x, x_i)}, \\
+w(x, x_i) &= e^{-\alpha\, d(x, x_i)}.
+\end{align}
+
+In Equation~\ref{eq:weighted_knn}, predictions depend only on neighboring data points and not on any learnable parameters.  
+Thus, weighted $k$NN avoids loss of plasticity (no parameters to get stuck in low-rank regions) and catastrophic forgetting (no parameters to overwrite).  
+Performance is fully determined by the support set and chosen distance metric.  
+
+Comparing Equation~\ref{eq:weighted_knn} with Equation~\ref{eq:query_based_model}, the difference lies in how the distance metric is obtained: in $k$NN it is fixed manually, while in the query-only attention it is learned as $\theta$.  
+Once $\theta$ is learned, predictions depend primarily on the support set, so continual adaptation occurs in-context rather than through constant parameter updates.  
+This makes the learning global in nature and independent of any single task which is different from vanilla backpropagation or continual backpropagation algorithm where the model updates its parameters continuously local for each task.
+
+%\clearpage
+
+\subsection{Model agnostic meta-learning for continual learning}
+We can rewrite equation~\ref{eq:query_based_model} as, 
+
+
+\begin{equation}
+\hat{y}_t(x) = \sum_{x_i, y_i \in B} \theta'_{t,i} \, y_i,
+\label{eq:query_based_model_2}
+\end{equation}
+
+
+From Equation~\ref{eq:query_based_model_2}, predictions depend on task-specific parameters $\theta'$ generated at inference time.
+This parallels the task-specific adaptation in MAML’s inner/outer-loop updates (Equations~\ref{eq:maml_inner}, \ref{eq:maml_outer}).
+However, unlike query-only attention models, MAML was originally designed with task IDs and distributions known, an assumption that breaks in continual learning.
+In our experiments, we find that using a large replay buffer stabilizes MAML training despite this limitation.
+Even more interestingly, MAML requires a much smaller support set than query-only attention or full attention networks, which could make it a promising direction for mitigating catastrophic forgetting in future continual learning work where memory efficiency is crucial.
+
+
+
+\subsection{Relationship to attention network}
+From Equation~\ref{eq:attention}, the prediction is a linear combination of value vectors, which are themselves transformed representations of the input.  
+Comparing this with Equation~\ref{eq:query_based_model_2}, we see a strong similarity: both aggregate information from a support set using learned weights.  
+The main difference is that in attention (Equation~\ref{eq:attention_weights}), task specific weights are derived from query–key dot products, whereas in the query-only model they come from a learned distance metric $\theta'$.  
+
+This equivalence suggests that attention networks can also mitigate loss of plasticity, much like the query-only model.  
+However, computing attention weights requires all pairwise query–key dot products, leading to $\mathcal{O}(n^2)$ complexity for a support set of size $n$.  
+In contrast, our query-only model only compares the current query with the support set, reducing the complexity to $\mathcal{O}(n)$.  
+This efficiency allows us to scale to larger support sets in continual learning, improving performance without incurring the prohibitive cost of full attention.
+
+
+\subsection{Hessian rank analysis}
+
+To study plasticity, we analyze the \textit{effective rank} of the Hessian \citep{lewandowski2023curvature},\citep{roy2007effective},  
+defined as
+\begin{equation}
+\mathrm{erank}(H) = \exp\!\Big(-\sum_{i=1}^n p_i \log p_i\Big), 
+\quad 
+p_i = \frac{\lambda_i}{\sum_j \lambda_j},
+\label{eq:effective_rank}
+\end{equation}
+where $\{\lambda_i\}$ are the eigenvalues of the Hessian.  
+A stable effective non-decreasing effective rank indicates models that preserve plasticity across tasks.
+
+
+\subsection{Responsible Continual Adaptation}
+Query-Only Attention maintains a high curvature rank that supports online adaptation and robustness, while also utilizing reduced number of parameters.
+
+% ---------- EXPERIMENTS SECTION ----------
+
+%\FloatBarrier
+\section{Experiments}
+\label{sec:experiment}
+We evaluate forward (plasticity) and backward (forgetting) performance on three benchmarks: 
+\textbf{Permuted MNIST} (abrupt shifts), \textbf{Tiny ImageNet} ~\citep{tinyimagenet}, and 
+\textbf{Slowly Changing Regression (SCR)} (gradual drift).
+The above experiments follow same setup as explained in \citet{dohare2024loss}, except instead of full ImageNet we choose Tiny ImageNet for efficiency.
+Distinction is that we perform experiments in a online setting, using \emph{unknown} task boundaries to study loss of plasticity and \emph{known} task boundaries to study catastrophic forgetting.
+Detailed configurations appear in the Appendix. 
+Results are averaged over three seeds with shaded $\pm$1 std regions. 
+Higher accuracy (classification) and lower MSE (regression) indicate better performance. 
+Baselines include \textbf{BP}, \textbf{CBP}, and the \textbf{Full-Attention Network}.
+Since the primary focus of this work is mitigating loss of plasticity, we additionally include the state-of-the-art forgetting baseline \textbf{Elastic Weight Consolidation (EWC)} in the ImageNet experiments for completeness.
+The full details of the experiments is available in Appendix section ~\ref{sec:permuted_mnist_setup} , ~\ref{sec:split_image_net_setup} , ~\ref{sec:scr_setup}
+
+
+% ---------- Permuted MNIST: forward + backward in one figure ----------
+\subsection{Permuted MNIST}
+We evaluate the \textbf{query-only attention} model with support sizes of $1000$ and $200$ and
+name them as Query-Only Attention V1 and Query-Only Attention V2. 
+The \textbf{full-attention} uses support $100$, since its $\mathcal{O}(n^2)$ attention limits scalability, while our $\mathcal{O}(n)$ query-only design allows larger supports at lower cost. 
+The \textbf{MAML}-style model uses a large replay buffer with a small support of $10$, trained on $100$ tasks. 
+Each iteration is costlier due to inner-loop updates, so it runs on fewer tasks but performs multiple updates per iteration.
+For readability, performance curves are averaged over fixed task windows.
+
+
+
+
+
+\label{subsec:permuted-mnist}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{permuted_mnist_forward_performance_averaged.png}
+    \caption{Forward accuracy (permuted MNIST).}
+    \label{fig:mnist_fwd}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{permuted_mnist_backward_performance_averaged.png}
+    \caption{Backward accuracy (permuted MNIST).}
+    \label{fig:mnist_bwd}
+  \end{subfigure}
+ \caption{The prediction is over 7500 tasks and each data-point in the graph is averaged over 100 tasks for all models except for MAML. For MAML, we run over only 75 tasks and is  shown without averaging.}
+  \label{fig:mnist_both}
+  \vspace{-2mm}
+\end{figure}
+
+
+
+% ---------- SPLIT IMAGENET: forward + backward in one figure ----------
+\subsection{Split Image Net}
+\emph{Split-image-net}  we use a support size of 180 for both query-only attention and full-attention model. For MAML a support size of only size 10 is enough.
+\label{subsec:split-image-net}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{split_image_net_forward_performance_averaged.png}
+    \caption{Forward accuracy (Split Image Net).}
+    \label{fig:split_imagenet_fwd}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{split_image_net_BACKWARD_performance_averaged.png}
+    \caption{Backward accuracy (Split Image Net).}
+    \label{fig:split_imagenet_bwd}
+  \end{subfigure}
+  \caption{The prediction is over 9000 tasks and each data-point in the graph is averaged over 100 tasks for all the models except MAML. MAML is run over 500 tasks, averaged over 5 tasks.  }
+  \label{fig:split_imagenet_both}
+  \vspace{-2mm}
+\end{figure}
+%\FloatBarrier
+
+
+\paragraph{Observations in Classification Tasks.}
+Across both \ref{subsec:permuted-mnist} and \ref{subsec:split-image-net}, the \textbf{query-only attention} model consistently outperforms all baselines in forward and backward performance. 
+The \textbf{full-attention} reaches similar final accuracy but with 50\% more parameters and slower convergence. 
+Under unknown task boundaries, \textbf{CBP} performs poorly, especially on Split ImageNet, while the \textbf{vanilla network} shows clear loss of plasticity. 
+The \textbf{MAML}-based model converges fastest, achieving intermediate performance between attention-based and standard networks.
+
+
+
+
+% ---------- SCR: forward + backward in one figure ----------
+\subsection{Slowly Changing Regression}
+In \emph{SCR}, we use a single query-only attention model with support size $100$, \emph{matching} the full-attention (both $100$) to isolate algorithmic effects under equal memory/compute.
+With equal support ($100$) for query-only attention and full attention, both sustain low MSE in forward testing.
+\label{subsec:SCR}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{scr_forward_performance.png}
+    \caption{Forward MSE (SCR).}
+    \label{fig:scr_fwd}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{scr_backward_performance.png}
+    \caption{Backward MSE (SCR).}
+    \label{fig:scr_bwd}
+  \end{subfigure}
+  \caption{The prediction is over 800 tasks and each data-point in the graph is averaged over 10 tasks for all models.}
+  \label{fig:scr_both}
+  \vspace{-2mm}
+\end{figure}
+%\FloatBarrier
+
+\paragraph{Observations on Regression Task.}
+As in classification, \textbf{BP} gradually loses plasticity, while \textbf{CBP} fails to learn effectively due to its purely online setup. 
+The \textbf{query-only attention} model converges quickly with near-zero MSE, whereas \textbf{full attention} converges more slowly with slightly lower performance. 
+Unlike in classification, the \textbf{MAML}-based model struggles to converge but still maintains plasticity. 
+In backward testing, BP and CBP show severe forgetting, while query-only attention, full-attention, and MAML models retain high performance. 
+Including $y_i$ in $Q_\theta(x_t, x_i, y_i)$ offered no gain on this regression task, so we used only $(x_t, x_i)$; for Permuted-MNIST, label inclusion improved results and was retained.
+
+
+
+
+\paragraph{Result analysis.}
+Across all benchmarks, \textbf{query-only attention} and \textbf{full-attention} models perform similarly, but the query-only attention model converges faster and scales better with $\mathcal{O}(n)$ complexity. 
+The \textbf{MAML}-based approach shows strong backward performance and quick convergence with minimal support, though less consistent on SCR. 
+\textbf{Query-only attention} model mitigates loss of plasticity and forgetting, highlighting its practicality under limited compute and memory.
+These findings suggest that preserving plasticity contributes directly to the reliability and interpretability of model updates, ensuring safer adaptation under non-stationary data distributions.
+
+\subsection{Effective Rank}
+\label{subsec:effective-rank}
+
+\begin{figure}[H]
+  \centering
+  % ---- Left figure ----
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{permuted_mnist_forward_effective_rank_averaged.png}
+    \label{fig:mnist_effective_rank}
+  \end{subfigure}
+  \hfill
+  % ---- Right figure ----
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{scr_forward_effective_rank.png}
+    \label{fig:scr_effective_rank}
+  \end{subfigure}
+  \caption{ Effective rank co-varies with forward performance; dips align with reduced plasticity. Mean $\pm$ std over 3 seeds.}
+  \label{fig:effective_rank_both}
+  \vspace{-2mm}
+\end{figure}
+
+
+The effective rank provides a measure of model plasticity.
+We measure it at the start of each task using the Hessian of the final layer only, since full-Hessian computation is infeasible.
+We measure it only on Permuted MNIST and SCR and not on image-net due to computational constraints. Also, the effective rank has been normalized since effective rank will depend on size of neural net. 
+In both Permuted-MNIST and SCR, vanilla backpropagation shows a steady drop in effective rank, aligning with loss of plasticity. All other models show near minimal drop in effective rank thus indicating preserved plasticity.
+
+
+
+
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced a Query-Only Attention mechanism for continual learning, showing that it mitigates loss of plasticity even when task boundaries are unknown, outperforming state-of-the-art models without task repetition. When task boundaries are known, Query-Only Attention can also mitigate catastrophic forgetting. In addition, it achieves these benefits with lower computational cost compared to full attention.
+
+Our analysis connects Query-Only models to MAML and full attention through the lens of global vs.\ local solutions and further relates them to $k$-nearest neighbors. We confirmed this relationship empirically across three benchmarks. Hessian-rank experiments support the role of curvature in sustaining plasticity across different approaches that mitigate loss of plasticity.
+
+A key limitation is the reliance on a support set, which complicates mitigation of catastrophic forgetting. Future work will extend to larger and more diverse benchmarks, provide more rigorous theoretical analysis, and minimize reliance on explicit task support.
+From a responsible AI perspective, this limitation highlights the need for scalable, data-efficient continual learning mechanisms that preserve fairness and safety guarantees.
+
+From a Responsible AI perspective, these results demonstrate that simplifying attention through meta-learning principles can yield reliable, transparent, and safe continual adaptation, supporting fairness, accountability, and trustworthiness in deployed foundation models.
+
+
+\clearpage
+
+\section*{Code Availability}
+The implementation of Query-Only Attention and all experiments are available at:
+\url{https://github.com/gauthambekal93/query-only-attention-for-continual-learning.git}.
+
+\section*{Acknowledgments}
+We thank the organizers of the NeurIPS 2025 ResponsibleFM workshop for their feedback and support. We also appreciate the helpful discussions and suggestions from colleagues and peers who contributed to improving the quality of this work.
+We also thank anonymous reviewers for helpful feedback.
+
+\bibliographystyle{plainnat}
+\bibliography{main}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+
+\section{Technical Appendices and Supplementary Material}
+
+
+\subsection{Broader impacts}
+\label{sec:broader_impacts}
+This work is primarily foundational research in continual learning. 
+The proposed query-only attention mechanism and accompanying analysis aim to improve the 
+understanding of plasticity and forgetting in neural networks. 
+Potential positive impacts include enabling more efficient and adaptive AI systems, 
+which could reduce retraining costs, improve energy efficiency, and support applications 
+such as robotics, healthcare monitoring, and lifelong personal assistants.  
+
+At the same time, continual learning technologies can be misused in domains such as 
+surveillance or profiling, where adaptive models might amplify privacy concerns or biases.  
+While the present work is not directly deployable, these risks highlight the need for 
+responsible use and safeguards in future applications.  
+
+Overall, this research contributes theoretical and empirical insights into the foundations 
+of continual learning, with the aim of advancing the field in a transparent and beneficial direction.
+
+
+\subsection{Limitations}
+\label{sec:limitations}
+Our work has a few important limitations.  
+First, the query-only attention model relies on a support set, which can be restrictive for mitigating catastrophic forgetting in practical continual learning scenarios.  
+Second, our evaluation is limited to two benchmarks (Permuted MNIST and Slowly Changing Regression); broader validation on more complex datasets is needed to confirm generality.  
+Third, while we provide theoretical analysis and intuition linking query-only attention to MAML and $k$NN, we do not include formal proofs.  
+We acknowledge these as areas for future work, particularly in extending the experimental scope and strengthening the theoretical foundation.
+
+
+
+\subsection{Permuted MNIST Setup}
+\label{sec:permuted_mnist_setup}
+The MNIST dataset \citep{lecun1998gradient} consists of 60,000 training and 10,000 test images of hand-written digits ($0$–$9$), each represented as a $28 \times 28$ grayscale image.  
+To adapt this dataset for continual learning, we make the following modifications:
+
+\begin{itemize}
+    \item \textbf{Train/test split.} For each task, we use the entire 60,000 original training images. These are further divided into 58,000 images for training and 2,000 images for evaluation within the task. The global MNIST test set is not used directly; instead, we re-sample 2,000 held-out examples per task to serve as test data. This ensures consistency across tasks and keeps evaluation lightweight.
+    
+    \item \textbf{Downsampling.} To reduce computational cost, all images are downsampled from $28 \times 28$ to $7 \times 7$, giving 49 input features per image.
+    
+    \item \textbf{Task generation.} Each task corresponds to a new random permutation of the 49 input pixels. The same permutation is applied consistently to all 60,000 images within a task. Labels remain unchanged.
+    
+    \item \textbf{Continual stream.} The learner observes tasks sequentially. After completing all 58,000 training pairs of a given permutation, the learner encounters remaining 2000 data-points for testing, following which it encounters the next task (with a new permutation). In total, 7,000 such tasks are generated in the continual stream.
+\end{itemize}
+
+This setup forces the continual learner to adapt to a new input representation (permutation) at the start of each task, while retaining performance on past permutations. It is a widely used benchmark for evaluating both \textit{plasticity} (ability to adapt to new tasks) and \textit{stability} (ability to avoid catastrophic forgetting).
+
+ 
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Permuted MNIST configuration: Query-Only Attention (V1).}
+\label{tab:pmnist_query_only_attention_v1}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 1000 \\
+Replay buffer size & \texttt{1000} \\
+Distance metric & Learned $Q_{\theta}$ (query-only) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & (batch size $=400$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) & ( 108, 100, 1, 9 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{6.5 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Permuted MNIST configuration: Query-Only Attention (V2).}
+\label{tab:pmnist_query_only_attention_v2}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 200 \\
+Replay buffer size & \texttt{200} \\
+Distance metric & Learned $Q_{\theta}$ (query-only) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=400$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) & ( 108, 100, 1, 9 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{4 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Permuted MNIST configuration: MAML.}
+\label{tab:pmnist_maml}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+(Support size, query size, tasks per iteration) ($|B|$) & (10, 10, 5) \\
+Replay buffer size & \texttt{50000} \\
+Optimizer & Adam \\
+Outer Learning rate & \texttt{1e-4} \\
+Inner Learning rate & \texttt{1e-2} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=400$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 75 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 49, 100, 10, 3 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{4.2 hours } \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+The attention network for continual learning is directly adapted from \citep{wang2025replay}, which contains the comprehensive details.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Permuted MNIST configuration: Attention Network baseline.}
+\label{tab:pmnist_attention}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 100 \\
+Attention & Full self-attention ($\mathcal{O}(n^2)$) \\
+Replay buffer size & \texttt{100} \\
+Optimizer & Adam \\
+Learning rate & \texttt{5e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=400$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7500 \\
+Steps per task & \texttt{150} \\
+Architecture & \texttt{10 layers, 1 head, d\_model=59} \\
+(Attention Layers, Attention Heads, Dimension) : & ( 10, 1, 59 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{10 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The vanilla backpropagation and continual backpropagation algorithm is from paper \citep{dohare2024loss}, which contains more details.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Permuted MNIST configuration: Vanilla Backpropagation.}
+\label{tab:pmnist_bp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size & N/A \\
+Replay buffer size & 0 (no replay) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & Online (batch size $=1$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 49, 200, 10, 3 ) \\ 
+Init &  Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{5.0 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Permuted MNIST configuration: Continuous Backpropagation.}
+\label{tab:pmnist_bp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size & N/A \\
+Replay buffer size & 0 (no replay) \\
+Optimizer & Adam  \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0} \\
+Batching & Online (batch size $=1$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 49, 200, 10, 3 ) \\ 
+Init &  Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{7.0 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\subsection{Split Image Net}
+\label{sec:split_image_net_setup}
+We adopt the Split Image Net benchmark introduced by Dohare et al.~\citep{dohare2024loss}. However, due to computational constraints we utilize 
+tiny version of the image net instead of full image net. We further downsample the images to 32 * 32 for faster computation.
+The remaining setup is same as in the original paper, ensuring comparability of results.  
+For full details, we refer readers to the experimental protocol in \citep{dohare2024loss}.
+Tiny image net consits of 200 labels and 500 images per label in training setup.
+The test setup consists of 50 labels per class. 
+To incorporate tiny image net for continual learning, each task consits of randomly sampling images from 2 classes. Thus a task is a binary classification task with 1000 datapoints for training. At the end of training in that class we measure the accuray on 100 datapoints corresponding to 2 lables used in training.
+Since the training is purely online fashion a task is trained for a single epoch and then validation is carried out, followed by images for next task.
+All the below architectures presented use the same CNN architure as the starting point for input image transformation:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Split Image Net: CNN architecture (same for all models)}
+\label{tab:split_image_net_cnn}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+(Input channels, Output Channels,Kernel Size, Padding, MaxPool, Activation) & ( 3, 32, 5, 1, 2, Relu ) \\ 
+(Input channels, Output Channels,Kernel Size, Padding, MaxPool, Activation) & ( 32, 64, 3, 1, 2, Relu ) \\ 
+(Input channels, Output Channels,Kernel Size, Padding, MaxPool, Activation) & ( 64, 128, 3, 1, 2, Relu ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Split Image Net: Query-Only Attention.}
+\label{tab:split_image_net_query_only_attention_v1}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 180 \\
+Replay buffer size & \texttt{200} \\
+Distance metric & Learned $Q_{\theta}$ (query-only) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & (batch size $=10$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 9500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) & ( 2304, 128, 1, 1 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{3 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Split Image Net: MAML.}
+\label{tab:split_image_net_maml}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+(Support size, query size, tasks per iteration) ($|B|$) & (10, 10, 5) \\
+Replay buffer size & \texttt{20000} \\
+Optimizer & Adam \\
+Outer Learning rate & \texttt{1e-4} \\
+Inner Learning rate & \texttt{1e-2} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=10$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 1152, 128, 2, 1 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{5 hours (ran only first 100 tasks)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Split Image Net: Attention Network baseline.}
+\label{tab:split_image_net_attention}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 180 \\
+Attention & Full self-attention ($\mathcal{O}(n^2)$) \\
+Replay buffer size & \texttt{200} \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=10$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 9500 \\
+Steps per task & \texttt{150} \\
+Architecture & \texttt{3 layers, 1 head, d\_model=130} \\
+Init & Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{4.5 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The vanilla backpropagation and continual backpropagation algorithm is from paper \citep{dohare2024loss}, which contains more details.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Split Image Net: Vanilla Backpropagation.}
+\label{tab:split_image_net_bp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size & N/A \\
+Replay buffer size & 0 (no replay) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & Online (batch size $=10$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 9500 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 1152, 128, 2, 1 ) \\ 
+Init &  Xavier uniform (weights), Zeros (biases) \\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{4.0 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Split Image Net: Continuous Backpropagation.}
+\label{tab:split_image_net_cbp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size & N/A \\
+Replay buffer size & 0 (no replay) \\
+Optimizer & Adam  \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0} \\
+Batching & Online (batch size $=1$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7000 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 1152, 128, 2, 1 ) \\ 
+Init &  Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{5.5 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{EWC: Elastic Weight Consolidation.}
+\label{tab:split_image_net_cbp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Lambda &\texttt{100000} \\
+Optimizer & Adam  \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0} \\
+Batching & Online (batch size $=1$) \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 7000 \\
+Steps per task & \texttt{150} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 1152, 128, 2, 1 ) \\ 
+Init &  Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{5.5 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\clearpage
+
+\subsection{Slowly changing regression (SCR)}
+\label{sec:scr_setup}
+We adopt the Slowly changing regression (SCR) benchmark introduced by Dohare et al.~\citep{dohare2024loss}, 
+which was designed to study loss of plasticity in continual learning.  
+In this task, regression targets evolve gradually over time according to smoothly drifting functions, 
+creating a non-stationary data stream.  
+We use the same setup and data-generation procedure as in the original paper, ensuring comparability of results.  
+For full details, we refer readers to the experimental protocol in \citep{dohare2024loss}.
+
+
+ 
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Slowly changing regression task: Query-Only Attention.}
+\label{tab:scr_query_only_attention}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 100 \\
+Replay buffer size & \texttt{100} \\
+Distance metric & Learned $Q_{\theta}$ (query-only) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching &  batch size $=1$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 800 \\
+Steps per task & \texttt{10000} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 40, 20, 1, 1 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{7 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Slowly changing regression task: MAML.}
+\label{tab:scr_maml}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+(Support size, query size, tasks per iteration) ($|B|$) & (10, 10, 5) \\
+Replay buffer size & \texttt{20000} \\
+Optimizer & Adam \\
+Inner Learning rate & \texttt{1e-2} \\
+Outer Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=1$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 800 \\
+Steps per task & \texttt{10000} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 20, 40, 1, 1 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{8.5 hour to run 100 tasks} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Slowly changing regression task: Attention Network.}
+\label{tab:scr_attention}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Support size ($|B|$) & 100 \\
+Replay buffer size & \texttt{100} \\
+Distance metric & Learned $Q_{\theta}$ (query-only) \\
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=1$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 800 \\
+Steps per task & \texttt{10000} \\
+(Attention Layers, Attention Heads, Dimension) : & ( 1, 1, 21 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{14 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Slowly changing regression task: Vanilla Backpropagation}
+\label{tab:scr_bp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=1$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 800 \\
+Steps per task & \texttt{10000} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 20, 40, 1, 1 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{8 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Slowly changing regression task: Continuous Backpropagation}
+\label{tab:scr_cbp}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Setting & Value \\ \midrule
+Optimizer & Adam \\
+Learning rate & \texttt{1e-4} \\
+Weight decay & \texttt{0.0} \\
+Batching & batch size $=1$ \\
+Seeds & 20, 30, 40 (report mean $\pm$ std) \\
+Tasks & 800 \\
+Steps per task & \texttt{10000} \\
+(Input size, Hidden Size, Output Size, Hidden Layers) : & ( 20, 40, 1, 1 ) \\ 
+Init & Xavier uniform (weights), Zeros (biases)\\
+Hardware & \texttt{1$\times$ RTX 3090 24GB, CUDA 11.8} \\
+Wall-clock & \texttt{11 hours/run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section*{NeurIPS Paper Checklist}
+
+\begin{enumerate}
+
+\item {\bf Claims}
+    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The abstract and introduction clearly state that the paper introduces a query-only attention mechanism for continual learning, demonstrates its effectiveness in mitigating loss of plasticity and catastrophic forgetting, and provides supporting analysis via connections to K-nearest neighbor algorithm, attention network and MAML. The claims are consistent with both the theoretical discussion and the experimental evaluation (permuted MNIST and regression and SPLIT Image Net), and limitations are explicitly acknowledged. Please refer to section ~\ref{sec:theory} and ~\ref{sec:experiment}.
+
+\item {\bf Limitations}
+    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+    \item[] Answer:  \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper explicitly acknowledges limitations, including the reliance on a support set (which may be restrictive in some continual learning scenarios), limited evaluation on permuted MNIST , Image Net and regression tasks, and the need for more rigorous theoretical analysis. We also note that computational cost and scalability of support-based methods remain open challenges for future work. Please refer to section ~\ref{sec:conclusion} and ~\ref{sec:limitations}.
+ 
+
+\item {\bf Theory assumptions and proofs}
+    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+    \item[] Answer: \answerNo{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper provides theoretical analysis and intuition (e.g., links between query-only attention, kNN, and MAML, as well as Hessian rank arguments), but does not contain formal theorems or complete proofs. The focus is on providing insight and empirical evidence rather than rigorous formalization. We acknowledge this as a limitation and identify formal proofs as an important direction for future work.
+
+
+\item {\bf Experimental result reproducibility}
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper specifies datasets (Permuted MNIST and Slowly Changing Regression and Split Image Net), model architectures (query-only attention, full-attention, BP, CBP, and MAML-style, EWC), training setup (online continual learning with single-pass data), evaluation metrics (forward and backward performance), and hyperparameters (support sizes, replay buffer sizes, etc.). Together, these details allow reproduction of the reported results. Code and implementation details (e.g., training loops, Hessian rank calculation) will be released to further ensure reproducibility. Please refer to appendix section ~\ref{sec:permuted_mnist_setup} and ~\ref{sec:scr_setup} and ~\ref{sec:split_image_net_setup}
+    
+
+\item {\bf Open access to data and code}
+    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification:We have provided link to GitHub URL for, ensuring reproducibility while preserving double-blind review. This will allow faithful reproduction of the main results. The GitHub is code currently being cleaned for easy reproducibility. Please refer to section ~\ref{sec:permuted_mnist_setup} , ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup} for reproducibility.
+
+
+\item {\bf Experimental setting/details}
+    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer, etc.) necessary to understand the results?
+    \item[] Answer:  \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper specifies datasets (Permuted-MNIST , Split Image Net and Slowly Changing Regression), evaluation protocols (forward vs. backward performance), optimizer (AdamW), replay buffer size, support set sizes, number of seeds (3), and training setup (single-pass, no epochs). Key hyperparameters are reported in the text, and additional details (exact learning rates, batch sizes, task counts) are provided in the appendix and GitHub code repository for reproducibility. Please refer to sections ~\ref{sec:permuted_mnist_setup} ,  ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup}.
+
+
+\item {\bf Experiment statistical significance}
+    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: All experimental curves report the mean over 3 random seeds, with shaded regions showing $\pm 1$ standard deviation across seeds. Please refer to ~\ref{sec:experiment}, ~\ref{sec:permuted_mnist_setup}, ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup}.
+    This captures variability due to different random initializations and stochasticity in training.  
+
+\item {\bf Experiments compute resources}
+    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
+    \item[] Answer: \answerYes{}% Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: We specify the compute resources used for all experiments. Runs were conducted on a single NVIDIA RTX 3090 GPU (24 GB VRAM) with 32 GB RAM. Each experiment (training across all tasks) required approximately 6–8 hours for permuted MNIST, 5-7 hours for split image net and 4–6 hours for slowly changing regression (SCR). The total reported results (3 seeds per experiment) were completed within 1 week. No large-scale distributed training or additional hidden compute was required beyond the reported experiments. Please refer to section ~\ref{sec:permuted_mnist_setup}, ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup}.
+
+    
+\item {\bf Code of ethics}
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
+    \item[] Answer:  \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The work uses only publicly available datasets (MNIST, Tiny Image Net and synthetic regression benchmarks), contains no human or personally identifiable data, and does not raise safety, fairness, or environmental risks beyond typical compute usage for deep learning research. All experiments comply with the NeurIPS Code of Ethics.
+   
+
+\item {\bf Broader impacts}
+    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This paper is primarily foundational research in continual learning and does not target immediate deployment. The potential positive impact lies in improving machine learning systems’ ability to adapt over time without retraining, which could reduce computational costs and enable more sustainable, adaptive AI in areas such as robotics, healthcare monitoring, and personalized systems.
+
+    Possible negative impacts include misuse in surveillance or adaptive profiling systems, where continual learning might enable intrusive or biased tracking over time. However, since our work focuses on simplified models (query-only attention) and theoretical analysis, these risks are indirect.
+
+    We explicitly acknowledge these as broader considerations, and stress that the current work is a step toward understanding fundamental mechanisms (plasticity vs. forgetting), not a directly deployable system. Please refer to section ~\ref{sec:broader_impacts}
+
+    
+\item {\bf Safeguards}
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pretrained language models, image generators, or scraped datasets)?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This work is foundational research on continual learning algorithms and does not involve sensitive data or direct deployment. 
+    Potential positive impacts include advancing more adaptive and efficient machine learning systems, which could benefit areas such as robotics, personalized assistants, or scientific discovery. 
+    Potential negative impacts are indirect: continual learning techniques could be misused in surveillance, autonomous weapons, or other harmful applications if combined with inappropriate datasets or objectives. 
+    While the current work is limited to controlled benchmarks, we acknowledge these risks and encourage responsible use of such methods. 
+    Overall, the societal impact is primarily positive in advancing fundamental ML understanding.
+
+
+\item {\bf Licenses for existing assets}
+    \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
+    \item[] Answer: \answerYes{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: We use only publicly available benchmark datasets and assets, including MNIST \citep{lecun1998gradient} (permuted variant), tiny image net and synthetic regression tasks (SCR). 
+    MNIST is distributed under a permissive license for research use, and we cite the original source.  
+    We also cite all baseline algorithms (e.g. transformers \citep{vaswani2017attention}, CBP \citep{dohare2024loss}).  
+    No proprietary or restricted data, models, or code were used, and all assets are properly credited and used within their intended terms.  
+
+\item {\bf New assets}
+    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+    \item[] Answer: \answerNA{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This work does not introduce new datasets or external assets. 
+    The only new contribution is the proposed query-only attention model, which is described in full detail in the paper and can be reproduced from the provided code. 
+    No human subjects or sensitive data are involved. 
+
+
+\item {\bf Crowdsourcing and research with human subjects}
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
+    \item[] Answer:  \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification:  This work does not involve crowdsourcing or research with human subjects. All experiments are purely computational, conducted on standard machine learning benchmarks (Permuted MNIST and SCR).  
+
+\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
+    \item[] Answer: \answerNA{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification:This work does not involve human subjects, crowdsourcing, or any study requiring IRB approval. All experiments are computational and use standard public machine learning datasets.  
+
+
+\item {\bf Declaration of LLM usage}
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does not impact the core methodology, scientific rigorousness, or originality of the research, declaration is not required.
+    %this research? 
+    \item[] Answer: \answerNA{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: No large language models (LLMs) were used as part of the core methodology or experiments. LLMs were only used as a general writing and editing assistant, which does not affect the scientific rigor or originality of the research.  
+
+
+\end{enumerate}
+
+\end{document}

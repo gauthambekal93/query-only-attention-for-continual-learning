@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 # Add it to sys.path
 #sys.path.append(str(BASE_DIR / "common" / "codes"))
-#sys.path.append(str(BASE_DIR / "analysis_and_workings" / "bp"/ "Code"/"split_image_net"))
+#sys.path.append(str(BASE_DIR / "algorithms" / "bp"/ "Code"/"split_image_net"))
 
 
 import json
@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.maml.permuted_mnist.static_data_distribution.code_v1.data_manager import DataManager 
-    from analysis_and_workings.maml.permuted_mnist.static_data_distribution.code_v1.runner import Runner 
-    from analysis_and_workings.maml.permuted_mnist.static_data_distribution.code_v1.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.maml.permuted_mnist.static_data_distribution.code_v1.neural_networks import ERNetwork
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.data_manager import DataManager 
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.runner import Runner 
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.checkpoint_manager import CheckpointManager 
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.neural_networks import ERNetwork
     
     global ERNetwork, DataManager, Runner, CheckpointManager
     
@@ -107,9 +107,9 @@ class PermutedMNISTExperiment:
         self.num_hidden_layers = model_params["num_hidden_layers"]
         
         self.inner_step_size = model_params["inner_step_size"]
-                
-        self.outer_step_size = model_params["outer_step_size"]
         
+        self.outer_step_size = model_params["outer_step_size"]
+                
         self.weight_decay = model_params['weight_decay']
     
         self.test_batch_size = model_params["test_batch_size"]
@@ -128,8 +128,7 @@ class PermutedMNISTExperiment:
 
         
     def initialize_model(self):
-         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.inner_step_size , 
-                                            self.outer_step_size, self.weight_decay, self.total_classes)
+         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.inner_step_size, self.outer_step_size, self.weight_decay, self.total_classes)
         
       
     def initialize_data_manager(self):
@@ -184,7 +183,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration.json") 
+    config_path = os.path.join( experiment_dir, "configuration-0.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   
