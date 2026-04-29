@@ -117,6 +117,8 @@ class CheckpointManager:
             
             data_manager_obj.backward_accuracy =  self.results_dict["backward_accuracy"]
             
+            data_manager_obj.deltas = self.results_dict["deltas"]
+            
             
             task_id =  self.results_dict["task_id"]
             

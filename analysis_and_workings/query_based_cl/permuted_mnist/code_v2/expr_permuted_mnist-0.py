@@ -43,17 +43,17 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.data_manager import DataManager 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.runner import Runner 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.neural_networks import ERNetwork
+    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.data_manager import DataManager 
+    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.runner import Runner 
+    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.checkpoint_manager import CheckpointManager 
+    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
     
     
 class TrainContext:
-    def __init__(self, input_size, num_features, classes_per_task, num_attention_layers, step_size, weight_decay, total_classes):
+    def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, step_size, weight_decay, total_classes):
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -68,6 +68,8 @@ class TrainContext:
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
         
         
+    
+       
     
 class PermutedMNISTExperiment:
     
@@ -98,7 +100,7 @@ class PermutedMNISTExperiment:
         
         self.num_features = model_params["num_features"]
         
-        self.num_attention_layers = model_params["num_attention_layers"]
+        self.num_hidden_layers = model_params["num_hidden_layers"]
         
         self.step_size = model_params["step_size"]
                 
@@ -114,7 +116,7 @@ class PermutedMNISTExperiment:
 
         
     def initialize_model(self):
-         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_attention_layers, self.step_size, self.weight_decay, self.total_classes)
+         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.step_size, self.weight_decay, self.total_classes)
         
       
     def initialize_data_manager(self):
@@ -168,7 +170,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-2.json") 
+    config_path = os.path.join( experiment_dir, "configuration-0.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   

@@ -23,7 +23,6 @@ class CheckpointManager:
         self.results_dict["prequential_accuracy"] = {}
         self.results_dict["forward_accuracy"] = {}
         self.results_dict["backward_accuracy"] = {} 
-        self.results_dict["deltas"] = {} 
         
     
         
@@ -33,7 +32,7 @@ class CheckpointManager:
         self.model_path = os.path.join(root, model_dir ,  "model.pkl")
 
         
-    def save_result_checkpoint(self,  data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy, deltas):
+    def save_result_checkpoint(self,  data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy):
         
         try:
             current_task_id = data_manager_obj.current_task_id
@@ -46,7 +45,6 @@ class CheckpointManager:
             self.results_dict["prequential_accuracy"][current_task_id] = prequential_accuracy
             self.results_dict["forward_accuracy"][current_task_id] = forward_accuracy
             self.results_dict["backward_accuracy"][current_task_id] = backward_accuracy
-            self.results_dict["deltas"][current_task_id] = deltas
             
             self.results_dict["task_train_x"] = copy.deepcopy ( data_manager_obj.task_train_x )
             self.results_dict["task_train_y"] = copy.deepcopy ( data_manager_obj.task_train_y)
@@ -54,8 +52,8 @@ class CheckpointManager:
             self.results_dict["task_test_x"] = copy.deepcopy ( data_manager_obj.task_test_x )
             self.results_dict["task_test_y"] = copy.deepcopy ( data_manager_obj.task_test_y)
             
-            self.results_dict["fifo_x"] = copy.deepcopy(data_manager_obj.fifo_x)
-            self.results_dict["fifo_y"] = copy.deepcopy(data_manager_obj.fifo_y)
+            self.results_dict["buffer_x"] = copy.deepcopy(data_manager_obj.buffer_x)
+            self.results_dict["buffer_y"] = copy.deepcopy(data_manager_obj.buffer_y)
             
             with open(self.result_path , 'wb+') as f:
                  pickle.dump(self.results_dict, f) 
@@ -103,9 +101,9 @@ class CheckpointManager:
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
             
             
-            data_manager_obj.fifo_x =  self.results_dict["fifo_x"]
+            data_manager_obj.buffer_x =  self.results_dict["buffer_x"]
             
-            data_manager_obj.fifo_y =  self.results_dict["fifo_y"]
+            data_manager_obj.buffer_y =  self.results_dict["buffer_y"]
             
             
             data_manager_obj.train_loss =  self.results_dict["train_loss"]
@@ -117,8 +115,6 @@ class CheckpointManager:
             data_manager_obj.forward_accuracy =  self.results_dict["forward_accuracy"]
             
             data_manager_obj.backward_accuracy =  self.results_dict["backward_accuracy"]
-            
-            data_manager_obj.deltas = self.results_dict["deltas"]
             
             
             task_id =  self.results_dict["task_id"]

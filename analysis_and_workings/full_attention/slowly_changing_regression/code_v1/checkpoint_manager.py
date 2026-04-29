@@ -19,11 +19,10 @@ class CheckpointManager:
 
         self.results_dict = {}
         self.results_dict["train_loss"] = {}
-        self.results_dict["train_accuracy"] = {}
-        self.results_dict["prequential_accuracy"] = {}
-        self.results_dict["forward_accuracy"] = {}
-        self.results_dict["backward_accuracy"] = {} 
-        self.results_dict["deltas"] = {} 
+        self.results_dict["prequential_loss"] = {}
+        self.results_dict["forward_loss"] = {}
+        self.results_dict["backward_loss"] = {} 
+        self.results_dict["effective_rank"] = {} 
         
     
         
@@ -33,7 +32,7 @@ class CheckpointManager:
         self.model_path = os.path.join(root, model_dir ,  "model.pkl")
 
         
-    def save_result_checkpoint(self,  data_manager_obj, train_loss, train_accuracy, prequential_accuracy, forward_accuracy, backward_accuracy, deltas):
+    def save_result_checkpoint(self,  data_manager_obj, train_loss, prequential_loss, forward_loss, backward_loss, effective_rank):
         
         try:
             current_task_id = data_manager_obj.current_task_id
@@ -41,12 +40,11 @@ class CheckpointManager:
             self.results_dict["task_id"]= current_task_id
             
             self.results_dict["train_loss"][current_task_id] = train_loss
-            self.results_dict["train_accuracy"][current_task_id] = train_accuracy
             
-            self.results_dict["prequential_accuracy"][current_task_id] = prequential_accuracy
-            self.results_dict["forward_accuracy"][current_task_id] = forward_accuracy
-            self.results_dict["backward_accuracy"][current_task_id] = backward_accuracy
-            self.results_dict["deltas"][current_task_id] = deltas
+            self.results_dict["prequential_loss"][current_task_id] = prequential_loss
+            self.results_dict["forward_loss"][current_task_id] = forward_loss
+            self.results_dict["backward_loss"][current_task_id] = backward_loss
+            self.results_dict["effective_rank"][current_task_id] = effective_rank
             
             self.results_dict["task_train_x"] = copy.deepcopy ( data_manager_obj.task_train_x )
             self.results_dict["task_train_y"] = copy.deepcopy ( data_manager_obj.task_train_y)
@@ -56,7 +54,9 @@ class CheckpointManager:
             
             self.results_dict["fifo_x"] = copy.deepcopy(data_manager_obj.fifo_x)
             self.results_dict["fifo_y"] = copy.deepcopy(data_manager_obj.fifo_y)
-            
+          
+            self.results_dict["fifo_counter"] = data_manager_obj.fifo_counter
+     
             with open(self.result_path , 'wb+') as f:
                  pickle.dump(self.results_dict, f) 
         except:
@@ -102,23 +102,21 @@ class CheckpointManager:
             
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
             
-            
             data_manager_obj.fifo_x =  self.results_dict["fifo_x"]
-            
+         
             data_manager_obj.fifo_y =  self.results_dict["fifo_y"]
-            
-            
+         
+            data_manager_obj.fifo_counter = self.results_dict["fifo_counter"] 
+         
             data_manager_obj.train_loss =  self.results_dict["train_loss"]
             
-            data_manager_obj.train_accuracy =  self.results_dict["train_accuracy"]
+            data_manager_obj.prequential_loss =  self.results_dict["prequential_loss"]
             
-            data_manager_obj.prequential_accuracy =  self.results_dict["prequential_accuracy"]
+            data_manager_obj.forward_loss =  self.results_dict["forward_loss"]
             
-            data_manager_obj.forward_accuracy =  self.results_dict["forward_accuracy"]
+            data_manager_obj.backward_loss =  self.results_dict["backward_loss"]
             
-            data_manager_obj.backward_accuracy =  self.results_dict["backward_accuracy"]
-            
-            data_manager_obj.deltas = self.results_dict["deltas"]
+            data_manager_obj.effective_rank =  self.results_dict["effective_rank"]
             
             
             task_id =  self.results_dict["task_id"]
@@ -127,10 +125,5 @@ class CheckpointManager:
             
             
             return self.results_dict["train_loss"][task_id]
-
-    
-    
-    
-    
-    
-    
+        
+ 

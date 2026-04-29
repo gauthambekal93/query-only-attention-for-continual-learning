@@ -104,9 +104,13 @@ class CheckpointManager:
             data_manager_obj.task_test_y  = self.results_dict["task_test_y"]
             
             
-            data_manager_obj.buffer_x =  self.results_dict["buffer_x"]
+            data_manager_obj.prev_task_buffer_x =  self.results_dict["prev_task_buffer_x"]
             
-            data_manager_obj.buffer_y =  self.results_dict["buffer_y"]
+            data_manager_obj.prev_task_buffer_y =  self.results_dict["prev_task_buffer_y"]
+            
+            data_manager_obj.curr_task_buffer_x =  self.results_dict["curr_task_buffer_x"]
+            
+            data_manager_obj.curr_task_buffer_y =  self.results_dict["curr_task_buffer_y"]
             
             
             data_manager_obj.train_loss =  self.results_dict["train_loss"]

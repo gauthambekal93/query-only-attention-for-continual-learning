@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 # Get current file's directory
@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 # Add it to sys.path
 #sys.path.append(str(BASE_DIR / "common" / "codes"))
-#sys.path.append(str(BASE_DIR / "analysis_and_workings" / "bp"/ "Code"/"split_image_net"))
+#sys.path.append(str(BASE_DIR / "algorithms" / "bp"/ "Code"/"split_image_net"))
 
 
 import json
@@ -43,17 +43,17 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.data_manager import DataManager 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.runner import Runner 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.full_attention.permuted_mnist.code_v3.neural_networks import ERNetwork
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.data_manager import DataManager 
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.runner import Runner 
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.checkpoint_manager import CheckpointManager 
+    from analysis_and_workings.maml.permuted_mnist.normal_changing_stream.code_v1.neural_networks import ERNetwork
     
-    global  ERNetwork, DataManager, Runner, CheckpointManager
+    global ERNetwork, DataManager, Runner, CheckpointManager
     
     
     
 class TrainContext:
-    def __init__(self, input_size, num_features, classes_per_task, num_attention_layers, step_size, weight_decay, total_classes):
+    def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, inner_step_size, outer_step_size, weight_decay, total_classes):
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -63,11 +63,17 @@ class TrainContext:
         
         beta_1, beta_2 = 0.9,  0.999
         
-        self.opt = torch.optim.Adam(self.net.parameters(), lr=step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=outer_step_size, betas=(beta_1, beta_2), weight_decay=weight_decay)
         
         self.loss = torch.nn.CrossEntropyLoss(reduction="mean")
         
+        self.inner_step_size = inner_step_size
         
+        self.outer_step_size = outer_step_size
+        
+        
+    
+       
     
 class PermutedMNISTExperiment:
     
@@ -98,32 +104,41 @@ class PermutedMNISTExperiment:
         
         self.num_features = model_params["num_features"]
         
-        self.num_attention_layers = model_params["num_attention_layers"]
+        self.num_hidden_layers = model_params["num_hidden_layers"]
         
-        self.step_size = model_params["step_size"]
+        self.inner_step_size = model_params["inner_step_size"]
+        
+        self.outer_step_size = model_params["outer_step_size"]
                 
         self.weight_decay = model_params['weight_decay']
     
-        self.buffer_size = model_params["buffer_size"]
-                
         self.test_batch_size = model_params["test_batch_size"]
         
-        self.samples_per_label = model_params["samples_per_label"]
-
+        self.supports_per_task = model_params["supports_per_task"]
         
+        self.queries_per_task = model_params["queries_per_task"]
+        
+        self.num_tasks_in_buffer = model_params["num_tasks_in_buffer"]
+         
+        self.buffer_size_per_task = model_params["buffer_size_per_task"]
+        
+        self.num_train_iterations = model_params["num_train_iterations"]
+        
+        self.num_tasks_per_update = model_params["num_tasks_per_update"]
 
         
     def initialize_model(self):
-         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_attention_layers, self.step_size, self.weight_decay, self.total_classes)
+         self.train_context =  TrainContext(self.input_size, self.num_features, self.classes_per_task, self.num_hidden_layers, self.inner_step_size, self.outer_step_size, self.weight_decay, self.total_classes)
         
       
     def initialize_data_manager(self):
          self.data_manager_obj = DataManager(self.train_context.device, ROOT, self.data_dir, self.classes_per_task, 
-                                             self.num_old_task_window, self.buffer_size, self.num_datapoints_per_timestep, self.samples_per_label, self.num_tasks)
+                                             self.num_old_task_window, self.num_datapoints_per_timestep, self.supports_per_task, self.queries_per_task, self.buffer_size_per_task, 
+                                             self.num_tasks_in_buffer, self.num_tasks)
          
     
     def initialize_runner(self):
-        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size)
+        self.runner_obj = Runner(self.num_datapoints_per_timestep , self.test_batch_size, self.num_train_iterations, self.num_tasks_per_update)
     
     
 
@@ -168,7 +183,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-2.json") 
+    config_path = os.path.join( experiment_dir, "configuration-1.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   
