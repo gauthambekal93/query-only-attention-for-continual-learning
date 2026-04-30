@@ -14,7 +14,7 @@
 "model_config":{
 "seed": 30,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/regenerative_regularization\\1\\1",
+"model_dir": "results//slowly_changing_regression/regenerative_regularization/2/1",
 "num_inputs": 20,
 "num_outputs":1, 
 "num_features": 40,
