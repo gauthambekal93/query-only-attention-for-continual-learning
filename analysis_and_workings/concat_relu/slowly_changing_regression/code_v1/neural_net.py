@@ -45,7 +45,7 @@ class feed_forward_nn(nn.Module):
 
     def calculate_effective_rank(self,X, Y, loss_func):
         
-        params  = list(self.net.layers.parameters()) #list(self.fc2.parameters() )
+        params  = list(self.parameters()) #list(self.fc2.parameters() )
         
         y_pred = self.forward( X )
     
