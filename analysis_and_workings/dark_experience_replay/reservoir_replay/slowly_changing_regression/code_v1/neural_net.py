@@ -11,9 +11,7 @@ from torch import optim
 
 
     
-class CReLU(nn.Module):
-    def forward(self, x):
-        return torch.cat([F.relu(x), F.relu(-x)], dim=1)
+
 
 class feed_forward_nn(nn.Module):
     def __init__(self, input_size, num_features, num_outputs  ):
@@ -24,28 +22,26 @@ class feed_forward_nn(nn.Module):
         
         self.fc1 = nn.Linear(input_size, num_features)
         
-        self.fc2 = nn.Linear(num_features *2, num_outputs)
+        self.fc2 = nn.Linear(num_features, num_outputs)
+    
         
         nn.init.kaiming_uniform_(self.fc1.weight, nonlinearity='relu')
         nn.init.zeros_(self.fc1.bias)
         
         nn.init.kaiming_uniform_(self.fc2.weight, nonlinearity='linear')
         nn.init.zeros_(self.fc2.bias)
-        
-        self.crelu = CReLU()
-        
-        
+                
     def forward(self, x):
         
-        x = self.crelu(self.fc1(x))
+        x = F.relu(self.fc1(x))
         x = self.fc2(x)
         
         return x
 
-
+    
     def calculate_effective_rank(self,X, Y, loss_func):
         
-        params  = list(self.net.layers.parameters()) #list(self.fc2.parameters() )
+        params = params = list(self.parameters()) #list(self.fc2.parameters() )
         
         y_pred = self.forward( X )
     
@@ -87,3 +83,4 @@ class feed_forward_nn(nn.Module):
         effective_rank = torch.exp(entropy).item()
         
         return effective_rank
+    
