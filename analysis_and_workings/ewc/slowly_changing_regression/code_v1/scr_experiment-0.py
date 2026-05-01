@@ -157,7 +157,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-0.json") 
+    config_path = os.path.join( experiment_dir, "configuration-2.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
     
