@@ -20,6 +20,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from pathlib import Path
+import torch
+import io
 
 project_root = Path(__file__).resolve().parent.parent  # go up two levels, adjust as needed
 
@@ -35,11 +37,18 @@ PLOT_EVERY = 50
 #NUM_TASKS_LONG = 6000  # will be clipped to available length per series
 
 # ==============================================================================
+
+class unpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if module == 'torch.storage' and name == '_load_from_bytes':
+            return lambda b: torch.load(io.BytesIO(b), map_location='cuda:0')
+        return super().find_class(module, name)
+
 def _load_pickle(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"Missing file: {path}")
     with open(path, "rb") as f:
-        return pickle.load(f)
+        return unpickler(f).load()
 
 
 
