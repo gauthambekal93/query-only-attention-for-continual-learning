@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 40,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/full_attention\\parameter_adaptations\\2",
+"model_dir": "results/permuted_mnist/full_attention/parameter_adaptations/2",
 "input_size": 49,    
 "num_features":100,
 "num_attention_layers": 3,

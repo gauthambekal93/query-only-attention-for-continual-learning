@@ -55,7 +55,7 @@ def import_modules():
 class TrainContext:
     def __init__(self, input_size, num_features, classes_per_task, num_attention_layers, step_size, weight_decay, total_classes):
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
         self.net = ERNetwork(input_size=input_size, num_features=num_features, num_outputs=classes_per_task)
         
@@ -168,7 +168,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-0.json") 
+    config_path = os.path.join( experiment_dir, "configuration-2.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   

@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 40,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/query_based_cl/fifo_buffer\\parameter_adaptations\\2",
+"model_dir": "results/permuted_mnist/query_based_cl/fifo_buffer/parameter_adaptations/2",
 "input_size": 49,    
 "num_features":40,
 "num_hidden_layers": 4,
