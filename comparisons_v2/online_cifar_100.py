@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri May  1 19:32:08 2026
+Created on Sun Mar 29 17:57:48 2026
 
 @author: gauthambekal93
 """
@@ -15,7 +15,7 @@ import pickle
 
 project_root = Path(__file__).resolve().parent.parent  # go up two levels, adjust as needed
 
-exp_path = os.path.join(project_root, "results", "consolidated_for_paper", "permuted_mnist.pkl")
+exp_path = os.path.join(project_root, "results", "consolidated_for_paper", "data_cifar_100.pkl")
 
 
 
@@ -100,30 +100,29 @@ plot_graph({
 
 
             },
-             title="Permuted MNIST - Prequential Accuracy",
+             title="Augmented Cifar 100 - Prequential Accuracy",
              ylabel = "Accuracy")    
 
 
-    
+
 plot_graph({ 
-            "BP: Forward Accurcy":  (obj['fwd_bp_acc'], obj['fwd_bp_std'], {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
-            "CBP: Forward Accuracy":  (obj['fwd_cbp_acc'], obj['fwd_cbp_std'], {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Accuracy":  (obj['fwd_ewc_acc'], obj['fwd_ewc_std'], {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Regern_Reg: Forward Accuracy":  (obj['fwd_regen_reg_acc'], obj['fwd_regen_reg_std'], {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Forward Accuracy":  (obj['fwd_concat_relu_acc'], obj['fwd_concat_relu_std'], {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "ER: Forward Accurcy":  (obj['fwd_er_replay'], obj['fwd_er_std'], {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
-            "Dark_Exp: Forward Accuracy":  (obj['fwd_dark_exp_acc'], obj['fwd_dark_exp_std'], {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Forward Accuracy":  (obj['fwd_qcl_acc'], obj['fwd_qcl_std'], {"color":"black", "linestyle": "-",  "marker": "s"}),
+            
+            "BP: Forward Loss":  (obj['fwd_bp_acc'], obj['fwd_bp_std'], {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP: Forward Loss":  (obj['fwd_cbp_acc'], obj['fwd_cbp_std'], {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Loss":  (obj['fwd_ewc_acc'], obj['fwd_ewc_std'], {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen_Reg: Forward Loss":  (obj['fwd_regen_reg_acc'], obj['fwd_regen_reg_std'], {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Forward Loss":  (obj['fwd_concat_relu_acc'], obj['fwd_concat_relu_std'], {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Forward Loss":  (obj['fwd_er_replay'], obj['fwd_er_std'], {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Forward Loss":  (obj['fwd_dark_exp_acc'], obj['fwd_dark_exp_std'], {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Query_CL: Forward Loss":  (obj['fwd_qcl_acc'], obj['fwd_qcl_std'], {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Full_attention: Forward Accuracy":  (obj['fwd_fatt_acc'], obj['fwd_fatt_std'], {"color":"red", "linestyle": "-",  "marker": "s"}),
 
-
             },
-             title="Permuted MNIST - Forward Accuracy",
-             ylabel = "Accuracy") 
+             title="Augmented Cifar 100 - Forward Accuracy",
+             ylabel = "Loss")
 
 
-
-print("----Permuted MNIST----")
+print("----Online CIFAR 100----")
 for k, v in obj.items():
     if 'prequential' in k and ( 'acc' in k or 'er_replay' in k):
         start = k.split('_')[0]
@@ -132,7 +131,7 @@ for k, v in obj.items():
         
         print("Model Name: ", k, "Start Accuracy: ", v[0], "End Accuracy: ", v[-1])
  
-    
+
  
 optimal_value = 0
 for idx in range(len(obj['prequential_bp_acc'])):
@@ -143,7 +142,7 @@ for idx in range(len(obj['prequential_bp_acc'])):
     
      
 
-print("----Regret Permuted MNIST----")
+print("----Regret Online CIFAR 100----")
 for k, v in obj.items():
     if 'prequential' in k and ( 'acc' in k or 'er_replay' in k):
         start = k.split('_')[0]
@@ -152,4 +151,5 @@ for k, v in obj.items():
         
         print("Model Name: ", k,  "Regret: ",  optimal_value - v.sum() )
         
-        
+
+   

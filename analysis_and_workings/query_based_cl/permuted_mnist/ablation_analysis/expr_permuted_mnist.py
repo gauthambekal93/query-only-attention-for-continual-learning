@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 # Get current file's directory
@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 # Add it to sys.path
 #sys.path.append(str(BASE_DIR / "common" / "codes"))
-#sys.path.append(str(BASE_DIR / "analysis_and_workings" / "bp"/ "Code"/"split_image_net"))
+#sys.path.append(str(BASE_DIR / "algorithms" / "bp"/ "Code"/"split_image_net"))
 
 
 import json
@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.query_based_cl.permuted_mnist.parameter_adaptations.data_manager import DataManager 
-    from analysis_and_workings.query_based_cl.permuted_mnist.parameter_adaptations.runner import Runner 
-    from analysis_and_workings.query_based_cl.permuted_mnist.parameter_adaptations.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.query_based_cl.permuted_mnist.parameter_adaptations.neural_networks import ERNetwork
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.data_manager import DataManager 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.runner import Runner 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.checkpoint_manager import CheckpointManager 
+    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
@@ -170,7 +170,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-1.json") 
+    config_path = os.path.join( experiment_dir, "configuration-2.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   

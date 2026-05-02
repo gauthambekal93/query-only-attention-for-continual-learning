@@ -1,0 +1,58 @@
+
+----Permuted MNIST----
+Model Name:  bp Start Accuracy:  65.41772627257018 End Accuracy:  53.43642100608597
+Model Name:  cbp Start Accuracy:  62.5780888888889 End Accuracy:  67.08598888888889
+Model Name:  concatrelu Start Accuracy:  74.71679830609925 End Accuracy:  78.97664281050363
+Model Name:  darkexp Start Accuracy:  73.88396492263509 End Accuracy:  64.14964294562738
+Model Name:  er Start Accuracy:  71.3848261322495 End Accuracy:  64.43698185682297
+Model Name:  ewc Start Accuracy:  49.83902662159046 End Accuracy:  39.08586574342516
+Model Name:  fatt Start Accuracy:  29.704650619187014 End Accuracy:  88.66125343746607
+Model Name:  qcl Start Accuracy:  80.8551537246713 End Accuracy:  87.81440954130557
+Model Name:  regenreg Start Accuracy:  66.79802625961395 End Accuracy:  68.12517066320612
+
+
+----Online CIFAR 100----
+Model Name:  bp Start Accuracy:  27.69106721362471 End Accuracy:  21.090400448143484
+Model Name:  cbp Start Accuracy:  38.842133980264265 End Accuracy:  51.5684007312258
+Model Name:  concatrelu Start Accuracy:  28.537600558519365 End Accuracy:  44.14773401167989
+Model Name:  darkexp Start Accuracy:  28.27506722389658 End Accuracy:  33.58786726657549
+Model Name:  er Start Accuracy:  30.48960057400663 End Accuracy:  24.003467162549494
+Model Name:  ewc Start Accuracy:  27.862933887451888 End Accuracy:  65.17040093226234
+Model Name:  fatt Start Accuracy:  37.51437493596552 End Accuracy:  84.34540138137339
+Model Name:  qcl Start Accuracy:  47.54604246939566 End Accuracy:  88.88493466195463
+Model Name:  regenreg Start Accuracy:  27.04746720567346 End Accuracy:  21.93466712749005
+
+
+----Online Tiny Image Net 200 ----
+Model Name:  bp Start Accuracy:  22.16883380588144 End Accuracy:  20.51600043660651
+Model Name:  cbp Start Accuracy:  29.86883390850077 End Accuracy:  35.09616729248315
+Model Name:  concatrelu Start Accuracy:  23.526333828891314 End Accuracy:  25.206500524431465
+Model Name:  darkexp Start Accuracy:  23.273167158601183 End Accuracy:  25.662667191115524
+Model Name:  er Start Accuracy:  23.707167167042694 End Accuracy:  21.36550045506408
+Model Name:  ewc Start Accuracy:  22.446833812644087 End Accuracy:  45.46650068343928
+Model Name:  fatt Start Accuracy:  29.221653842593366 End Accuracy:  62.253667487067474
+Model Name:  qcl Start Accuracy:  36.593340679634565 End Accuracy:  67.77933427451798
+Model Name:  regenreg Start Accuracy:  22.37500047333539 End Accuracy:  19.43233375148227
+
+
+----Online Image Net 1000 ----
+Model Name:  bp Start Accuracy:  52.7333340772738 End Accuracy:  52.41375075094402
+Model Name:  cbp Start Accuracy:  61.67666750947635 End Accuracy:  55.73958411946273
+Model Name:  concatrelu Start Accuracy:  54.09000073367108 End Accuracy:  55.102084123964104
+Model Name:  darkexp Start Accuracy:  53.64083405829346 End Accuracy:  59.247500797485316
+Model Name:  er Start Accuracy:  52.78083408800885 End Accuracy:  59.19291747237246
+Model Name:  ewc Start Accuracy:  53.07125074115272 End Accuracy:  59.43791751122724
+Model Name:  fatt Start Accuracy:  59.56592381193345 End Accuracy:  76.16333449594677
+Model Name:  qcl Start Accuracy:  65.98027517651974 End Accuracy:  85.97166792539258
+Model Name:  regenreg Start Accuracy:  52.695000747963775 End Accuracy:  52.43791739884763
+
+----Slowly Changing Regression (SCR)----
+Model Name: bp 0.9699652395212732 Start Accuracy:  End Accuracy:  0.6408988758906103
+Model Name: cbp 1.093961731598694 Start Accuracy:  End Accuracy:  0.6930124709847244
+Model Name: concatrelu 0.8140142499177548 Start Accuracy:  End Accuracy:  0.6474321248298651
+Model Name: darkexp 0.9605821656114053 Start Accuracy:  End Accuracy:  0.44742354773284715
+Model Name: er 0.9951374787029575 Start Accuracy:  End Accuracy:  0.5120225895757313
+Model Name: ewc 2.761392736927974 Start Accuracy:  End Accuracy:  2.897414427186127
+Model Name: fatt 1.1183948563083388 Start Accuracy:  End Accuracy:  0.7944899192538287
+Model Name: qcl 7.541623128467914 Start Accuracy:  End Accuracy:  0.5096879858503363
+Model Name: regenreg 1.005727770692266 Start Accuracy:  End Accuracy:  0.7013646722312701
