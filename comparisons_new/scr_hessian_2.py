@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 30 22:20:18 2026
+
+@author: apujari1
+"""
+
 # -*- coding: utf-8 -*-
 """
 Created on Wed Apr  1 14:27:22 2026
@@ -12,6 +20,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from pathlib import Path
+import torch
+import io
 
 project_root = Path(__file__).resolve().parent.parent  # go up two levels, adjust as needed
 
@@ -27,11 +37,18 @@ PLOT_EVERY = 50
 #NUM_TASKS_LONG = 6000  # will be clipped to available length per series
 
 # ==============================================================================
+
+class unpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if module == 'torch.storage' and name == '_load_from_bytes':
+            return lambda b: torch.load(io.BytesIO(b), map_location='cuda:0')
+        return super().find_class(module, name)
+
 def _load_pickle(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"Missing file: {path}")
     with open(path, "rb") as f:
-        return pickle.load(f)
+        return unpickler(f).load()
 
 
 
@@ -143,33 +160,36 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 
 # ===============BP============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0", "1", "2"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "bp")
 
+effective_rank_bp, effective_rank_std_bp = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 train_loss_bp, train_loss_std_bp  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_bp, forward_loss_std_bp = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_bp, prequential_loss_std_bp = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
-bwd_loss_bp, bwd_loss_std_bp  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
 
 # ===============CBP============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "cbp")
+
+effective_rank_cbp, effective_rank_std_cbp = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_cbp, train_loss_std_cbp  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_cbp, forward_loss_std_cbp = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_cbp, prequential_loss_std_cbp = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
-bwd_loss_cbp, bwd_loss_std_cbp  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
 
 # ===============EWC============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0", "1", "2"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "ewc")
+
+effective_rank_ewc, effective_rank_std_ewc = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_ewc, train_loss_std_ewc  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_ewc, forward_loss_std_ewc = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
@@ -178,67 +198,79 @@ bwd_loss_ewc, bwd_loss_std_ewc  = calculate_curve(base_path,  config_id, seed_id
 
 # ===============Regenerative Regularisation============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0", "1", "2"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "regenerative_regularization")
+
+effective_rank_regen_reg, effective_rank_std_regen_reg = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_regen_reg, train_loss_std_regen_reg  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_regen_reg, forward_loss_std_regen_reg = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_regen_reg, prequential_loss_std_regen_reg = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
 bwd_loss_regen_reg, bwd_loss_std_regen_reg  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
+
 # ===============Concat_ReLU============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "concat_relu")
+
+effective_rank_concat_relu, effective_rank_std_concat_relu = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_concat_relu, train_loss_std_concat_relu  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_concat_relu, forward_loss_std_concat_relu = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_concat_relu, prequential_loss_std_concat_relu = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
 bwd_loss_concat_relu, bwd_loss_std_concat_relu  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
+
 # ===============Experience Replay============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0", "1", "2"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "experience_replay", "reservoir_replay")
+
+effective_rank_exp_rep, effective_rank_std_exp_rep = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_exp_rep, train_loss_std_exp_rep  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_exp_rep, forward_loss_std_exp_rep = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_exp_rep, prequential_loss_std_exp_rep = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
 bwd_loss_exp_rep, bwd_loss_std_exp_rep  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
-
 # ===============Dark Experience Replay============
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0", "1", "2"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "dark_experience_replay", "reservoir_replay")
+
+effective_rank_dark_exp_rep, effective_rank_std_dark_exp_rep = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_dark_exp_rep, train_loss_std__dark_exp_rep  = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
 bwd_loss_dark_exp_rep, bwd_loss_std_dark_exp_rep  = calculate_curve(base_path,  config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
-
 # ===============Query Based CL============
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0", "1", "2"] , 1000, 20
 
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "query_based_cl","fifo_buffer")
+
+effective_rank_query_based_fifo, effective_rank_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_query_based_fifo, train_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_query_based_fifo, forward_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
 prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
-bwd_loss_query_based_fifo, bwd_loss_std_query_based_fifo  = calculate_curve(base_path, config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
+
 
 # ==============full attention==================== 
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0","1","2"] , 1000, 20
+config_id, seed_ids, NUM_TASKS, average_over = "2" , ["0","1","2"] , 1000, 20
 base_path = os.path.join(project_root, "results", "slowly_changing_regression", "full_attention" )
+
+effective_rank_fatt, effective_rank_std_fatt = calculate_curve(base_path, config_id, seed_ids, "effective_rank",  NUM_TASKS, average_over)
 
 train_loss_fatt, train_loss_std_fatt = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
 forward_loss_fatt, forward_loss_std_fatt = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
@@ -246,16 +278,34 @@ prequential_loss_fatt, prequential_loss_std_fatt = calculate_curve(base_path, co
 bwd_loss_fatt, bwd_loss_std_fatt  = calculate_curve(base_path, config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
 
 
+
 plot_graph({ 
             
-            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"BP: effective_rank":  (effective_rank_bp, effective_rank_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            #"CBP: effective_rank":  (effective_rank_cbp, effective_rank_std_cbp, {"color":"#B58900", "linestyle": "-",  "marker": "s"}),
+            #"EWC: effective_rank":  (effective_rank_ewc, effective_rank_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            #"Regen_Reg: effective_rank":  (effective_rank_regen_reg, effective_rank_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            #"Concat_ReLU: effective_rank":  (effective_rank_concat_relu, effective_rank_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"Exp_Rep: effective_rank":  (effective_rank_exp_rep, effective_rank_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            #"Dark_Exp_Rep: effective_rank":  (effective_rank_dark_exp_rep, effective_rank_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Query_CL: effective_rank":  (effective_rank_query_based_fifo, effective_rank_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: effective_rank":  (effective_rank_fatt, effective_rank_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
+
+            },
+             title="Slowly Changing Regression - effective_rank",
+             ylabel = "Rank")
+
+
+plot_graph({ 
+            
+            #"BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            #"CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            #"EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            #"Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            #"Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            #"Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Full_attention: Prequential Loss":  (prequential_loss_fatt, prequential_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
@@ -264,55 +314,16 @@ plot_graph({
 
 plot_graph({ 
             
-            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            #"BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            #"CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            #"EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            #"Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            #"Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            #"Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            #"Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Full_attention: Forward Accuracy":  (forward_loss_fatt, forward_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - Forward Loss",
              ylabel = "Loss")
-
-'''
-
-""" ===============Query Based CL============"""
-
-
-
-
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 1000, 50
->>>>>>> main
-base_path = os.path.join(project_root, "results", "slowly_changing_regression", "query_based_cl","fifo_buffer")
-
-train_loss_query_based_fifo, train_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "train_loss",  NUM_TASKS, average_over)
-forward_loss_query_based_fifo, forward_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "forward_loss",  NUM_TASKS, average_over)
-prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo = calculate_curve(base_path, config_id, seed_ids, "prequential_loss",  NUM_TASKS, average_over)
-bwd_loss_query_based_fifo, bwd_loss_std_query_based_fifo  = calculate_curve(base_path, config_id, seed_ids, "backward_loss",  NUM_TASKS, average_over)
-
-
-
-plot_graph({ 
-            
-            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "Query Based FIFO: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            },
-             title="Slowly Changing Regression - Prequential Loss",
-             ylabel = "Loss")
-
-plot_graph({ 
-            
-            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"red", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "Query Based FIFO: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            },
-             title="Slowly Changing Regression - Forward Loss",
-             ylabel = "Loss")
-'''
