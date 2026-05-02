@@ -220,6 +220,46 @@ prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path, config_
 bwd_fatt_acc, bwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
 
+data = {'fwd_bp_acc': fwd_bp_acc,
+        'fwd_bp_std': fwd_bp_std,
+        'prequential_bp_acc': prequential_bp_acc,
+        'prequential_bp_std': prequential_bp_std,
+        'fwd_cbp_acc':fwd_cbp_acc,
+        'fwd_cbp_std': fwd_cbp_std,
+        'prequential_cbp_acc': prequential_cbp_acc,
+        'prequential_cbp_std': prequential_cbp_std,
+        'fwd_concat_relu_acc': fwd_concat_relu_acc,
+        'fwd_concat_relu_std': fwd_concat_relu_std,
+        'prequential_concat_relu_acc': prequential_concat_relu_acc,
+        'prequential_concat_relu_std': prequential_concat_relu_std,
+        'fwd_dark_exp_acc': fwd_dark_exp_acc,
+        'fwd_dark_exp_std': fwd_dark_exp_std,
+        'prequential_dark_exp_acc': prequential_dark_exp_acc,
+        'prequential_dark_exp_std': prequential_dark_exp_std,
+        'fwd_er_replay': fwd_er_replay,
+        'fwd_er_std': fwd_er_std,
+        'prequential_er_replay': prequential_er_replay,
+        'prequential_er_std': prequential_er_std,
+        'fwd_ewc_acc': fwd_ewc_acc,
+        'fwd_ewc_std': fwd_ewc_std,
+        'prequential_ewc_acc': prequential_ewc_acc,
+        'prequential_ewc_std': prequential_ewc_std,
+        'prequential_fatt_acc': prequential_fatt_acc,
+        'prequential_fatt_std': prequential_fatt_std,
+        'fwd_fatt_acc': fwd_fatt_acc,
+        'fwd_fatt_std': fwd_fatt_std,
+        'fwd_qcl_acc': fwd_qcl_acc,
+        'fwd_qcl_std': fwd_qcl_std,
+        'prequential_qcl_acc': prequential_qcl_acc,
+        'prequential_qcl_std': prequential_qcl_std,
+        'fwd_regen_reg_acc': fwd_regen_reg_acc,
+        'fwd_regen_reg_std': fwd_regen_reg_std,
+        'prequential_regen_reg_acc': prequential_regen_reg_acc,
+        'prequential_regen_reg_std': prequential_regen_reg_std}
+
+with open("data_cifar_100.pkl", "wb") as f: 
+    pickle.dump(data, f)
+
 
 
 plot_graph({ 

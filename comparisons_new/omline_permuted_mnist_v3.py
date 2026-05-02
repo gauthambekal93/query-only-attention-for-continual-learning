@@ -120,9 +120,6 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
     plt.show()
     
     
-    
-    
-
 # ==============Vanilla Backprop ==================== 
 
 
@@ -132,7 +129,6 @@ base_path = os.path.join(project_root, "results", "permuted_mnist", "bp",)
 fwd_bp_acc, fwd_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 prequential_bp_acc, prequential_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 bwd_bp_acc, bwd_bp_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
-
 
 
 # ==============Continual Backprop ==================== 
@@ -223,18 +219,58 @@ prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path, config_
 bwd_fatt_acc, bwd_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "backward_accuracy",  NUM_TASKS, average_over)
 
 
+data = {'fwd_bp_acc': fwd_bp_acc,
+        'fwd_bp_std': fwd_bp_std,
+        'prequential_bp_acc': prequential_bp_acc,
+        'prequential_bp_std': prequential_bp_std,
+        'fwd_cbp_acc':fwd_cbp_acc,
+        'fwd_cbp_std': fwd_cbp_std,
+        'prequential_cbp_acc': prequential_cbp_acc,
+        'prequential_cbp_std': prequential_cbp_std,
+        'fwd_concat_relu_acc': fwd_concat_relu_acc,
+        'fwd_concat_relu_std': fwd_concat_relu_std,
+        'prequential_concat_relu_acc': prequential_concat_relu_acc,
+        'prequential_concat_relu_std': prequential_concat_relu_std,
+        'fwd_dark_exp_acc': fwd_dark_exp_acc,
+        'fwd_dark_exp_std': fwd_dark_exp_std,
+        'prequential_dark_exp_acc': prequential_dark_exp_acc,
+        'prequential_dark_exp_std': prequential_dark_exp_std,
+        'fwd_er_replay': fwd_er_replay,
+        'fwd_er_std': fwd_er_std,
+        'prequential_er_replay': prequential_er_replay,
+        'prequential_er_std': prequential_er_std,
+        'fwd_ewc_acc': fwd_ewc_acc,
+        'fwd_ewc_std': fwd_ewc_std,
+        'prequential_ewc_acc': prequential_ewc_acc,
+        'prequential_ewc_std': prequential_ewc_std,
+        'prequential_fatt_acc': prequential_fatt_acc,
+        'prequential_fatt_std': prequential_fatt_std,
+        'fwd_fatt_acc': fwd_fatt_acc,
+        'fwd_fatt_std': fwd_fatt_std,
+        'fwd_qcl_acc': fwd_qcl_acc,
+        'fwd_qcl_std': fwd_qcl_std,
+        'prequential_qcl_acc': prequential_qcl_acc,
+        'prequential_qcl_std': prequential_qcl_std,
+        'fwd_regen_reg_acc': fwd_regen_reg_acc,
+        'fwd_regen_reg_std': fwd_regen_reg_std,
+        'prequential_regen_reg_acc': prequential_regen_reg_acc,
+        'prequential_regen_reg_std': prequential_regen_reg_std}
+
+with open("data.pkl", "wb") as f: 
+    pickle.dump(data, f)
+
 
 
 plot_graph({ 
-            #"BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
-            #"CBP: Forward Accuracy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Regern_Reg: Forward Accuracy":  (fwd_regen_reg_acc, fwd_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Forward Accuracy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            #"ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
+            "BP: Forward Accurcy":  (fwd_bp_acc, fwd_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
+            "CBP: Forward Accuracy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regern_Reg: Forward Accuracy":  (fwd_regen_reg_acc, fwd_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Forward Accuracy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Forward Accuracy":  (fwd_dark_exp_acc, fwd_dark_exp_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            #"Q_CL: Forward Accuracy":  (fwd_qcl_acc, fwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            #"Full_attention: Forward Accuracy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "Q_CL: Forward Accuracy":  (fwd_qcl_acc, fwd_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Forward Accuracy":  (fwd_fatt_acc, fwd_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             
             },
@@ -242,15 +278,15 @@ plot_graph({
              ylabel = "Accuracy")
 
 plot_graph({ 
-            #"BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
-            #"CBP: Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Regern_Reg: Prequential Accuracy":  (prequential_regen_reg_acc, prequential_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Prequential Accuracy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            #"ER: Prequential Accurcy":  (prequential_er_replay, prequential_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
+            "BP: Prequential Accurcy":  (prequential_bp_acc, prequential_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
+            "CBP: Prequential Accuracy":  (prequential_cbp_acc, prequential_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Accuracy":  (prequential_ewc_acc, prequential_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regern_Reg: Prequential Accuracy":  (prequential_regen_reg_acc, prequential_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Prequential Accuracy":  (prequential_concat_relu_acc, prequential_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "ER: Prequential Accurcy":  (prequential_er_replay, prequential_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
             "Dark_Exp: Prequential Accuracy":  (prequential_dark_exp_acc, prequential_dark_exp_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            #"Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            #"Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
 
             },
