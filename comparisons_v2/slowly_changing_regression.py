@@ -281,14 +281,14 @@ bwd_loss_fatt, bwd_loss_std_fatt  = calculate_curve(base_path, config_id, seed_i
 
 plot_graph({ 
             
-            #"BP: effective_rank":  (effective_rank_bp, effective_rank_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            #"CBP: effective_rank":  (effective_rank_cbp, effective_rank_std_cbp, {"color":"#B58900", "linestyle": "-",  "marker": "s"}),
-            #"EWC: effective_rank":  (effective_rank_ewc, effective_rank_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Regen_Reg: effective_rank":  (effective_rank_regen_reg, effective_rank_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: effective_rank":  (effective_rank_concat_relu, effective_rank_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            #"Exp_Rep: effective_rank":  (effective_rank_exp_rep, effective_rank_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            #"Dark_Exp_Rep: effective_rank":  (effective_rank_dark_exp_rep, effective_rank_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            #"Query_CL: effective_rank":  (effective_rank_query_based_fifo, effective_rank_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "BP: effective_rank":  (effective_rank_bp, effective_rank_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP: effective_rank":  (effective_rank_cbp, effective_rank_std_cbp, {"color":"#B58900", "linestyle": "-",  "marker": "s"}),
+            "EWC: effective_rank":  (effective_rank_ewc, effective_rank_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen_Reg: effective_rank":  (effective_rank_regen_reg, effective_rank_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: effective_rank":  (effective_rank_concat_relu, effective_rank_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: effective_rank":  (effective_rank_exp_rep, effective_rank_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: effective_rank":  (effective_rank_dark_exp_rep, effective_rank_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Query_CL: effective_rank":  (effective_rank_query_based_fifo, effective_rank_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Full_attention: effective_rank":  (effective_rank_fatt, effective_rank_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
@@ -298,14 +298,14 @@ plot_graph({
 
 plot_graph({ 
             
-            #"BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            #"CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            #"Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            #"Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            #"Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Full_attention: Prequential Loss":  (prequential_loss_fatt, prequential_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
@@ -314,16 +314,47 @@ plot_graph({
 
 plot_graph({ 
             
-            #"BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            #"CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            #"Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            #"Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            #"Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
             "Full_attention: Forward Accuracy":  (forward_loss_fatt, forward_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - Forward Loss",
              ylabel = "Loss")
+
+
+print("----Slowly Changing Regression (SCR)----") 
+print("Model Name: bp",prequential_loss_bp[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_bp[-1])
+print("Model Name: cbp",prequential_loss_cbp[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_cbp[-1])
+print("Model Name: concatrelu",prequential_loss_concat_relu[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_concat_relu[-1])
+print("Model Name: darkexp",prequential_loss_dark_exp_rep[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_dark_exp_rep[-1])
+print("Model Name: er",prequential_loss_exp_rep[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_exp_rep[-1])
+print("Model Name: ewc",prequential_loss_ewc[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_ewc[-1])
+print("Model Name: fatt",prequential_loss_fatt[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_fatt[-1])
+print("Model Name: qcl",prequential_loss_query_based_fifo[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_query_based_fifo[-1])
+print("Model Name: regenreg",prequential_loss_regen_reg[0], "Start Accuracy: ", "End Accuracy: ", prequential_loss_regen_reg[-1])
+
+
+optimal_value = 0
+for idx in range(len(prequential_loss_bp)):
+    optimal_value = optimal_value + min( prequential_loss_bp[idx], prequential_loss_cbp[idx], prequential_loss_concat_relu[idx],
+                         prequential_loss_dark_exp_rep[idx], prequential_loss_ewc[idx], prequential_loss_fatt[idx],
+                         prequential_loss_query_based_fifo[idx], prequential_loss_regen_reg[idx])
+     
+
+print("----Regret in Slowly Changing Regression (SCR)----") 
+print("Model Name: bp",prequential_loss_bp.sum() - optimal_value )
+print("Model Name: cbp",prequential_loss_cbp.sum() - optimal_value )
+print("Model Name: concatrelu",prequential_loss_concat_relu.sum() - optimal_value)
+print("Model Name: darkexp",prequential_loss_dark_exp_rep.sum() - optimal_value)
+print("Model Name: er",prequential_loss_exp_rep.sum() - optimal_value)
+print("Model Name: ewc",prequential_loss_ewc.sum() - optimal_value)
+print("Model Name: fatt",prequential_loss_fatt.sum() - optimal_value)
+print("Model Name: qcl",prequential_loss_query_based_fifo.sum() -  optimal_value)
+print("Model Name: regenreg",prequential_loss_regen_reg.sum() - optimal_value)

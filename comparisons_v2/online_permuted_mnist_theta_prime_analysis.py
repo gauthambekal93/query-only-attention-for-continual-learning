@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 29 17:57:48 2026
+Created on Fri Mar 13 14:39:50 2026
 
 @author: gauthambekal93
 """
@@ -41,18 +41,16 @@ def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, averag
     num_tasks: optional truncate length
     """
     runs = []
-
+    
     for seed_id in seed_ids:
         
         p = os.path.join(base_path, config_id, seed_id, "result.pkl" )
         
         out = _load_pickle(p)
         arr = np.array([v for k, v in out[key].items()])   [: num_tasks] 
+        arr = ( arr - arr.min() ) /  ( arr.max() - arr.min() )
         runs.append(arr)
-    
-    max_tasks = min([ len(run) for  run  in runs])
-    runs = [ run[:max_tasks] for run in runs ]
-    
+        
     runs = np.stack(runs, axis=1)  # [T, R]
     mean_curve = runs.mean(axis=1)  # [T]
     std  = runs.std(axis = 1)  
@@ -126,52 +124,42 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
     
     
 
-# ==============Vanilla Backprop ==================== 
-
-
-config_id, seed_ids, NUM_TASKS, average_over = "parameter_adaptations" , [ "0", "1", "2"] , 9000, 100
-base_path = os.path.join(project_root, "results", "permuted_mnist", "bp",)
-
-param_change_bp_acc, param_change_bp_std  = calculate_curve(base_path,  config_id, seed_ids, "param_change",  NUM_TASKS, average_over)
 
 
 
 # ==============query-based cl====================
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "parameter_adaptations" , ["0", "1"] , 9000, 100
+config_id, seed_ids, NUM_TASKS, average_over = "8" , ["0", "1", "2"] , 1990, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "query_based_cl", "fifo_buffer")
 
-param_change_qcl_acc, param_change_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "param_change",  NUM_TASKS, average_over)
+deltas_qcl_acc, deltas_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "deltas",  NUM_TASKS, average_over)
+prequential_qcl_acc, prequential_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+
 
 # ==============full_attention====================
 
-config_id, seed_ids, NUM_TASKS, average_over = "parameter_adaptations" , ["0"] , 9000, 100
+
+config_id, seed_ids, NUM_TASKS, average_over = "4" , ["0", "1", "2"] , 1990, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "full_attention")
 
-param_change_fatt_acc, param_change_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "param_change",  NUM_TASKS, average_over)
+deltas_fatt_acc, deltas_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "deltas",  NUM_TASKS, average_over)
+prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 
 
 
 
 
 plot_graph({ 
-            "BP: Param Change":  (param_change_bp_acc, param_change_bp_std, {"color":"skyblue", "linestyle": "-",  "marker": "d"}),
-            #"CBP: Forward Accuracy":  (fwd_cbp_acc, fwd_cbp_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            #"EWC: Forward Accuracy":  (fwd_ewc_acc, fwd_ewc_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            #"Regern_Reg: Forward Accuracy":  (fwd_regen_reg_acc, fwd_regen_reg_std, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            #"Concat_ReLU: Forward Accuracy":  (fwd_concat_relu_acc, fwd_concat_relu_std, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            #"ER: Forward Accurcy":  (fwd_er_replay, fwd_er_std, {"color":"chocolate", "linestyle": "-",  "marker": "x"}),
-            #"Dark_Exp: Forward Accuracy":  (fwd_dark_exp_acc, fwd_dark_exp_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Q_CL: Param Change":  (param_change_qcl_acc, param_change_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Param Change":  (param_change_fatt_acc, param_change_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
+
+            "Q_CL: Theta Prime Property":  (deltas_qcl_acc, deltas_qcl_std, {"color":"grey", "linestyle": "-",  "marker": "x"}),
+            "Full_attention: Theta Prime Property":  (deltas_fatt_acc, deltas_fatt_std, {"color":"magenta", "linestyle": "-",  "marker": "x"}),
+
+            "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             
             },
-             title="Augmented Permuted_MNIST - Param Change Over Tasks ",
-             ylabel = "Param Change")
+             title="Augmented Permuted_MNIST - Prequential Accuracy & Theta Prime Property",
+             ylabel = "Accuracy & Theta Prime Property")
 
-
-
-
-    

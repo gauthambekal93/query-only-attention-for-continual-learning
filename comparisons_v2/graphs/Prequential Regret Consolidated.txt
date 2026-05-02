@@ -1,0 +1,60 @@
+
+
+----Online Permuted MNIST----
+Model Name:  bp Regret:  2859.3348241052618
+Model Name:  cbp Regret:  2027.3156715405094
+Model Name:  concatrelu Regret:  839.9453604882647
+Model Name:  darkexp Regret:  1905.966276575542
+Model Name:  er Regret:  1710.338680573609
+Model Name:  ewc Regret:  4393.064585741615
+Model Name:  fatt Regret:  435.69154433739277
+Model Name:  qcl Regret:  22.336286173767803
+Model Name:  regenreg Regret:  1877.0150962818807
+
+
+----Online Online CIFAR 100----
+Model Name:  bp Regret:  5547.375183588329
+Model Name:  cbp Regret:  3427.537163592153
+Model Name:  concatrelu Regret:  4177.701834794614
+Model Name:  darkexp Regret:  4422.48983693895
+Model Name:  er Regret:  5042.099576641105
+Model Name:  ewc Regret:  2430.445954030398
+Model Name:  fatt Regret:  1933.056496743342
+Model Name:  qcl Regret:  0.0
+Model Name:  regenreg Regret:  5432.982648393881
+
+
+----Online Tiny ImageNet 200 ----
+Model Name:  bp Regret:  3703.8280416447215
+Model Name:  cbp Regret:  2841.4928622247694
+Model Name:  concatrelu Regret:  3265.2740340274245
+Model Name:  darkexp Regret:  3268.26953401787
+Model Name:  er Regret:  3521.317037944947
+Model Name:  ewc Regret:  2070.904189482137
+Model Name:  fatt Regret:  1409.1693658804907
+Model Name:  qcl Regret:  0.0
+Model Name:  regenreg Regret:  3705.7237083211335
+
+
+----Online ImageNet 1000 ----
+Model Name:  bp Regret:  1445.5957161193624
+Model Name:  cbp Regret:  1247.244464293548
+Model Name:  concatrelu Regret:  1348.5248818865266
+Model Name:  darkexp Regret:  1171.600297060972
+Model Name:  er Regret:  1065.1607122790906
+Model Name:  ewc Regret:  1250.6773807075092
+Model Name:  fatt Regret:  1072.3606209094196
+Model Name:  qcl Regret:  0.0
+Model Name:  regenreg Regret:  1443.5794661347359
+
+
+----Online in Slowly Changing Regression (SCR)----
+Model Name: bp 10.083904672609147
+Model Name: cbp 12.102953039408089
+Model Name: concatrelu 8.973318723374195
+Model Name: darkexp 1.748813682801007
+Model Name: ewc 118.07232426051863
+Model Name: fatt 22.092473712977903
+Model Name: qcl 10.894622784023586
+Model Name: regenreg 13.50471806748536
+

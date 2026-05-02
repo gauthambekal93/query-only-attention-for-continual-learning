@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Mar 13 14:39:50 2026
+Created on Fri May  1 19:32:08 2026
 
 @author: gauthambekal93
 """
-
 
 import os
 import pickle
@@ -48,7 +47,6 @@ def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, averag
         
         out = _load_pickle(p)
         arr = np.array([v for k, v in out[key].items()])   [: num_tasks] 
-        arr = ( arr - arr.min() ) /  ( arr.max() - arr.min() )
         runs.append(arr)
         
     runs = np.stack(runs, axis=1)  # [T, R]
@@ -126,40 +124,35 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 
 
 
-
-# ==============query-based cl====================
-
-
-config_id, seed_ids, NUM_TASKS, average_over = "8" , ["0", "1", "2"] , 1990, 100
-base_path = os.path.join(project_root, "results", "permuted_mnist", "query_based_cl", "fifo_buffer")
-
-deltas_qcl_acc, deltas_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "deltas",  NUM_TASKS, average_over)
-prequential_qcl_acc, prequential_qcl_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
+# ==============Dark Experience Replay==================== 
 
 
-# ==============full_attention====================
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "maml", "normal_changing_stream")
+
+online_fwd_maml_acc, online_fwd_maml_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+online_prequential_maml_acc, online_prequential_maml_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "4" , ["0", "1", "2"] , 1990, 100
-base_path = os.path.join(project_root, "results", "permuted_mnist", "full_attention")
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 9500, 100
+base_path = os.path.join(project_root, "results", "permuted_mnist", "maml", "static_data_distribution")
 
-deltas_fatt_acc, deltas_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "deltas",  NUM_TASKS, average_over)
-prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
-
-
+static_fwd_maml_acc, static_fwd_maml_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
+static_prequential_maml_acc, static_prequential_maml_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 
 
+        
+    
+plot_graph({ 
+            "Online MAML: Forward Accuracy":  (online_fwd_maml_acc, online_fwd_maml_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Static MAML: Forward Accuracy":  (static_fwd_maml_acc, static_fwd_maml_std, {"color":"orange", "linestyle": "-",  "marker": "s"})
+            },
+             title="Permuted MNIST - Forward Accuracy ",
+             ylabel = "Accuracy")
 
 plot_graph({ 
-
-            "Q_CL: Theta Prime Property":  (deltas_qcl_acc, deltas_qcl_std, {"color":"green", "linestyle": "-",  "marker": "x"}),
-            "Full_attention: Theta Prime Property":  (deltas_fatt_acc, deltas_fatt_std, {"color":"red", "linestyle": "-",  "marker": "x"}),
-
-            "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-
-            
+            "Online MAML: Prequential Accuracy":  (online_prequential_maml_acc, online_prequential_maml_std, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            #"Static MAML: Prequential Accuracy":  (static_prequential_maml_acc, static_prequential_maml_std, {"color":"orange", "linestyle": "-",  "marker": "s"})
             },
-             title="Augmented Permuted_MNIST - Prequential Accuracy & Theta Prime Property",
-             ylabel = "Accuracy & Theta Prime Property")
-
+             title="Permuted MNIST - Prequential Accuracy",
+             ylabel = "Accuracy")
