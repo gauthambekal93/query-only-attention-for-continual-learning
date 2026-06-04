@@ -66,65 +66,24 @@ def calculate_curve( base_path, config_id, seed_ids, key, num_tasks=None, averag
     
     return mean_curve, std
 
+    
 
-def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
-    """
-    series_dict: {label: y | label: (y, {style})}
-      style keys: color, marker, linewidth, alpha, plot_every, linestyle
-    """
-    plt.figure(figsize=(8, 4))
+def plot_graph_on_axis(ax, series_dict, title, ylabel):
+
     for lbl, payload in series_dict.items():
-        if isinstance(payload, tuple) and len(payload) == 3 and isinstance(payload[2], dict):
-            y, std, style = payload
-        else:
-            y, style = payload, {}
-        
-        
-        y = np.asarray(y, dtype=float)
-        x = np.arange(len(y))
-    
-        line_width = 1.3
-        plt.plot(
-            x, y,
-            color=style.get("color", None),
-            linewidth=style.get("linewidth", line_width),
-            alpha=style.get("alpha", 0.95),
-            label=lbl,
-            marker=style.get("marker", 'o'),
-            markersize=2,
-            markevery=max(1, style.get("plot_every", PLOT_EVERY)),
-            linestyle=style.get("linestyle", '-'),
-        )
-        
-        x = np.arange(len(y))
-        plt.fill_between(
-            x,
-            y - std,
-            y + std,
-            color=style.get("color", None),
-            alpha=0.1
-        )
-        
-        
-    ax = plt.gca()
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=10))
-    if hline_at is not None:
-        plt.axhline(hline_at, linewidth=1, alpha=0.5)
-    if vline_at is not None:
-        plt.axvline(vline_at, linewidth=1, alpha=0.5)
-    plt.xlabel("Steps", fontsize = 13)
-    plt.ylabel(ylabel, fontsize = 13)
-    plt.title(title, fontsize=14)
-    plt.grid(True, linewidth=0.3, alpha=0.5)
-    plt.legend(ncol=3, fontsize=11, frameon=True,  loc="upper center", bbox_to_anchor=(0.65, 0.01) )
-    plt.tight_layout()
-    plt.show()
-    
-    
-    
-    
+        y, std, style = payload
 
+        x = np.arange(len(y))
 
+        ax.plot(x, y, label=lbl, color=style["color"])
+
+        ax.fill_between(x, y - std, y + std,
+                        color=style["color"], alpha=0.1)
+
+    ax.set_title(title, fontsize=20)
+    ax.set_xlabel("Steps", fontsize=17)
+    ax.set_ylabel(ylabel, fontsize=17)
+    ax.legend()
 
 
 # ==============query-based cl====================
@@ -150,16 +109,29 @@ prequential_fatt_acc, prequential_fatt_std  = calculate_curve(base_path, config_
 
 
 
-plot_graph({ 
+fig, axes = plt.subplots(1, 2, figsize=(9, 5)) 
 
-            "Q_CL: Theta Prime Property":  (deltas_qcl_acc, deltas_qcl_std, {"color":"grey", "linestyle": "-",  "marker": "x"}),
-            "Full_attention: Theta Prime Property":  (deltas_fatt_acc, deltas_fatt_std, {"color":"magenta", "linestyle": "-",  "marker": "x"}),
+# LEFT → Accuracy
+plot_graph_on_axis(
+    axes[0],
+    {
+        "Q_CL": (prequential_qcl_acc, prequential_qcl_std, {"color": "black"}),
+        "Full_attn": (prequential_fatt_acc, prequential_fatt_std, {"color": "red"})
+    },
+    "Prequential Accuracy",
+    "Accuracy"
+)
 
-            "Q_CL: Prequential Accuracy":  (prequential_qcl_acc, prequential_qcl_std, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Prequential Accuracy":  (prequential_fatt_acc, prequential_fatt_std, {"color":"red", "linestyle": "-",  "marker": "s"}),
+# RIGHT → Theta Prime
+plot_graph_on_axis(
+    axes[1],
+    {
+        "Q_CL": (deltas_qcl_acc, deltas_qcl_std, {"color": "grey"}),
+        "Full_attn": (deltas_fatt_acc, deltas_fatt_std, {"color": "#f4a3a3"})
+    },
+    "Constraint Gap Over Time",
+    "Constraint Gap"
+)
 
-            
-            },
-             title="Augmented Permuted_MNIST - Prequential Accuracy & Theta Prime Property",
-             ylabel = "Accuracy & Theta Prime Property")
-
+plt.tight_layout()
+plt.show()

@@ -1,0 +1,1077 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+\PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2026
+
+% The authors should use one of these tracks.
+% Before accepting by the NeurIPS conference, select one of the options below.
+% 0. "default" for submission
+\usepackage{neurips_2026}
+% the "default" option is equal to the "main" option, which is used for the Main Track with double-blind reviewing.
+% 1. "main" option is used for the Main Track
+%  \usepackage[main]{neurips_2026}
+% 2. "position" option is used for the Position Paper Track
+%  \usepackage[position]{neurips_2026}
+% 3. "eandd" option is used for the Evaluations & Datasets Track
+ % \usepackage[eandd]{neurips_2026}
+% 4. "creativeai" option is used for the Creative AI Track
+%  \usepackage[creativeai]{neurips_2026}
+% 5. "sglblindworkshop" option is used for the Workshop with single-blind reviewing
+ % \usepackage[sglblindworkshop]{neurips_2026}
+% 6. "dblblindworkshop" option is used for the Workshop with double-blind reviewing
+%  \usepackage[dblblindworkshop]{neurips_2026}
+
+% After being accepted, the authors should add "final" behind the track to compile a camera-ready version.
+% 1. Main Track
+ % \usepackage[main, final]{neurips_2026}
+% 2. Position Paper Track
+%  \usepackage[position, final]{neurips_2026}
+% 3. Evaluations & Datasets Track
+ % \usepackage[eandd, final]{neurips_2026}
+% 4. Creative AI Track
+%  \usepackage[creativeai, final]{neurips_2026}
+% 5. Workshop with single-blind reviewing
+%  \usepackage[sglblindworkshop, final]{neurips_2026}
+% 6. Workshop with double-blind reviewing
+%  \usepackage[dblblindworkshop, final]{neurips_2026}
+% Note. For the workshop paper template, both \title{} and \workshoptitle{} are required, with the former indicating the paper title shown in the title and the latter indicating the workshop title displayed in the footnote.
+% For workshops (5., 6.), the authors should add the name of the workshop, "\workshoptitle" command is used to set the workshop title.
+% \workshoptitle{WORKSHOP TITLE}
+
+% "preprint" option is used for arXiv or other preprint submissions
+ % \usepackage[preprint]{neurips_2026}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2026}
+% Preamble
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx} 
+\usepackage{float} 
+
+\usepackage{etoolbox}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\usepackage{placeins}  % adds \FloatBarrier
+\usepackage{subcaption}                 % for subfigures
+\usepackage[font=small]{caption}        % slightly smaller captions
+\captionsetup{skip=4pt}                 % space between figure and caption
+
+% tighten float spacing (safe, lightweight)
+\setlength{\textfloatsep}{8pt plus 1pt minus 2pt}
+\setlength{\intextsep}{6pt plus 1pt minus 2pt}
+\setlength{\floatsep}{8pt plus 1pt minus 2pt}
+
+
+% Note. For the workshop paper template, both \title{} and \workshoptitle{} are required, with the former indicating the paper title shown in the title and the latter indicating the workshop title displayed in the footnote. 
+\title{Global Representations Prevent Loss of Plasticity in Online Continual Learning}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+\author{Anonymous Authors
+}
+
+
+\begin{document}
+\nolinenumbers
+
+
+\maketitle
+
+\begin{abstract}
+
+Continual learning in fully online settings is challenging due to non-stationary data streams and single-pass training without task boundaries or data reuse. In this regime, models often suffer from a \emph{loss of plasticity}, i.e., a reduced ability to adapt to new data over time, leading to degradation in forward performance. We propose Query-Only Attention (QOA), derived by simplifying attention-based models for the online continual learning setting, which learns a direct similarity function between queries and support examples without relying on keys or values. We show that this formulation enforces a consistent matching behavior, where inputs with similar outputs are mapped to similar representations. We provide a theoretical perspective supporting convergence toward a shared global solution across tasks, which stabilizes adaptation and mitigates loss of plasticity. We evaluate QOA on long-horizon online versions of CIFAR-100, ImageNet, and additional benchmarks. Existing continual learning approaches, including replay, regularization, and re-initialization methods, often exhibit degraded forward performance under strict online, non-stationary settings due to slow adaptation. In contrast, QOA achieves higher prequential accuracy and near-zero cumulative regret, indicating faster and more reliable online adaptation. Our focus is on forward performance and the preservation of plasticity in fully online settings, where adaptation must occur without task boundaries or data reuse.
+
+\end{abstract}
+
+
+
+\section{Introduction}
+Continual learning remains a fundamental challenge in deep learning \citep{wang2024comprehensive}, where models must learn from non-stationary data streams without succumbing to catastrophic forgetting \citep{kirkpatrick2017overcoming} or loss of plasticity \citep{dohare2024loss}. In fully online settings, where data is observed only once and task boundaries are absent, models must continuously adapt to evolving distributions while maintaining strong forward performance.
+
+While existing approaches mitigate forgetting using replay buffers \citep{zhang2024core} or regularization \citep{kirkpatrick2017overcoming}, preserving plasticity—the ability to acquire new knowledge over time—remains less understood. Moreover, methods designed to preserve plasticity often exhibit degraded performance in strict online, non-stationary settings.
+
+Recent work suggests that attention mechanisms \citep{vaswani2017attention, olsson2022induction, graves2014ntm} can support stable adaptation across tasks \citep{wang2025replay}. Motivated by this, we ask: can the core mechanism of attention be simplified while retaining its ability to support continual adaptation? Further, what properties of attention enable it to mitigate loss of plasticity and achieve strong performance in online settings?
+
+We propose Query-Only Attention (QOA), a simplified attention-based model that removes keys and values and instead learns a direct similarity function between queries and support examples. Alongside the model, we develop a simple theoretical perspective and empirical analysis that explain how such similarity-based interactions lead to stable adaptation over time. In particular, we show that this formulation enforces a consistent matching behavior, leading to convergence toward a shared global solution across tasks. This behavior stabilizes learning and mitigates loss of plasticity over long horizons.
+
+Our analysis shows that QOA exhibits stable task-adapted representations and reduced parameter drift across tasks. Additional comparisons with Model-Agnostic Meta-Learning \citep{finn2017maml}, (Appendix) further highlight differences in adaptation behavior under online settings.
+
+
+
+
+\textbf{Key contributions:}
+\begin{itemize}
+\item We derive \textit{Query-Only Attention} (QOA) from the standard attention mechanism  \citep{vaswani2017attention} for the online continual learning setting. By removing keys and learned value vectors and instead using direct query--support similarity with support-label aggregation, QOA preserves the support-based structure of attention while simplifying the prediction rule.
+
+\item We provide a theoretical analysis showing why both full attention and query-based continual learning can mitigate loss of plasticity: their objectives induce a consistent query--support matching behavior across tasks. This leads to convergence toward a shared \textit{global} solution rather than repeatedly adapting to task-specific local solutions.
+
+\item We show that QOA is computationally better suited to online continual learning than full attention. While full attention requires pairwise buffer interactions, QOA only computes query--support interactions needed for the current prediction, reducing the dependence on buffer size from quadratic to linear.
+
+\item We conduct a comprehensive empirical comparison in difficult long-horizon, non-stationary online settings against replay-, regularization-, activation-, and re-initialization-based continual learning baselines. QOA achieves superior prequential accuracy, showing stronger online performance and sustained plasticity.
+
+\item We evaluate convergence speed using relative cumulative regret. QOA achieves near-zero regret on several classification benchmarks, indicating faster convergence and more reliable adaptation compared to existing continual learning methods.
+
+\item We introduce a task-wise augmentation protocol for large-scale benchmarks (CIFAR-100, Tiny ImageNet, and ImageNet-1000), where each task is generated via deterministic, per-task augmentations. This induces controlled distribution shifts across tasks, enabling realistic evaluation of online adaptation and plasticity without relying on repeated data or explicit task boundaries.
+
+\item As supporting analysis, we include Hessian rank evaluation \citep{lewandowski2023curvature} and comparisons with gradient-based meta-learning methods \citep{finn2017maml}, which provide additional evidence for the role of global solution convergence in preserving plasticity (Appendix).
+
+\end{itemize}
+
+
+\section{Related Work}
+
+Deep neural networks typically assume stationary data and multiple passes over the dataset, whereas online continual learning operates on non-stationary streams where each sample is observed once. This setting introduces two fundamental challenges: \emph{catastrophic forgetting}, the degradation of previously learned tasks \citep{mccloskey1989catastrophic, kemker2018measuring, ramasesh2021anatomy}, and \emph{loss of plasticity}, the reduced ability to learn new tasks over time \citep{dohare2024loss, abbas2023plasticity, chen2023stability}, which is commonly observed in standard training methods such as \emph{vanilla backpropagation (BP)}.
+
+Several recent methods explicitly target loss of plasticity. \emph{Continual Backpropagation (CBP)} \citep{dohare2024loss} restores plasticity through selective re-initialization, \emph{Concat ReLU (CReLU)} \citep{abbas2023plasticity} improves representational capacity through activation design, and \emph{Regenerative Regularization (RegenReg)} \citep{abati2020regenerative} encourages parameters to remain adaptable. Regularization methods such as  \emph{Elastic Weight Consolidation (EWC)} \citep{kirkpatrick2017overcoming}, \emph{Synaptic Intelligence (SI)} \citep{zenke2017si}, and \emph{Learning without Forgetting (LwF)} \citep{li2016lwf}, as well as replay methods such as \emph{Experience Replay (ER)} \citep{rolnick2019experience} and \emph{Dark Experience Replay (DER)} \citep{buzzega2020dark}, are also widely used to stabilize continual learning.
+
+However, many of these methods are evaluated in relatively controlled settings, often with clear task boundaries or evaluation focused on end-of-task accuracy. End-of-task evaluation can overstate adaptability because it measures performance after the model has already trained on the current task. In strict online settings with distribution shifts across tasks, the more relevant question is whether the model adapts quickly as data arrives. We therefore emphasize prequential accuracy and cumulative regret, which directly measure online adaptability and convergence speed.
+
+Recent work suggests that attention-based models can mitigate loss of plasticity in controlled or toy settings \citep{wang2025replay}. However, the mechanisms underlying this behavior are not well understood. In this work, we provide a simple theoretical perspective, supported by empirical analysis, explaining why similarity-based interactions in attention help preserve plasticity.
+
+Building on this insight, we derive Query-Only Attention (QOA), a simplified formulation tailored for online continual learning. QOA retains the query--support matching mechanism of attention while removing keys and learned value vectors, reducing computational cost from $\mathcal{O}(n^2 d)$ to $\mathcal{O}(n d)$. We show that both full attention and query-based models can converge toward a shared global solution across tasks, which stabilizes learning and mitigates loss of plasticity. Empirically, QOA achieves improved cumulative regret and prequential accuracy in more realistic, non-stationary settings, demonstrating stronger online performance under distribution shift.
+
+More broadly, our approach connects attention mechanisms, in-context learning \citep{dong2024survey, wu2025why, ahn2023transformers}, and meta-learning frameworks such as \emph{Model Agnostic Meta-Learning (MAML)} \citep{finn2017maml} and metric-based methods \citep{vinyals2016matching, koch2015siamese, snell2017prototypical}. Finally, to study plasticity dynamics, we adopt curvature-based analyses such as effective Hessian rank \citep{lewandowski2023curvature, roy2007effective}, where stable rank indicates sustained adaptability.
+
+
+
+\section{Problem Statement}
+We consider an \textit{online continual learning} setting where a model observes a stream of data sequentially, each sample seen once (no epochs or replay) \citep{cai2021online, aljundi2019online}. The stream is generated from tasks $\{T_1, T_2, \dots\}$, where each task $T_i$ follows a (potentially non-stationary) distribution $\mathcal{D}_i(x,y)$. 
+The model is trained online without access to task identities or boundaries, updating parameters using only current observations (single samples or small batches) \citep{koh2021online, chaudhry2018riemannian, aljundi2019online}. 
+Evaluation is performed in a forward (prequential) manner along the stream, where each sample is first used for testing before training, reflecting real-world deployment scenarios \citep{dawid1984present, gama2013survey, cai2021online, lin2022clear}. 
+We measure \textbf{forward performance (plasticity)} via predictive accuracy on incoming samples prior to training, where degradation over time indicates loss of plasticity.
+
+
+
+\section{Method}
+\subsection{From Attention to Query-Only Attention}
+\label{sec:attention_to_qoa}
+
+We derive Query-Only Attention (QOA) from standard attention in the online continual learning setting. Let $\tau$ denote the current task and $x_{\tau,t}\in\mathbb{R}^{1\times d}$ the current datapoint. Let the support set contain $m$ examples $\mathcal{S}_{\tau}=\{(x_{\tau,j},y_{\tau,j})\}_{j=1}^{m}$ with $x_{\tau,j}\in\mathbb{R}^{1\times d}$.
+
+Full attention stacks the datapoint and support set into
+\[
+X_{\tau,t}=
+\begin{bmatrix}
+x_{\tau,t} \\
+x_{\tau,1} \\
+\vdots \\
+x_{\tau,m}
+\end{bmatrix}
+\in\mathbb{R}^{(m+1)\times d},
+\]
+and computes $Q=X_{\tau,t}W_Q$, $K=X_{\tau,t}W_K$, and $V=X_{\tau,t}W_V$, where $W_Q,W_K,W_V\in\mathbb{R}^{d\times d}$.
+
+The attention matrix is $A=\operatorname{softmax}\!\left(\frac{QK^\top}{\sqrt{d}}\right)\in\mathbb{R}^{(m+1)\times(m+1)}$, and the output is $Y=AV\in\mathbb{R}^{(m+1)\times d}$.
+
+This computes representations for both the current datapoint and all support elements. However, in our setting we only require the prediction for $x_{\tau,t}$, making support--support interactions unnecessary.
+
+Let $n=m+1$. The projection step costs $\mathcal{O}(nd^2)$, while computing $QK^\top$ and $AV$ each costs $\mathcal{O}(n^2 d)$. Thus, full attention scales as $\mathcal{O}(nd^2 + n^2 d)$, with quadratic dependence on the support size through the pairwise attention terms. For predicting the current datapoint, the only required interactions are between $x_{\tau,t}$ and each support example $x_{\tau,j}$. In standard attention, this interaction is given by
+\[
+q_{\tau,t}k_{\tau,j}^{\top}
+=
+(x_{\tau,t}W_Q)(x_{\tau,j}W_K)^\top .
+\]
+QOA retains the query--support interaction structure but replaces the projected dot-product similarity with a learned similarity function
+\[
+f_\theta(x_{\tau,t},x_{\tau,j})\in\mathbb{R}.
+\]
+Computing this score for all support examples gives the task-adapted representation
+\[
+\theta'_{\tau,t}
+=
+\big[
+f_\theta(x_{\tau,t},x_{\tau,1}),
+\ldots,
+f_\theta(x_{\tau,t},x_{\tau,m})
+\big]
+\in\mathbb{R}^{m}.
+\]
+Unlike standard attention, QOA does not apply softmax normalization to these scores.
+
+\textbf{Prediction via label aggregation.}
+In standard attention, the output is a weighted sum of learned value vectors. In online continual learning, each support example already has an associated label or target. Therefore, QOA replaces learned value vectors with the corresponding support labels. Each support example contributes its label to the prediction according to its learned similarity with the current datapoint, yielding a similarity-weighted label aggregation.
+
+For classification, let
+\[
+Y_{\tau}^{\mathrm{sup}} = [e(y_{\tau,1}); \ldots; e(y_{\tau,m})] \in \mathbb{R}^{m\times C},
+\]
+where $e(y_{\tau,j})$ is the one-hot encoding of label $y_{\tau,j}$ and $C$ is the number of classes. The predicted logits are
+\[
+Y_{\mathrm{pred}} = \theta'_{\tau,t} \, Y_{\tau}^{\mathrm{sup}} \in \mathbb{R}^{1\times C}.
+\]
+
+For regression, let
+\[
+y_{\tau}^{\mathrm{sup}} = [y_{\tau,1}, \ldots, y_{\tau,m}]^\top \in \mathbb{R}^{m},
+\]
+\[
+Y_{\mathrm{pred}} = \theta'_{\tau,t} \, y_{\tau}^{\mathrm{sup}}.
+\]
+
+Thus, QOA preserves the attention principle of aggregating support information based on query--support similarity, while removing support--support interactions, explicit key projections, and learned value vectors. Focusing on scaling with support size, QOA computes $m$ query--support scores and scales linearly as $\mathcal{O}(md)$, whereas full attention scales as $\mathcal{O}(nd^2 + n^2 d)$ with $n=m+1$, exhibiting quadratic dependence on the support size.
+
+
+\paragraph{Balanced support sampling.}
+In practice, we do not use all elements in the buffer to compute $Y_{\mathrm{pred}}$. Instead, we construct a support set by sampling a fixed number of examples per class. For a classification task with $C$ classes, we sample $k$ examples per class, yielding a support size $m = C \times k$, even if the buffer is significantly larger.
+This balanced sampling ensures that each class contributes equally to the prediction and avoids bias toward overrepresented classes. It also aligns with the query--support matching structure of QOA, where each class provides comparable evidence during similarity-based aggregation, while reducing computational cost.
+
+
+\paragraph{Training Procedure.}
+The model is trained in a fully online manner. At each step, the current sample is added to the buffer using a FIFO policy, a support set is sampled, and the model is updated via gradient descent on the prediction loss.
+\begin{algorithm}[H]
+\caption{Query-Only Attention (QOA) with Replay Buffer}
+\label{alg:qoa}
+\begin{algorithmic}[1]
+\Require Data stream $(x_{\tau,t}, y_{\tau,t})$; buffer $\mathcal{B}$ of size $n$; support size $m$; scoring network $f_\theta$
+\State Initialize parameters $\theta$; buffer $\mathcal{B} \gets \emptyset$
+
+\For{each timestep $t$ with sample $(x_{\tau,t}, y_{\tau,t})$}
+
+    \State $\mathcal{S}_{\tau} = \{(x_{\tau,j}, y_{\tau,j})\}_{j=1}^{m} \subset \mathcal{B}$
+
+    \State \textbf{Query--support scoring:}
+    \State Stack supports: $X_{\tau}^{\mathrm{sup}}$
+    \State Repeat query: $X_{\tau,t}^{\mathrm{rep}}$
+    \State Concatenate: $Z = [X_{\tau,t}^{\mathrm{rep}}, X_{\tau}^{\mathrm{sup}}]$
+    \State $\theta_{\tau,t}' = f_\theta(Z)$
+
+    \State \textbf{Aggregate prediction:}
+    \If{classification}
+        \State $\hat{y}_{\tau,t} = (\theta_{\tau,t}')^\top Y_{\tau}^{\mathrm{sup}}$
+    \Else
+        \State $\hat{y}_{\tau,t} = (\theta_{\tau,t}')^\top y_{\tau}^{\mathrm{sup}}$
+    \EndIf
+
+    \State \textbf{Loss and update:}
+    \State $\mathcal{L}_{\tau,t} \gets \ell(\hat{y}_{\tau,t}, y_{\tau,t})$
+    \State $\theta \gets \theta - \eta \nabla_\theta \mathcal{L}_{\tau,t}$
+
+    \State \textbf{Update buffer:}
+    \State Insert $(x_{\tau,t}, y_{\tau,t})$ into $\mathcal{B}$
+    \State Evict oldest if $|\mathcal{B}| > n$
+
+\EndFor
+
+\Statex \textit{Note: The current sample is not included in the support set. The buffer is updated after learning to avoid trivial matching.}
+
+\end{algorithmic}
+\end{algorithm}
+
+% ---------- EXPERIMENTS SECTION ----------
+
+\section{Experiments}
+\label{sec:experiment}
+\subsection{Experimental Setup}
+
+We evaluate our method on five benchmarks: Slowly Changing Regression (SCR), Permuted MNIST, CIFAR-100, Tiny ImageNet, and ImageNet, under a strict online continual learning setting.
+
+
+\paragraph{CIFAR-100, Tiny ImageNet, and ImageNet.}
+We use the CIFAR-100 dataset \citep{krizhevsky2009learning}, the Tiny ImageNet dataset \citep{tinyimagenet}, and ImageNet \citep{deng2009imagenet}. For CIFAR-100 and Tiny ImageNet, each task consists of 5 classes sampled uniformly at random (with replacement) from the global label set. To introduce distributional shift, we apply a fixed augmentation per task (e.g., cropping, rotation, or color transformations) to all images in that task. This design induces two key challenges: (i) \emph{recurring classes}, where the same class reappears across tasks, and (ii) \emph{distributional variation}, where the input distribution for the same class changes across tasks due to augmentations. As a result, the model must continuously adapt to new variations of previously seen classes without explicit task information.
+For ImageNet, we adopt a similar setup but construct binary classification tasks. Each task consists of 2 classes sampled from the 1000-class dataset, with task-specific augmentations applied as above. This setting scales the problem to a large and diverse dataset while retaining the challenges of recurring classes and distribution shift.
+\paragraph{Permuted MNIST.}
+Each task consists of all 10 classes, with a task-specific random permutation applied to the input pixels. This results in tasks that share the same label space but differ in input distribution, requiring the model to adapt to changing representations while maintaining classification performance \citep{goodfellow2013empirical}.
+\paragraph{Slowly Changing Regression (SCR).}
+We use the SCR benchmark from \citep{dohare2024loss}, where the data distribution evolves gradually over time. This setting isolates the effect of non-stationary and is specifically designed to study loss of plasticity.
+
+\paragraph{Evaluation Protocol and Metrics.}
+We consider a fully online continual learning setting where data is presented as a continuous stream without task identifiers, and each sample is observed only once. Tasks are constructed to exhibit both \emph{distributional shift} and \emph{recurring classes}, creating a challenging non-stationary environment. Unlike standard benchmarks that rely on task boundaries or multiple epochs over data, our setup enforces single-pass learning with evolving input distributions.
+We evaluate models using \emph{prequential accuracy}, where each sample is first used for testing before the model is updated \citep{dawid1984present}:
+\[
+\mathrm{Acc}_T^{(m)} = \frac{1}{T}\sum_{t=1}^{T}\mathbb{I}(\hat{y}_t^{(m)} = y_t),
+\]
+where $\hat{y}_t^{(m)}$ is the prediction of method $m$ at time $t$.
+For each task, prequential accuracy is computed as the average of prequential evaluations over all timesteps belonging to that task.
+Under this protocol, performance on a new task is initially low and improves as more samples are observed. Consequently, prequential accuracy is typically lower than evaluation based on held-out test sets measured after training on a task, as it more closely reflects real-world deployment where predictions must be made before adaptation. Importantly, this metric explicitly penalizes slow adaptation, since models incur errors over the early portion of each task.
+
+
+\paragraph{Baselines.}
+We first consider methods explicitly designed to address loss of plasticity, including \emph{Continual Backpropagation (CBP)}, \emph{Concat ReLU (CReLU)}, and \emph{Regenerative Regularization (RR)}. While these approaches aim to preserve adaptability, they have not been evaluated under prequential metrics, which directly penalize slow adaptation.
+We additionally compare against a \emph{full attention} model, from which our formulation is derived, to isolate the impact of the query-only design.
+Finally, we include replay-based methods such as \emph{Experience Replay (ER)} and \emph{Dark Experience Replay (DER)}, which are strong baselines for mitigating catastrophic forgetting, to evaluate how they perform under our strictly online, non-stationary setting.
+
+
+\subsection{Experiment Results}
+\begin{table}[ht]
+
+\caption{Prequential performance across datasets; start and end denote early-stage and long-horizon performance; accuracy ($\uparrow$) is higher-is-better and SCR loss ($\downarrow$) is lower-is-better.}
+\label{tab:main_results}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+
+\begin{tabular}{lcccccccccc}
+\toprule
+& \multicolumn{2}{c}{PMNIST} & \multicolumn{2}{c}{CIFAR-100} & \multicolumn{2}{c}{TinyIN} & \multicolumn{2}{c}{ImageNet} & \multicolumn{2}{c}{SCR} \\
+Method 
+& Start $\uparrow$ & End $\uparrow$ 
+& Start $\uparrow$ & End $\uparrow$ 
+& Start $\uparrow$ & End $\uparrow$ 
+& Start $\uparrow$ & End $\uparrow$ 
+& Start $\downarrow$ & End $\downarrow$ \\
+\midrule
+Vanilla BP      & 65.42 & 53.44 & 27.69 & 21.09 & 22.17 & 20.52 & 52.73 & 52.41 & 0.970 & 0.641 \\
+CBP             & 62.58 & 67.09 & 38.84 & 51.57 & 29.87 & 35.10 & 61.68 & 55.74 & 1.094 & 0.693 \\
+Concat ReLU     & 74.72 & 78.98 & 28.54 & 44.15 & 23.53 & 25.21 & 54.09 & 55.10 & \textbf{0.814} & 0.647 \\
+Dark Exp.       & 73.88 & 64.15 & 28.28 & 33.59 & 23.27 & 25.66 & 53.64 & 59.25 & 0.961 & \textbf{0.447} \\
+ER              & 71.38 & 64.44 & 30.49 & 24.00 & 23.71 & 21.37 & 52.78 & 59.19 & 0.995 & 0.512 \\
+EWC             & 49.84 & 39.09 & 27.86 & 65.17 & 22.45 & 45.47 & 53.07 & 59.44 & 2.761 & 2.897 \\
+Full Attention  & 29.70 & 88.66 & 37.51 & 84.35 & 29.22 & 62.25 & 59.57 & 76.16 & 1.118 & 0.794 \\
+QOA (Ours)      & \textbf{80.86} & \textbf{87.81} 
+                & \textbf{47.55} & \textbf{88.88} 
+                & \textbf{36.59} & \textbf{67.78} 
+                & \textbf{65.98} & \textbf{85.97} 
+                & 7.542 & 0.510 \\
+Reg. Reg.       & 66.80 & 68.13 & 27.05 & 21.93 & 22.38 & 19.43 & 52.70 & 52.44 & 1.006 & 0.701 \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+\label{tab:main_results}
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{online_cifar_100_prequential_performance.png}
+    \caption{CIFAR-100}
+    \label{fig:cifar100}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{online_tiny_imagenet_200_prequential_performance.png}
+    \caption{Tiny ImageNet-200}
+    \label{fig:tinyin}
+  \end{subfigure}
+  \caption{Prequential accuracy over $10^4$ tasks. Each point is averaged over 100 tasks. QOA achieves consistently higher accuracy and faster adaptation compared to baselines.}
+  \label{fig:prequential_main}
+\end{figure}
+
+\textit{We present prequential accuracy plots for CIFAR-100 and Tiny ImageNet in the main text. Corresponding results for all other datasets, along with forward performance plots, are deferred to the Appendix due to space limitations.}
+
+\paragraph{Observations on the performance}
+Across all benchmarks, \textbf{query-only attention (QOA)} consistently outperforms all baselines, with full-attention models as the closest competitor. QOA not only achieves higher final performance but also converges faster and scales more effectively on harder tasks.
+A key observation is that methods explicitly designed to mitigate \emph{loss of plasticity}, such as CBP, CReLU, and RR, often maintain adaptability but exhibit slow adaptation. Under the prequential evWe derive Query-aluation protocol, this results in poor performance, as these methods incur errors over a large number of early timesteps within each task before improving. For example, in CIFAR-100 and Tiny ImageNet, each task spans many timesteps, and slow initial adaptation leads to significantly lower average accuracy.
+Replay-based methods such as ER and DER, while effective at mitigating forgetting, struggle in this setting due to both loss of plasticity and limited ability to rapidly adapt to evolving distributions. As a result, their performance remains suboptimal under strict online conditions.
+In contrast, QOA and full-attention models achieve strong performance by rapidly adapting to new tasks while maintaining stability over long horizons. We attribute this to the emergence of a \emph{global solution}, where task-level representations align across tasks. Once this shared structure is learned, performance remains stable even at the beginning of new tasks, enabling both fast adaptation and sustained accuracy. These results highlight a fundamental limitation of existing approaches: preserving plasticity alone is insufficient in fully online settings, as methods must also achieve rapid adaptation; prequential evaluation exposes this trade-off, and QOA is able to satisfy both simultaneously.
+
+
+\paragraph{Convergence Speed via Regret.}
+While prequential accuracy captures forward performance under online adaptation, it does not fully reflect the time required to reach a stable solution. As observed in our experiments, once a \emph{global solution} is achieved, models perform consistently well on subsequent tasks. However, reaching this regime can require a large number of initial tasks, during which performance may remain poor and negatively impact downstream performance.
+To explicitly capture this effect, we measure convergence speed using \emph{relative cumulative regret} following standard online learning formulations \citep{cesa2006prediction}. Let $\ell_t^{(m)}$ denote the loss of method $m$ at time $t$, and define the instantaneous best loss as $\ell_t^* = \min_{m'} \ell_t^{(m')}$. The regret of method $m$ over $T$ steps is given by
+\[
+R_T^{(m)} = \sum_{t=1}^{T} \bigl(\ell_t^{(m)} - \ell_t^*\bigr),
+\]
+where lower regret indicates faster convergence and improved online adaptation. For classification, $\ell_t^{(m)}$ corresponds to cross-entropy loss, while for regression we use mean squared error.
+
+We additionally report the \emph{adaptation gap}
+\[
+\Delta_t = A_t^{\mathrm{forward}} - A_t^{\mathrm{preq}},
+\]
+which measures within-task improvement and serves as a diagnostic of adaptation speed. Regret is defined relative to the set of evaluated methods.
+
+
+\begin{table}[ht]
+
+\caption{Relative cumulative regret (lower is better); QOA achieves near-zero regret, indicating rapid convergence to a global solution, while baselines converge more slowly.}
+\label{tab:regret}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+
+\begin{tabular}{lccccc}
+\toprule
+Method & PMNIST $\downarrow$ & CIFAR-100 $\downarrow$ & TinyIN $\downarrow$ & ImageNet $\downarrow$ & SCR $\downarrow$ \\
+\midrule
+Vanilla BP      & 2859.33 & 5547.38 & 3703.83 & 1445.60 & 10.08 \\
+CBP             & 2027.32 & 3427.54 & 2841.49 & 1247.24 & 12.10 \\
+Concat ReLU     & 839.95  & 4177.70 & 3265.27 & 1348.52 & 8.97 \\
+Dark Exp.       & 1905.97 & 4422.49 & 3268.27 & 1171.60 & \textbf{1.75} \\
+ER              & 1710.34 & 5042.10 & 3521.32 & 1065.16 & 4.70 \\
+EWC             & 4393.06 & 2430.45 & 2070.90 & 1250.68 & 118.07 \\
+Full Attention  & 435.69  & 1933.06 & 1409.17 & 1072.36 & 22.09 \\
+QOA (Ours)      & \textbf{22.34} & \textbf{0.00} & \textbf{0.00} & \textbf{0.00} & 10.89 \\
+Reg. Reg.       & 1877.02 & 5432.98 & 3705.72 & 1443.58 & 13.50 \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+
+\paragraph{Regret analysis.}
+We analyze relative cumulative regret across datasets (lower is better). QOA consistently achieves the lowest regret on classification benchmarks, often approaching zero, indicating rapid convergence to a stable solution. In contrast, replay- and regularization-based methods exhibit substantially higher regret, reflecting slow adaptation under non-stationary conditions.
+Notably, while the full-attention model achieves competitive final performance, it incurs significantly higher regret compared to QOA. This indicates that full attention requires substantially more time to converge, resulting in prolonged periods of suboptimal performance during early time-steps. In fully online settings, where predictions must be made before adaptation and errors accumulate over time, such delayed convergence can have a significant impact on overall performance. These results highlight that convergence speed is a critical factor in online continual learning: methods that eventually achieve strong performance may still be ineffective in practice if they adapt too slowly.
+On SCR, Dark Experience achieves the lowest regret, while QOA remains a close second. We observe that QOA exhibits higher initial error in this setting, which contributes disproportionately to cumulative regret despite strong performance after adaptation. This suggests that, in regression settings with gradually evolving distributions, early-stage behavior plays a more significant role in regret, highlighting distinct optimization dynamics compared to classification benchmarks.
+
+\section{Task-Level Representations and Global Solutions}
+\label{sec:task_representations}
+In QOA, predictions are formed via similarity-weighted aggregation over a support set, yielding a task-level representation $\theta'_{\tau,t}$.
+
+To correctly predict $y_{\tau,t}$, the model must assign larger values in $\theta'_{\tau,t}$ to supports with matching labels than to those with non-matching labels. Formally,
+\[
+\mathbb{E}_{j : y_j = y_{\tau,t}} \theta'_{\tau,t,j}
+>
+\mathbb{E}_{j : y_j \neq y_{\tau,t}} \theta'_{\tau,t,j}.
+\]
+
+This induces a task-invariant relational structure, as the constraint depends only on label agreement and not on task identity. As a result, the representations $\theta'_{\tau,t}$ tend to align across tasks, leading to a shared global solution that stabilizes learning and mitigates loss of plasticity.
+
+\textit{Full derivation is provided in Appendix~\ref{sec:derivation_task_representations}.}
+
+\begin{figure}[ht]
+\centering
+
+\begin{subfigure}[t]{0.48\columnwidth}
+    \centering
+    \includegraphics[width=\linewidth]{theta_prime_constarint.png}
+    \caption{Consistency of task-adapted representations ($\theta'$) over 2K Permuted MNIST tasks}
+    \label{fig:theta_prime_constraint}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\columnwidth}
+    \centering
+    \includegraphics[width=\linewidth]{theta_change_on_successive_tasks.png}
+    \caption{Parameter change between successive tasks over 10K Permuted MNIST tasks}
+    \label{fig:param_change}
+\end{subfigure}
+
+\caption{Model dynamics across tasks. (a) QOA and full-attention increasingly satisfy the matching constraint, leading to consistent task-adapted representations. (b) Parameter updates decrease over time, indicating convergence to a stable solution.}
+\label{fig:model_analysis}
+
+\end{figure}
+
+
+\paragraph{Empirical verification of global solution.}
+We empirically validate the global solution hypothesis using two complementary analyses on Permuted MNIST.
+First, we track the \emph{constraint gap}, defined as the difference between similarity assigned to supports with matching and non-matching labels. As shown in Figure~\ref{fig:theta_prime_constraint}, both QOA and full-attention exhibit a steadily increasing gap over time, indicating progressive satisfaction of the task-invariant matching constraint. This closely correlates with improvements in prequential accuracy, linking constraint satisfaction to faster adaptation.
+Second, we measure parameter change across tasks by computing the distance between parameters at the end of successive tasks. As shown in Figure~\ref{fig:param_change}, QOA and full-attention exhibit decreasing parameter updates, indicating convergence to a stable solution. In contrast, vanilla backpropagation maintains large parameter shifts, reflecting continual re-adaptation and lack of convergence.
+Together, these results support the global solution hypothesis: enforcing the matching constraint leads to aligned task-level representations, stable learning dynamics, and reduced loss of plasticity.
+
+
+\paragraph{Comparison to gradient-based adaptation.}
+Gradient-based meta-learning methods such as MAML compute task-specific parameters
+\begin{equation}
+\theta'_t = \theta - \alpha \nabla_\theta \mathcal{L}_t(\theta),
+\end{equation}
+where $\mathcal{L}_t$ depends on the current task.
+
+Unlike query-based or attention models, MAML does not induce a task-invariant structural constraint on the relationship between inputs. The adaptation step is driven entirely by task-specific gradients, which vary across tasks. As a result, the resulting representations $\theta'_t$ are not required to align or converge across tasks.
+In contrast, our formulation induces a consistent matching structure across tasks through the learning objective, enabling convergence to a shared task-level representation.
+
+
+\subsection{Ablation Study: Effect of Buffer Size}
+
+We study the impact of buffer size on performance by varying the number of support samples $n$ while keeping all other factors fixed. As shown in Figure~\ref{fig:ablation_study}, performance improves consistently as the buffer size increases, indicating that the model effectively leverages additional past information. The gains saturate beyond a certain point, suggesting diminishing returns for very large buffers. This behavior is consistent with the linear scaling of our method with respect to buffer size, enabling efficient utilization of larger buffers.
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{permuted_mnist_ablation_study.png}
+    \caption{Ablation study on Permuted MNIST}
+  \end{subfigure}\hfill
+  \caption{Prequential accuracy over $10^4$ tasks. Each point is averaged over 100 tasks.
+  The accuracy improves as the support size increases.}
+  \label{fig:ablation_study}
+\end{figure}
+
+\section{Conclusion}
+\label{sec:conclusion}
+We proposed Query-Only Attention (QOA) for fully online continual learning, targeting the loss of plasticity under non-stationary data streams without task boundaries or repeated data access. QOA replaces standard attention with a direct query–support matching mechanism that induces a task-invariant relational constraint through the learning objective.
+We showed both theoretically and empirically that this constraint leads to the emergence of a shared \emph{global solution}, where task-level representations align across tasks. This alignment stabilizes learning dynamics, enabling sustained adaptability over long horizons. Across challenging online benchmarks, QOA achieves higher prequential accuracy and lower regret than replay, regularization, and re-initialization methods, demonstrating faster adaptation and improved forward performance.
+Our analysis further highlights that convergence speed is critical in online settings: methods that eventually perform well can still incur substantial errors if they adapt slowly. In contrast, QOA rapidly satisfies the matching constraint and converges to stable representations, reducing the need for continual parameter updates.
+While QOA relies on a support set, its simplicity and linear scaling with support size make it practical for long-horizon learning. Future work includes extending the approach to larger-scale settings, reducing dependence on explicit support sets, and developing a deeper theoretical understanding of the global solution regime.
+
+\bibliographystyle{plainnat}
+\bibliography{main}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+\section{Technical appendices and supplementary material}
+\subsection{Broader impacts}
+\label{sec:broader_impacts}
+This work focuses on foundational aspects of online continual learning, specifically understanding and mitigating loss of plasticity in non-stationary settings. By improving adaptation speed and reducing the need for repeated training, our approach can contribute to more efficient and scalable learning systems. Potential positive impacts include reduced computational cost, improved energy efficiency, and more adaptive models in applications such as robotics, healthcare monitoring, and personalized systems.
+
+However, continual learning systems that adapt over time may also introduce risks. In particular, adaptive models deployed in sensitive domains (e.g., surveillance or user profiling) may amplify biases or privacy concerns if not properly controlled. While our work is not directly tied to any specific deployment, these considerations highlight the importance of responsible use, monitoring, and safeguards when applying continual learning systems in real-world settings.
+
+Overall, this work contributes to a better understanding of learning dynamics in non-stationary environments, which can support the development of more robust and reliable adaptive systems.
+
+
+\subsection{Limitations}
+\label{sec:limitations}
+Our work has several limitations.
+
+First, QOA relies on a support set for prediction, which may introduce memory and computation constraints in large-scale settings, and does not directly address catastrophic forgetting in the absence of stored examples.
+
+Second, while we evaluate on a range of benchmarks including Permuted MNIST, Slowly Changing Regression, CIFAR-100, Tiny ImageNet, and ImageNet, these are still controlled settings. Further validation on more complex, real-world continual learning scenarios is needed to assess generality.
+
+Third, our theoretical analysis provides intuition for the emergence of a global solution through task-invariant constraints, but does not constitute a formal proof. A more rigorous theoretical characterization of this phenomenon remains an important direction for future work.
+
+Finally, while QOA achieves strong prequential performance and low regret, its behavior in settings with extreme class imbalance or rapidly shifting label spaces remains to be explored.
+
+
+
+\section{Task-Level Representations and Derivation of Global Solutions}
+\label{sec:derivation_task_representations}
+
+\paragraph{Setup.}
+In online continual learning, the data stream is organized as a sequence of tasks. Let $\tau$ denote the task index and $i$ denote the datapoint index within task $\tau$. The supervised objective can be written as
+\begin{equation}
+\min_{\theta}
+\sum_{\tau=1}^{T}
+\sum_{i=1}^{n_\tau}
+\mathcal{L}\big(f_\theta(x_{\tau,i}), y_{\tau,i}\big),
+\end{equation}
+where $x_{\tau,i}$ and $y_{\tau,i}$ are the input and label of datapoint $i$ in task $\tau$.
+
+Predictions are computed using a buffer
+\[
+B=\{(x_j,y_j)\}_{j=1}^{|B|}.
+\]
+For clarity, assume that the current datapoint has label $k$, denoted $x_{\tau,t}^{k}$, and that the support set contains one sampled support example per label from the buffer. Let $x_j^\ell$ denote the support datapoint sampled from the buffer with label $\ell$.
+
+\paragraph{Query-only task representation.}
+In QOA, the task-specific representation for query $x_{\tau,t}^{k}$ is the vector of learned query--support scores:
+\begin{equation}
+\theta_{\tau,t}^{\prime k}
+=
+\Big[
+\theta_{\tau,t}^{\prime k,1},
+\theta_{\tau,t}^{\prime k,2},
+\dots,
+\theta_{\tau,t}^{\prime k,C}
+\Big],
+\qquad
+\theta_{\tau,t}^{\prime k,\ell}\in\mathbb{R},
+\end{equation}
+where $C$ is the number of labels in the task. Each component $\theta_{\tau,t}^{\prime k,\ell}$ measures the relationship between the current datapoint $x_{\tau,t}^{k}$ and a support datapoint $x_j^\ell$ with label $\ell$.
+
+Since $t$ only indexes the current timestep, we drop it when discussing the task-level structure and write
+\[
+\theta_{\tau}^{\prime k}
+=
+\Big[
+\theta_{\tau}^{\prime k,1},
+\dots,
+\theta_{\tau}^{\prime k,C}
+\Big].
+\]
+
+\paragraph{Prediction by label aggregation.}
+For classification, QOA predicts by aggregating support labels using the entries of $\theta_{\tau}^{\prime k}$. With one support example per label, the prediction can be written as
+\begin{equation}
+Y_{\mathrm{pred}}
+=
+\sum_{\ell=1}^{C}
+\theta_{\tau}^{\prime k,\ell} e_\ell,
+\end{equation}
+where $e_\ell$ is the one-hot vector for label $\ell$. Equivalently,
+\begin{equation}
+Y_{\mathrm{pred}}
+=
+\theta_{\tau}^{\prime k} Y^{\mathrm{sup}},
+\end{equation}
+where $Y^{\mathrm{sup}}\in\mathbb{R}^{C\times C}$ contains the one-hot labels of the sampled supports.
+
+\paragraph{Constraint induced by training.}
+For the current datapoint with label $k$, the correct prediction requires the coefficient multiplying the correct one-hot label $e_k$ to be larger than the coefficients multiplying incorrect labels. Thus, training induces the constraint
+\begin{equation}
+\theta_{\tau}^{\prime k,k}
+>
+\theta_{\tau}^{\prime k,\ell},
+\qquad
+\forall \ell\neq k,\quad \ell\in\{1,\dots,C\}.
+\end{equation}
+
+This constraint is not task-specific: it must hold for every task $\tau$. Therefore, for all tasks, the representation induced by QOA must satisfy the same label-based ordering:
+\begin{equation}
+\theta_{\tau}^{\prime k,k}
+>
+\theta_{\tau}^{\prime k,\ell},
+\qquad
+\forall \ell\neq k,\quad \forall \tau.
+\end{equation}
+
+\paragraph{Global solution.}
+Because the same ordering constraint is shared across tasks, the model is driven toward parameters $\theta^\ast$ that satisfy this constraint for all tasks. Once this global constraint is satisfied, the learned representation no longer needs to change substantially from task to task. We refer to this regime as a \emph{global solution}. At this point, the repeated updating of $\theta$ across tasks is reduced, which mitigates the continual parameter drift that contributes to loss of plasticity.
+
+\paragraph{Extension to full attention.}
+The same argument applies to full attention with one modification. In QOA, the component $\theta_{\tau}^{\prime k,\ell}$ is produced directly by the learned query--support scoring function. In full attention, this component is instead computed through the transformed dot product
+\begin{equation}
+\theta_{\tau}^{\prime k,\ell}
+=
+\big(b_Q(x_{\tau,t}^{k})\big)^\top
+b_K(x_j^\ell),
+\end{equation}
+where $b_Q(\cdot)$ and $b_K(\cdot)$ are the learned query and key transformations.
+
+The remaining derivation is unchanged: the prediction is still formed by aggregating support-label information using query--support scores, and the learning objective still induces the constraint
+\begin{equation}
+\theta_{\tau}^{\prime k,k}
+>
+\theta_{\tau}^{\prime k,\ell},
+\qquad
+\forall \ell\neq k,\quad \forall \tau.
+\end{equation}
+Thus, full attention can also satisfy the same global constraint. However, because it uses additional query/key transformations and support interactions, the route to satisfying this constraint is less direct than in QOA.
+
+\paragraph{Summary}
+We refer to this regime as a \emph{global solution}, where a single task-level representation explains all tasks. In this regime, predictions become stable across tasks, reducing the need for continual adaptation and mitigating loss of plasticity.
+
+\subsection{Gradient-Based Adaptation: MAML in Online Continual Learning}
+
+To isolate the role of the \emph{global solution}, we study a model that also produces task-specific parameters but does not enforce a shared structure across tasks. This allows us to distinguish whether high performance arises from task-specific adaptation alone, or from the alignment of such adaptations.
+
+We adapt Model-Agnostic Meta-Learning (MAML) to the online continual learning setting by using a replay buffer to simulate task structure. At each step, the buffer is partitioned into pseudo-tasks, from which support and query sets are sampled to perform inner and outer updates.
+
+However, MAML is designed for stationary task distributions and requires multiple samples per task to compute stable gradients. In the fully online setting considered here, the data distribution is non-stationary and each sample is observed only once, making gradient-based adaptation unstable under distributional shift.
+
+Although MAML produces task-specific parameters of the form
+\begin{equation}
+\theta'_{\tau} = \theta - \alpha \nabla_\theta \mathcal{L}_{\tau}(\theta),
+\end{equation}
+these parameters are entirely driven by task-specific gradients and do not impose any task-invariant structural constraint.
+
+Consequently, the resulting representations $\theta'_{\tau}$ are not required to align across tasks, preventing convergence to a shared global solution. This leads to continual parameter drift and results in loss of plasticity despite the presence of task-specific adaptation.
+
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\linewidth]{maml_permuted_mnist_prequential_accuracy.png}
+\caption{Prequential accuracy on Permuted MNIST. MAML exhibits degraded performance under non-stationary data, indicating loss of plasticity.}
+\label{fig:maml_preq}
+\end{figure}
+
+\begin{algorithm}[t]
+\caption{MAML with Replay Buffer}
+\label{alg:maml_replay}
+\begin{algorithmic}[1]
+\Require Stream $(x_t,y_t)$; buffer $\mathcal{B}$ of size $N$; support size $s$; query size $q$; learning rates $\alpha,\beta$
+\State Initialize $\theta$; $\mathcal{B} \gets \emptyset$
+\For{each incoming $(x_t,y_t)$}
+    \State Insert $(x_t,y_t)$ into $\mathcal{B}$; evict oldest if $|\mathcal{B}|>N$
+    \State Partition $\mathcal{B}$ into pseudo-tasks
+    \For{each pseudo-task}
+        \State Sample support set $\mathcal{S}$ and query set $\mathcal{Q}$
+        \State $\theta' = \theta - \alpha \nabla_\theta \mathcal{L}(\mathcal{S}; \theta)$
+        \State $\theta \leftarrow \theta - \beta \nabla_\theta \mathcal{L}(\mathcal{Q}; \theta')$
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+\paragraph{Key insight.}
+These results show that generating task-specific parameters alone is insufficient for robust continual learning. High performance requires that such parameters share a common structure across tasks. QOA and full attention achieve this through a task-invariant matching constraint, enabling convergence to a global solution. In contrast, MAML lacks this shared structure, leading to misaligned task adaptations and loss of plasticity.
+
+\section{Additional Results}
+\label{sec:additional_results}
+
+\noindent
+\begin{center}
+
+% Row 1
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{permuted_mnist_prequential_accuracy.png}
+{\footnotesize PMNIST (Preq.)}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{permuted_mnist_fwd_accuracy.png}
+{\footnotesize PMNIST (Fwd.)}
+\end{minipage}
+
+\vspace{2mm}
+
+% Row 2
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{online_imagenet_1000_prequential_performance.png}
+{\footnotesize ImageNet (Preq.)}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{online_imagenet_1000_forward_performance.png}
+{\footnotesize ImageNet (Fwd.)}
+\end{minipage}
+
+\vspace{2mm}
+
+% Row 3
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{slowly_changing_regression_prequential_performance.png}
+{\footnotesize SCR (Preq.)}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{slowly_changing_regression_forward_performance.png}
+{\footnotesize SCR (Fwd.)}
+\end{minipage}
+
+\vspace{2mm}
+
+% Row 4
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{online_cifar_100_forward_performance.png}
+{\footnotesize CIFAR-100 (Fwd.)}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{online_tiny_imagenet_200_forward_performance.png}
+{\footnotesize TinyIN (Fwd.)}
+\end{minipage}
+
+\end{center}
+
+\noindent
+{\footnotesize \textbf{Figure.} Prequential (Preq.) and forward (Fwd.) performance across datasets. Prequential curves evaluate performance before model updates, capturing online adaptation dynamics, while forward curves measure performance after adaptation within each task. Across classification benchmarks, QOA exhibits consistently higher prequential accuracy and faster convergence. On SCR, performance differences highlight distinct optimization behavior in regression settings.}
+
+
+\noindent\textbf{Discussion.}
+Prequential performance reflects the model’s ability to adapt to the data stream, while forward performance captures its final accuracy after within-task updates. Across all classification datasets, QOA achieves higher prequential accuracy, indicating faster adaptation and reduced loss of plasticity. This is further supported by near-zero regret values in Table~\ref{tab:regret}. In contrast, replay and regularization-based methods exhibit slower adaptation, as reflected by lower prequential performance despite competitive forward accuracy. On SCR, the behavior differs, suggesting that regression settings induce distinct optimization dynamics compared to classification tasks.
+
+\subsection{Hessian rank analysis}
+
+To study plasticity, we analyze the \textit{effective rank} of the Hessian \citep{lewandowski2023curvature,roy2007effective},  
+defined as
+\begin{equation}
+\mathrm{erank}(H) = \exp\!\Big(-\sum_{i=1}^n p_i \log p_i\Big), 
+\quad 
+p_i = \frac{\lambda_i}{\sum_j \lambda_j},
+\label{eq:effective_rank}
+\end{equation}
+where $\{\lambda_i\}$ are the eigenvalues of the Hessian.  
+A stable non-decreasing effective rank indicates models that preserve plasticity across tasks.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\linewidth]{slowly_changing_regression_effective_rank.png}
+\caption{Effective rank dynamics across tasks. QOA maintains stable rank, indicating preserved plasticity.}
+\label{fig:hessian_rank}
+\end{figure}
+
+The effective rank provides a measure of model plasticity. We measure it at the start of each task using the Hessian of the final layer only, since full-Hessian computation is infeasible. We evaluate it on Permuted MNIST and SCR (not ImageNet due to computational constraints). The effective rank is normalized since it depends on network size. 
+
+In both Permuted MNIST and SCR, vanilla backpropagation shows a steady drop in effective rank, aligning with loss of plasticity. All other models show minimal drop, indicating preserved plasticity.
+
+\section{Implementation Details}
+\paragraph{Data generation and task-wise augmentations.}
+For Permuted MNIST (PMNIST), each task is generated by applying a fixed random permutation to all images, creating distributional shift across tasks while preserving labels. We follow the setup of \citet{dohare2024loss}. For Slowly Changing Regression (SCR), we adopt the same non-stationary data generation process as \citet{dohare2024loss}, where the underlying function evolves over time.
+
+For CIFAR-100, Tiny ImageNet, and ImageNet, tasks are constructed by sampling a subset of classes and drawing images with replacement, enabling an effectively unbounded sequence of tasks with recurring classes. To induce controlled non-stationarity, we apply task-specific augmentations.
+
+For each task $\tau$, augmentation parameters are deterministically generated from the task index using a hash function, ensuring reproducibility. These parameters remain fixed within the task and define the strength of each transformation. The augmentation pipeline includes horizontal flipping, random cropping with reflection padding, additive Gaussian noise, spatial blurring via average pooling, brightness and contrast adjustments, channel-wise color shifts, desaturation toward grayscale, and cutout masking. While transformation magnitudes are fixed per task, stochasticity is introduced at the sample level (e.g., random flips, crop offsets, and noise realizations), resulting in diverse but task-consistent variations.
+
+Formally, each task corresponds to a distribution $D_\tau(x,y)$ obtained by applying a transformation $T_\tau$ to the underlying dataset, where $T_\tau$ is parameterized by task-specific values for crop size, noise level, blur kernel size, brightness, contrast, color shift, desaturation, and cutout region size. This ensures that the same classes reappear under evolving input distributions, creating a non-stationary setting with recurring classes.
+
+The same transformation $T_\tau$ is applied to both training and test samples within each task. Prequential accuracy is computed directly on the data stream (each sample is evaluated before training), and an additional held-out test set is used at the end of each task to verify robustness.
+
+For CIFAR-100, each task samples 5 classes (5-way classification). For Tiny ImageNet, the same protocol is used over 200 classes. For ImageNet, tasks are constructed as binary (2-way) classification problems due to computational constraints.
+
+Classes are sampled independently for each task, allowing them to reappear across tasks. At each timestep, a fixed number of datapoints is sampled uniformly from the selected classes.
+
+Data is processed in a single pass, with each datapoint observed only once and no revisiting of past data. Although images are sampled with replacement, the task-specific augmentations make repeated samples effectively distinct, resulting in near-unique inputs across timesteps.
+
+\subsection{Data and Task Specification}
+
+\begin{table}[ht]
+\caption{Implementation details for all benchmarks. PMNIST = Permuted MNIST, SCR = Slowly Changing Regression, CIFAR-100, TinyIN = Tiny ImageNet, ImageNet-1000.}
+\label{tab:implementation_details}
+
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Parameter} & \textbf{PMNIST} & \textbf{SCR} & \textbf{CIFAR-100} & \textbf{TinyIN} & \textbf{ImageNet} \\
+\midrule
+num\_tasks                     & 10000  & --     & 10000  & 10000  & 5000 \\
+total\_classes                 & 10     & --     & 100    & 200    & 1000 \\
+classes\_per\_task             & 10     & --     & 5      & 5      & 2 \\
+num\_old\_task\_window         & 5      & 5      & 5      & 5      & 2 \\
+num\_datapoints\_per\_timestep & 400    & 1      & 10     & 10     & 10 \\
+num\_data\_points              & --     & 10M    & --     & --     & -- \\
+train\_size                    & --     & 9000   & --     & --     & -- \\
+flip\_after                    & --     & 10000  & --     & --     & -- \\
+change\_after                  & 60000  & --     & --     & --     & -- \\
+image\_size                    & 7 x 7  & --     & 3 x 32 x 32 & 3 x 32 x 32 & 3 x 128 x 128 \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+
+\paragraph{Hardware.}
+All experiments were conducted on a single NVIDIA Ada-series GPU.
+
+\subsubsection{Permuted MNIST: Model Specifications}
+
+\begin{table}[!ht]
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{2pt}
+
+\caption{Model hyperparameters for Permuted MNIST (abbrev.: BP, CBP, EWC, Regen, Concat, ER, DarkExp, Full-Attn, QOA).}
+\label{tab:pmnist_model_specs}
+
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Parameter} & \textbf{BP} & \textbf{CBP} & \textbf{EWC} & \textbf{Regen} & \textbf{Concat} & \textbf{ER} & \textbf{DarkExp} & \textbf{Full-Attn} & \textbf{QOA} \\
+\midrule
+input\_size            & 49 & 49 & 49 & 49 & 49 & 49 & 49 & 49 & 49 \\
+num\_features          & 200 & 200 & 200 & 200 & 200 & 200 & 200 & 100 & 40 \\
+hidden\_layers         & 4 & 4 & 4 & 4 & 4 & 4 & 4 & -- & 4 \\
+attention\_layers      & -- & -- & -- & -- & -- & -- & -- & 3 & -- \\
+step\_size             & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 \\
+weight\_decay          & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+optimizer              & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam \\
+\midrule
+maturity               & -- & 100 & -- & -- & -- & -- & -- & -- & -- \\
+decay\_rate            & -- & 0.99 & -- & -- & -- & -- & -- & -- & -- \\
+utility\_type          & -- & adaptable & -- & -- & -- & -- & -- & -- & -- \\
+replacement\_rate      & -- & 1e-4 & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+ewc\_lambda            & -- & -- & 100000 & -- & -- & -- & -- & -- & -- \\
+regenerative\_lambda   & -- & -- & -- & 0.01 & -- & -- & -- & -- & -- \\
+\midrule
+buffer\_size           & -- & -- & -- & -- & -- & 2000 & 2000 & 1600 & 1600 \\
+buffer\_type           & -- & -- & -- & -- & -- & reservoir & reservoir & -- & -- \\
+samples\_per\_label    & -- & -- & -- & -- & -- & -- & -- & 10 & 100 \\
+\midrule
+alpha                  & -- & -- & -- & -- & -- & -- & 0.5 & -- & -- \\
+beta                   & -- & -- & -- & -- & -- & -- & 0.5 & -- & -- \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+\subsection{CIFAR-100 Model Specifications}
+\label{sec:cifar_model_specs}
+
+\begin{table}[!ht]
+
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{2pt}
+
+\caption{CIFAR-100 model-specific hyperparameters for all methods.}
+\label{tab:cifar_model_specs}
+
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Parameter} & \textbf{BP} & \textbf{CBP} & \textbf{EWC} & \textbf{Regen} & \textbf{Concat} & \textbf{ER} & \textbf{DarkExp} & \textbf{Full-Attn} & \textbf{QOA} \\
+\midrule
+step\_size          & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 \\
+momentum            & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  \\
+weight\_decay       & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  \\
+hidden\_layer\_size & 100  & 100  & --   & --   & 100  & 100  & 100  & 100  & 50   \\
+optimizer           & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam \\
+\midrule
+reset\_head         & --   & false & --  & --   & --   & --   & --   & --   & --   \\
+early\_stopping     & --   & true  & --  & --   & --   & --   & --   & --   & --   \\
+replacement\_rate   & --   & 1e-5  & --  & --   & --   & --   & --   & --   & --   \\
+utility\_function   & --   & contribution & -- & -- & -- & -- & -- & -- & -- \\
+maturity\_threshold & --   & 1000  & --  & --   & --   & --   & --   & --   & --   \\
+noise\_std          & --   & 0     & --  & --   & --   & --   & --   & --   & --   \\
+perturb\_weights    & --   & false & --  & --   & --   & --   & --   & --   & --   \\
+\midrule
+ewc\_lambda         & --   & --    & 1000 & --  & --   & --   & --   & --   & --   \\
+regenerative\_lambda& --   & --    & --   & 1e-5 & --  & --   & --   & --   & --   \\
+\midrule
+buffer\_size        & --   & --    & --   & --   & --   & 2000 & 2000 & 100  & 100  \\
+samples\_from\_buffer & -- & --    & --   & --   & --   & 10   & 10   & --   & --   \\
+fifo\_samples\_per\_label & -- & -- & --  & --   & --   & --   & --   & 10   & 10   \\
+\midrule
+alpha               & --   & --    & --   & --   & --   & --   & 0.5  & --   & --   \\
+beta                & --   & --    & --   & --   & --   & --   & 0.5  & --   & --   \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+\subsection{Tiny ImageNet Model Specifications}
+\label{sec:tiny_model_specs}
+
+\begin{table}[!ht]
+
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{2pt}
+
+\caption{Tiny ImageNet model-specific hyperparameters for all methods.}
+\label{tab:tiny_model_specs}
+
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Parameter} & \textbf{BP} & \textbf{CBP} & \textbf{EWC} & \textbf{Regen} & \textbf{Concat} & \textbf{ER} & \textbf{DarkExp} & \textbf{Full-Attn} & \textbf{QOA} \\
+\midrule
+step\_size          & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 \\
+momentum            & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  \\
+weight\_decay       & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  \\
+hidden\_layer\_size & 100  & 100  & --   & --   & 100  & 100  & 100  & 100  & 50   \\
+optimizer           & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam \\
+\midrule
+reset\_head         & --   & false & --  & --   & --   & --   & --   & --   & --   \\
+early\_stopping     & --   & true  & --  & --   & --   & --   & --   & --   & --   \\
+replacement\_rate   & --   & 1e-5  & --  & --   & --   & --   & --   & --   & --   \\
+utility\_function   & --   & contribution & -- & -- & -- & -- & -- & -- & -- \\
+maturity\_threshold & --   & 1000  & --  & --   & --   & --   & --   & --   & --   \\
+noise\_std          & --   & 0     & --  & --   & --   & --   & --   & --   & --   \\
+perturb\_weights    & --   & false & --  & --   & --   & --   & --   & --   & --   \\
+\midrule
+ewc\_lambda         & --   & --    & 1000 & --  & --   & --   & --   & --   & --   \\
+regenerative\_lambda& --   & --    & --   & 1e-5 & --  & --   & --   & --   & --   \\
+\midrule
+buffer\_size        & --   & --    & --   & --   & --   & 2000 & 2000 & 100  & 100  \\
+samples\_from\_buffer & -- & --    & --   & --   & --   & 10   & 10   & --   & --   \\
+fifo\_samples\_per\_label & -- & -- & --  & --   & --   & --   & --   & 10   & 10   \\
+\midrule
+alpha               & --   & --    & --   & --   & --   & --   & 0.5  & --   & --   \\
+beta                & --   & --    & --   & --   & --   & --   & 0.5  & --   & --   \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+% in preamble
+
+
+% =========================
+
+
+
+% =========================
+
+% =========================
+\subsection{ImageNet-1000 Model Specifications}
+\label{sec:imagenet_model_specs}
+
+\begin{table*}[t]
+\centering
+\caption{ImageNet-1000 model-specific hyperparameters for all methods.}
+\label{tab:imagenet_model_specs}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Parameter} & \textbf{BP} & \textbf{CBP} & \textbf{EWC} & \textbf{Regen} & \textbf{Concat} & \textbf{ER} & \textbf{DarkExp} & \textbf{Full-Attn} & \textbf{QOA} \\
+\midrule
+step\_size          & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 \\
+momentum            & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  & 0.9  \\
+weight\_decay       & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  \\
+hidden\_layer\_size & 100  & 100  & --   & --   & 100  & 100  & 100  & 100  & 50   \\
+optimizer           & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam \\
+\midrule
+reset\_head         & --   & false & --  & --   & --   & --   & --   & --   & --   \\
+early\_stopping     & --   & true  & --  & --   & --   & --   & --   & --   & --   \\
+replacement\_rate   & --   & 1e-5  & --  & --   & --   & --   & --   & --   & --   \\
+utility\_function   & --   & contribution & -- & -- & -- & -- & -- & -- & -- \\
+maturity\_threshold & --   & 1000  & --  & --   & --   & --   & --   & --   & --   \\
+noise\_std          & --   & 0     & --  & --   & --   & --   & --   & --   & --   \\
+perturb\_weights    & --   & false & --  & --   & --   & --   & --   & --   & --   \\
+\midrule
+ewc\_lambda         & --   & --    & 1000 & --  & --   & --   & --   & --   & --   \\
+regenerative\_lambda& --   & --    & --   & 1e-5 & --  & --   & --   & --   & --   \\
+\midrule
+buffer\_size        & --   & --    & --   & --   & --   & 2000 & 2000 & 100  & 100  \\
+samples\_from\_buffer & -- & --    & --   & --   & --   & 10   & 10   & --   & --   \\
+fifo\_samples\_per\_label & -- & -- & --  & --   & --   & --   & --   & 10   & 10   \\
+\midrule
+alpha               & --   & --    & --   & --   & --   & --   & 0.5  & --   & --   \\
+beta                & --   & --    & --   & --   & --   & --   & 0.5  & --   & --   \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+
+\subsubsection{Regression (SCR): Model Specifications}
+\label{sec:scr_model_specs}
+
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+
+\caption{Model hyperparameters for slowly changing regression experiment.}
+\label{tab:scr_model_specs}
+
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Parameter} & \textbf{BP} & \textbf{CBP} & \textbf{EWC} & \textbf{Regen} & \textbf{Concat} & \textbf{ER} & \textbf{DarkExp} & \textbf{Full-Attn} & \textbf{QOA} \\
+\midrule
+num\_inputs        & 20 & 20 & 20 & 20 & 20 & 20 & 20 & 20 & 41 \\
+num\_outputs       & 1  & 1  & 1  & 1  & 1  & 1  & 1  & 1  & 1 \\
+num\_features      & 40 & 40 & 40 & 40 & 40 & 40 & 40 & 14 & 20 \\
+activation         & ReLU & ReLU & ReLU & ReLU & ReLU & ReLU & ReLU & ReLU & ReLU \\
+step\_size         & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 & 1e-4 \\
+weight\_decay      & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+\midrule
+optimizer          & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam & Adam \\
+$\beta_1$          & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 & 0.9 \\
+$\beta_2$          & 0.999 & 0.999 & 0.999 & 0.999 & 0.999 & 0.999 & 0.999 & 0.999 & 0.999 \\
+\midrule
+ewc\_lambda        & -- & -- & 100000 & -- & -- & -- & -- & -- & -- \\
+regenerative\_lambda & -- & -- & -- & 0.01 & -- & -- & -- & -- & -- \\
+\midrule
+buffer\_size       & -- & -- & -- & -- & -- & 2000 & 2000 & -- & -- \\
+fifo\_buffer\_size & -- & -- & -- & -- & -- & -- & -- & 100 & 100 \\
+samples\_from\_buffer & -- & -- & -- & -- & -- & 1 & 1 & -- & -- \\
+fifo\_samples      & -- & -- & -- & -- & -- & -- & -- & 100 & 100 \\
+\midrule
+alpha              & -- & -- & -- & -- & -- & -- & 0.5 & -- & -- \\
+beta               & -- & -- & -- & -- & -- & -- & 0.5 & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\input{checklist.tex}
+
+
+\end{document}
