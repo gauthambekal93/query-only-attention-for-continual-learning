@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 experiment_dir = Path(__file__).resolve().parent
-ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent   # go up two levels, adjust as needed
+ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent   # go up two levels, adjust as needed
 sys.path.insert(0, str(ROOT))
 
 # Get current file's directory
@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.data_manager import DataManager 
-    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.runner import Runner 
-    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.checkpoint_manager import CheckpointManager 
-    from algorithms.query_based_cl.fifo_buffer.permuted_mnist.code_v3.neural_networks import ERNetwork
+    from analysis_and_workings.query_based_cl.permuted_mnist.ablation_analysis.data_manager import DataManager 
+    from analysis_and_workings.query_based_cl.permuted_mnist.ablation_analysis.runner import Runner 
+    from analysis_and_workings.query_based_cl.permuted_mnist.ablation_analysis.checkpoint_manager import CheckpointManager 
+    from analysis_and_workings.query_based_cl.permuted_mnist.ablation_analysis.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
@@ -55,7 +55,7 @@ def import_modules():
 class TrainContext:
     def __init__(self, input_size, num_features, classes_per_task, num_hidden_layers, step_size, weight_decay, total_classes):
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
         self.net = ERNetwork(input_size=input_size, num_features=num_features, num_outputs=classes_per_task)
         
@@ -170,7 +170,7 @@ def main(arguments):
 
 if __name__ == '__main__':
     
-    config_path = os.path.join( experiment_dir, "configuration-2.json") 
+    config_path = os.path.join( experiment_dir, "configuration-8.json") 
 
     sys.exit( main ( ['-c1', config_path ] ) )
   
