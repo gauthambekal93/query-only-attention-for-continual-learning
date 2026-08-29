@@ -100,7 +100,7 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
     series_dict: {label: y | label: (y, {style})}
       style keys: color, marker, linewidth, alpha, plot_every, linestyle
     """
-    plt.figure(figsize=(8, 4))
+    plt.figure(figsize=(8, 6))
     for lbl, payload in series_dict.items():
         if isinstance(payload, tuple) and len(payload) == 3 and isinstance(payload[2], dict):
             y, std, style = payload
@@ -118,7 +118,7 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
             linewidth=style.get("linewidth", line_width),
             alpha=style.get("alpha", 0.95),
             label=lbl,
-            marker=style.get("marker", 'o'),
+            marker=None, #style.get("marker", 'o'),
             markersize=2,
             markevery=max(1, style.get("plot_every", PLOT_EVERY)),
             linestyle=style.get("linestyle", '-'),
@@ -130,7 +130,7 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
             y - std,
             y + std,
             color=style.get("color", None),
-            alpha=0.1
+            alpha=0.05
         )
         
         
@@ -140,11 +140,11 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
         plt.axhline(hline_at, linewidth=1, alpha=0.5)
     if vline_at is not None:
         plt.axvline(vline_at, linewidth=1, alpha=0.5)
-    plt.xlabel("Steps", fontsize = 13)
-    plt.ylabel(ylabel, fontsize = 13)
-    plt.title(title, fontsize=14)
+    plt.xlabel("Steps", fontsize = 17)
+    plt.ylabel(ylabel, fontsize = 17)
+    plt.title(title, fontsize=20)
     plt.grid(True, linewidth=0.3, alpha=0.5)
-    plt.legend(ncol=3, fontsize=11, frameon=True,  loc="upper center", bbox_to_anchor=(0.65, 0.01) )
+    plt.legend(ncol=3, fontsize=17, frameon=True,  loc="upper center", bbox_to_anchor=(0.5, -0.14)) 
     plt.tight_layout()
     plt.show()
 
@@ -281,15 +281,15 @@ bwd_loss_fatt, bwd_loss_std_fatt  = calculate_curve(base_path, config_id, seed_i
 
 plot_graph({ 
             
-            "BP: effective_rank":  (effective_rank_bp, effective_rank_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            "CBP: effective_rank":  (effective_rank_cbp, effective_rank_std_cbp, {"color":"#B58900", "linestyle": "-",  "marker": "s"}),
-            "EWC: effective_rank":  (effective_rank_ewc, effective_rank_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: effective_rank":  (effective_rank_regen_reg, effective_rank_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: effective_rank":  (effective_rank_concat_relu, effective_rank_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: effective_rank":  (effective_rank_exp_rep, effective_rank_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: effective_rank":  (effective_rank_dark_exp_rep, effective_rank_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Query_CL: effective_rank":  (effective_rank_query_based_fifo, effective_rank_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: effective_rank":  (effective_rank_fatt, effective_rank_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "BP":  (effective_rank_bp, effective_rank_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP":  (effective_rank_cbp, effective_rank_std_cbp, {"color":"#B58900", "linestyle": "-",  "marker": "s"}),
+            "EWC":  (effective_rank_ewc, effective_rank_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen":  (effective_rank_regen_reg, effective_rank_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat":  (effective_rank_concat_relu, effective_rank_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "ER":  (effective_rank_exp_rep, effective_rank_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "DarkExp":  (effective_rank_dark_exp_rep, effective_rank_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Q_CL":  (effective_rank_query_based_fifo, effective_rank_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full-Attn:":  (effective_rank_fatt, effective_rank_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - effective_rank",
@@ -298,15 +298,15 @@ plot_graph({
 
 plot_graph({ 
             
-            "BP: Prequential Loss":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            "CBP: Prequential Loss":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "EWC: Prequential Loss":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: Prequential Loss":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Prequential Loss":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: Prequential Loss":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: Prequential Loss":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Query_CL: Prequential Loss":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Prequential Loss":  (prequential_loss_fatt, prequential_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "BP":  (prequential_loss_bp, prequential_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP":  (prequential_loss_cbp, prequential_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC":  (prequential_loss_ewc, prequential_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen":  (prequential_loss_regen_reg, prequential_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat":  (prequential_loss_concat_relu, prequential_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "ER":  (prequential_loss_exp_rep, prequential_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "DarkExp":  (prequential_loss_dark_exp_rep, prequential_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Q_CL":  (prequential_loss_query_based_fifo, prequential_loss_std_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full-Attn":  (prequential_loss_fatt, prequential_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - Prequential Loss",
@@ -314,15 +314,15 @@ plot_graph({
 
 plot_graph({ 
             
-            "BP: Forward Loss":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
-            "CBP: Forward Loss":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
-            "EWC: Forward Loss":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
-            "Regen_Reg: Forward Loss":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
-            "Concat_ReLU: Forward Loss":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
-            "Exp_Rep: Forward Loss":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
-            "Dark_Exp_Rep: Forward Loss":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
-            "Query_CL: Forward Loss":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
-            "Full_attention: Forward Accuracy":  (forward_loss_fatt, forward_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
+            "BP":  (forward_loss_bp, forward_loss_std_bp, {"color":"skyblue", "linestyle": "-",  "marker": "s"}),
+            "CBP":  (forward_loss_cbp, forward_loss_std_cbp, {"color":"yellow", "linestyle": "-",  "marker": "s"}),
+            "EWC":  (forward_loss_ewc, forward_loss_std_ewc, {"color":"blue", "linestyle": "-",  "marker": "s"}),
+            "Regen":  (forward_loss_regen_reg, forward_loss_std_regen_reg, {"color":"orange", "linestyle": "-",  "marker": "s"}),
+            "Concat":  (forward_loss_concat_relu, forward_loss_std_concat_relu, {"color":"purple", "linestyle": "-",  "marker": "s"}),
+            "ER":  (forward_loss_exp_rep, forward_loss_std_exp_rep, {"color":"chocolate", "linestyle": "-",  "marker": "s"}),
+            "DarkExp":  (forward_loss_dark_exp_rep, forward_loss_std_dark_exp_rep, {"color":"magenta", "linestyle": "-",  "marker": "s"}),
+            "Q_CL":  (forward_loss_query_based_fifo, forward_loss_query_based_fifo, {"color":"black", "linestyle": "-",  "marker": "s"}),
+            "Full-Attn":  (forward_loss_fatt, forward_loss_std_fatt, {"color":"red", "linestyle": "-",  "marker": "s"}),
 
             },
              title="Slowly Changing Regression - Forward Loss",

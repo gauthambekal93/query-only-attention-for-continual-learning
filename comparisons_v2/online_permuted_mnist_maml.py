@@ -70,7 +70,7 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
     series_dict: {label: y | label: (y, {style})}
       style keys: color, marker, linewidth, alpha, plot_every, linestyle
     """
-    plt.figure(figsize=(8, 4))
+    plt.figure(figsize=(8, 6))
     for lbl, payload in series_dict.items():
         if isinstance(payload, tuple) and len(payload) == 3 and isinstance(payload[2], dict):
             y, std, style = payload
@@ -110,11 +110,11 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
         plt.axhline(hline_at, linewidth=1, alpha=0.5)
     if vline_at is not None:
         plt.axvline(vline_at, linewidth=1, alpha=0.5)
-    plt.xlabel("Steps", fontsize = 13)
-    plt.ylabel(ylabel, fontsize = 13)
-    plt.title(title, fontsize=14)
+    plt.xlabel("Steps", fontsize = 17)
+    plt.ylabel(ylabel, fontsize = 17)
+    plt.title(title, fontsize=20)
     plt.grid(True, linewidth=0.3, alpha=0.5)
-    plt.legend(ncol=3, fontsize=11, frameon=True,  loc="upper center", bbox_to_anchor=(0.65, 0.01) )
+    plt.legend(ncol=3, fontsize=17, frameon=True,  loc="upper center", bbox_to_anchor=(0.5, -0.18)) 
     plt.tight_layout()
     plt.show()
     
@@ -127,19 +127,19 @@ def plot_graph(series_dict, title, ylabel, hline_at=None, vline_at=None):
 # ==============Dark Experience Replay==================== 
 
 
-config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 9500, 100
+config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0", "1", "2"] , 9500, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "maml", "normal_changing_stream")
 
 online_fwd_maml_acc, online_fwd_maml_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 online_prequential_maml_acc, online_prequential_maml_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
 
-
+'''
 config_id, seed_ids, NUM_TASKS, average_over = "0" , ["0"] , 9500, 100
 base_path = os.path.join(project_root, "results", "permuted_mnist", "maml", "static_data_distribution")
 
 static_fwd_maml_acc, static_fwd_maml_std  = calculate_curve(base_path, config_id, seed_ids, "forward_accuracy",  NUM_TASKS, average_over)
 static_prequential_maml_acc, static_prequential_maml_std  = calculate_curve(base_path, config_id, seed_ids, "prequential_accuracy",  NUM_TASKS, average_over)
-
+'''
 
         
     
