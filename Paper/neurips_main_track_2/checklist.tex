@@ -1,0 +1,132 @@
+\section*{NeurIPS Paper Checklist}
+
+%%% BEGIN INSTRUCTIONS %%%
+The checklist is designed to encourage best practices for responsible machine learning research, addressing issues of reproducibility, transparency, research ethics, and societal impact. Do not remove the checklist: {\bf The papers not including the checklist will be desk rejected.} The checklist should follow the references and follow the (optional) supplemental material.  The checklist does NOT count towards the page
+limit. 
+
+Please read the checklist guidelines carefully for information on how to answer these questions. For each question in the checklist:
+\begin{itemize}
+    \item You should answer \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item \answerNA{} means either that the question is Not Applicable for that particular paper or the relevant information is Not Available.
+    \item Please provide a short (1--2 sentence) justification right after your answer (even for \answerNA). 
+   % \item {\bf The papers not including the checklist will be desk rejected.}
+\end{itemize}
+
+{\bf The checklist answers are an integral part of your paper submission.} They are visible to the reviewers, area chairs, senior area chairs, and ethics reviewers. You will also be asked to include it (after eventual revisions) with the final version of your paper, and its final version will be published with the paper.
+
+The reviewers of your paper will be asked to use the checklist as one of the factors in their evaluation. While \answerYes{} is generally preferable to \answerNo{}, it is perfectly acceptable to answer \answerNo{} provided a proper justification is given (e.g., error bars are not reported because it would be too computationally expensive'' or ``we were unable to find the license for the dataset we used''). In general, answering \answerNo{} or \answerNA{} is not grounds for rejection. While the questions are phrased in a binary way, we acknowledge that the true answer is often more nuanced, so please just use your best judgment and write a justification to elaborate. All supporting evidence can appear either in the main paper or the supplemental material, provided in appendix. If you answer \answerYes{} to a question, in the justification please point to the section(s) where related material for the question can be found.
+
+IMPORTANT, please:
+\begin{itemize}
+    \item {\bf Delete this instruction block, but keep the section heading ``NeurIPS Paper Checklist"},
+    \item  {\bf Keep the checklist subsection headings, questions/answers and guidelines below.}
+    \item {\bf Do not modify the questions and only use the provided macros for your answers}.
+\end{itemize} 
+ 
+
+%%% END INSTRUCTIONS %%%
+
+
+\begin{enumerate}
+
+\item {\bf Claims}
+    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The abstract and introduction clearly state that the paper introduces a query-only attention mechanism for continual learning, demonstrates its effectiveness in mitigating loss of plasticity and catastrophic forgetting, and provides supporting analysis via connections to K-nearest neighbor algorithm, attention network and MAML. The claims are consistent with both the theoretical discussion and the experimental evaluation (permuted MNIST and regression and SPLIT Image Net), and limitations are explicitly acknowledged. Please refer to section ~\ref{sec:theory} and ~\ref{sec:experiment}.
+    
+
+\item {\bf Limitations}
+    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+    \item[] Answer:   \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper explicitly acknowledges limitations, including the reliance on a support set (which may be restrictive in some continual learning scenarios), limited evaluation on permuted MNIST , Image Net and regression tasks, and the need for more rigorous theoretical analysis. We also note that computational cost and scalability of support-based methods remain open challenges for future work. Please refer to section ~\ref{sec:conclusion} and ~\ref{sec:limitations}.
+
+\item {\bf Theory assumptions and proofs}
+    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+    \item[] Answer:\item[] Answer: \answerNo{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper provides theoretical analysis and intuition (e.g., links between query-only attention, kNN, and MAML, as well as Hessian rank arguments), but does not contain formal theorems or complete proofs. The focus is on providing insight and empirical evidence rather than rigorous formalization. We acknowledge this as a limitation and identify formal proofs as an important direction for future work.
+
+    \item {\bf Experimental result reproducibility}
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper specifies datasets (Permuted MNIST and Slowly Changing Regression and Split Image Net), model architectures (query-only attention, full-attention, BP, CBP, and MAML-style, EWC), training setup (online continual learning with single-pass data), evaluation metrics (forward and backward performance), and hyperparameters (support sizes, replay buffer sizes, etc.). Together, these details allow reproduction of the reported results. Code and implementation details (e.g., training loops, Hessian rank calculation) will be released to further ensure reproducibility. Please refer to appendix section ~\ref{sec:permuted_mnist_setup} and ~\ref{sec:scr_setup} and ~\ref{sec:split_image_net_setup}
+
+
+\item {\bf Open access to data and code}
+    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification:We have provided link to GitHub URL for, ensuring reproducibility while preserving double-blind review. This will allow faithful reproduction of the main results. The GitHub is code currently being cleaned for easy reproducibility. Please refer to section ~\ref{sec:permuted_mnist_setup} , ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup} for reproducibility.
+
+
+\item {\bf Experimental setting/details}
+    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer) necessary to understand the results?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: All experimental curves report the mean over 3 random seeds, with shaded regions showing $\pm 1$ standard deviation across seeds. Please refer to ~\ref{sec:experiment}, ~\ref{sec:permuted_mnist_setup}, ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup}.
+    This captures variability due to different random initializations and stochasticity in training.  
+
+\item {\bf Experiment statistical significance}
+    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+    \item[] Answer:  \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: All experimental curves report the mean over 3 random seeds, with shaded regions showing $\pm 1$ standard deviation across seeds. Please refer to ~\ref{sec:experiment}, ~\ref{sec:permuted_mnist_setup}, ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup}.
+    This captures variability due to different random initializations and stochasticity in training.  
+
+\item {\bf Experiments compute resources}
+    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
+    \item[] Answer:\answerYes{}% Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: We specify the compute resources used for all experiments. Runs were conducted on a single NVIDIA RTX 3090 GPU (24 GB VRAM) with 32 GB RAM. Each experiment (training across all tasks) required approximately 6–8 hours for permuted MNIST, 5-7 hours for split image net and 4–6 hours for slowly changing regression (SCR). The total reported results (3 seeds per experiment) were completed within 1 week. No large-scale distributed training or additional hidden compute was required beyond the reported experiments. Please refer to section ~\ref{sec:permuted_mnist_setup}, ~\ref{sec:split_image_net_setup} and ~\ref{sec:scr_setup}.
+    
+\item {\bf Code of ethics}
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The work uses only publicly available datasets (MNIST, Tiny Image Net and synthetic regression benchmarks), contains no human or personally identifiable data, and does not raise safety, fairness, or environmental risks beyond typical compute usage for deep learning research. All experiments comply with the NeurIPS Code of Ethics.
+
+
+\item {\bf Broader impacts}
+    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This paper is primarily foundational research in continual learning and does not target immediate deployment. The potential positive impact lies in improving machine learning systems’ ability to adapt over time without retraining, which could reduce computational costs and enable more sustainable, adaptive AI in areas such as robotics, healthcare monitoring, and personalized systems.
+
+    Possible negative impacts include misuse in surveillance or adaptive profiling systems, where continual learning might enable intrusive or biased tracking over time. However, since our work focuses on simplified models (query-only attention) and theoretical analysis, these risks are indirect.
+
+    We explicitly acknowledge these as broader considerations, and stress that the current work is a step toward understanding fundamental mechanisms (plasticity vs. forgetting), not a directly deployable system. Please refer to section ~\ref{sec:broader_impacts}
+    
+\item {\bf Safeguards}
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pre-trained language models, image generators, or scraped datasets)?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This work is foundational research on continual learning algorithms and does not involve sensitive data or direct deployment. 
+    Potential positive impacts include advancing more adaptive and efficient machine learning systems, which could benefit areas such as robotics, personalized assistants, or scientific discovery. 
+    Potential negative impacts are indirect: continual learning techniques could be misused in surveillance, autonomous weapons, or other harmful applications if combined with inappropriate datasets or objectives. 
+    While the current work is limited to controlled benchmarks, we acknowledge these risks and encourage responsible use of such methods. 
+    Overall, the societal impact is primarily positive in advancing fundamental ML understanding.
+
+\item {\bf Licenses for existing assets}
+    \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
+    \item[] Answer: \answerYes{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: We use only publicly available benchmark datasets and assets, including MNIST \citep{lecun1998gradient} (permuted variant), tiny image net and synthetic regression tasks (SCR). 
+    MNIST is distributed under a permissive license for research use, and we cite the original source.  
+    We also cite all baseline algorithms (e.g. transformers \citep{vaswani2017attention}, CBP \citep{dohare2024loss}).  
+    No proprietary or restricted data, models, or code were used, and all assets are properly credited and used within their intended terms. 
+
+\item {\bf New assets}
+    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+    \item[] Answer: \answerNA{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This work does not introduce new datasets or external assets. 
+    The only new contribution is the proposed query-only attention model, which is described in full detail in the paper and can be reproduced from the provided code. 
+    No human subjects or sensitive data are involved. 
+
+\item {\bf Crowdsourcing and research with human subjects}
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification:  This work does not involve crowdsourcing or research with human subjects. All experiments are purely computational, conducted on standard machine learning benchmarks (Permuted MNIST and SCR).  
+
+\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
+    \item[] Answer: \answerNA{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification:This work does not involve human subjects, crowdsourcing, or any study requiring IRB approval. All experiments are computational and use standard public machine learning datasets.  
+
+\item {\bf Declaration of LLM usage}
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does \emph{not} impact the core methodology, scientific rigor, or originality of the research, declaration is not required.
+    %this research? 
+    \item[] Answer: \answerNA{}   % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: No large language models (LLMs) were used as part of the core methodology or experiments. LLMs were only used as a general writing and editing assistant, which does not affect the scientific rigor or originality of the research.
+
+\end{enumerate}

@@ -1,0 +1,155 @@
+Reviewer Qe7N:
+
+We thank Reviewer Qe7N for the thoughtful feedback.
+
+1.Novelty issue: The proposed QOA is arguably not a novel idea; instead, it is a simplification of the existing attention mechanism into multiplication of (xW_Q) and (x W_K)^T. 
+The theoretical foundation of the proposed idea, as well as the formulation of the proposed attention mechanism, and why QOA is relevant for online CL setting, is unclear.
+
+
+We appreciate the reviewer's comments. We agree that QOA is a deliberate simplification of the standard attention mechanism, and we do not claim that the architectural simplification itself is the primary novelty of this work. Rather, our contribution lies in identifying the minimal computation required to preserve plasticity in fully online continual learning and providing a mechanistic explanation for why it is effective.
+
+Our motivation originates from recent work [1], which showed empirically that attention combined with a small support buffer substantially mitigates loss of plasticity in fully online continual learning, but left the underlying mechanism unexplained. Our work addresses this open question by systematically simplifying the attention computation and demonstrating that the key and value projections are not essential for preserving plasticity. This leads naturally to Query-Only Attention (QOA) and reveals that the critical computation is query-support similarity, rather than full self-attention.
+
+This simplification is particularly relevant in fully online continual learning, where each sample is observed exactly once before the data distribution changes. In this setting, the model must simultaneously adapt rapidly to the current distribution while remaining plastic enough to continue learning throughout a long non-stationary stream. Consequently, identifying the minimal computation that preserves both rapid adaptation and long-term plasticity is important not only for improving computational efficiency but also for understanding the learning mechanism itself.
+
+Finally, our contribution is not a new optimization algorithm or a formal convergence theory. Instead, we provide a mechanistic explanation for the observed behavior. Conventional neural networks continually encode new tasks by modifying their parameters, leading to progressive parameter specialization and eventual loss of plasticity. In contrast, QOA learns a shared similarity function, while task-specific adaptation is performed through query-support matching rather than continual parameter specialization. Consistent with this interpretation, Figure 2(b) shows that the parameters of QOA rapidly converge to a stable shared solution, whereas conventional neural networks continue to undergo substantial parameter changes throughout training. We believe this provides a plausible mechanistic explanation for why similarity-based inference substantially mitigates loss of plasticity in fully online continual learning.
+
+
+[1]. Experience Replay Addresses Loss of Plasticity in Continual Learning (arXiv)
+
+=========================================================================================================================================================================================================
+2. Clarity Issues: The learning mechanism, including the loss function of the proposed method, is unclear. Some symbols are unexplained. It is unclear what the model (backbone network) in the study is, including its trainable parameters, the usage of pretrained weights, and so on.
+
+We apologize if the learning protocol was not sufficiently clear. Our work considers the standard fully online supervised learning setting. Unlike conventional supervised learning, there is no train/test split or multiple training epochs. Instead, data arrives as a continuous stream. For each incoming batch, the model first predicts the labels and the prediction performance is immediately recorded (prequential evaluation). The model then performs exactly one gradient update on the incoming batch using a standard cross-entropy loss. After this update, the samples remain temporarily in the FIFO support buffer to provide context for future predictions.
+
+QOA introduces no additional optimization objective, auxiliary loss, or regularization term. The support buffer is not replay memory and is never used for additional training. It simply stores the most recently observed samples, which are concatenated with the current incoming batch to provide the context required for query-support matching during prediction.
+
+The backbone architecture, trainable parameters, optimizer, and implementation details are described in Section D. All models are trained end-to-end from scratch with no pretrained weights. All trainable parameters, including those of the backbone and QOA, are updated through standard backpropagation using the same cross-entropy loss or squared error loss in case of regression.
+
+
+===========================================================================================================================================================================================================
+3. Baseline issue: Most of the baselines are outdated, and many of them are not relevant. Comparing the proposed method with DER or ER, which require a memory buffer in an online (one-time seen data) setting, does not make sense. Please include the latest online continual learning method as baselines, such as RanPAC[1], RanDumb[2], F-OAL[3], and PROL[4].
+
+We thank the reviewer for highlighting these recent online continual learning methods. Our primary objective is to study loss of plasticity in fully online continual learning, where the model is trained from scratch and each incoming sample/batch is observed exactly once before the stream progresses. Accordingly, our experiments primarily compare against methods that operate under the same continual representation learning paradigm (e.g., CBP and CReLU), while also including representative rehearsal-based online continual learning baselines (ER and DER) under the identical fully online protocol to provide broader performance comparisons.
+
+We agree that RanPAC, RanDumb, F-OAL, and PROL represent important recent developments in online continual learning. However, these methods largely rely on pre-trained foundation models together with parameter-efficient adaptation mechanisms (e.g., prompt tuning, feature projection, or analytic classifiers), rather than continual gradient-based representation learning from scratch. Since our work focuses on understanding and improving the plasticity of continually learned representations, we selected baselines that operate under the same learning paradigm to enable a more direct comparison.
+
+Nevertheless, we appreciate the reviewer's suggestion and will evaluate these recent methods, where compatible with our experimental setting, during the discussion period and include the corresponding comparisons in the revised version.
+
+
+========================================================================================================================================================================================================
+4. Performance Issue: The experiment setting is not clear, e.g., task-splits, blurry/disjoint/mixed. It is not clear what is meant by start and end accuracy in Table 1. CL is supposed to address catastrophic forgetting (CF), but I do not see forgetting measurement and analysis in the paper. Table 2 shows regret measurement, but its relevance to the methods' performance is unclear
+
+We thank the reviewer for highlighting places where the presentation can be made more explicit. The experimental protocol is described in Section 5.1. In CIFAR-100, ImageNet and Tiny ImageNet each task contains a subset of classes sampled with replacement, so classes can recur across tasks under task-specific transformations. The setting is therefore fully online, task-free, and non-disjoint rather than a conventional disjoint class-incremental split. Each incoming example is evaluated before being used for a single update, and no epochs or repeated passes over the stream are used. We will add a concise summary of these properties using standard terminology at the beginning of the experimental section.
+
+In Table 5.2, "Start" denotes the average prequential accuracy over the first 100 tasks, whereas "End" denotes the average over the final 100 tasks. These quantities measure whether a method retains its ability to adapt as the stream progresses. We will rename the columns to "First 100 Tasks" and "Last 100 Tasks" to remove ambiguity.
+
+Our work focuses on fully online continual learning, where each example is evaluated once, updated once, and the stream immediately continues. In this setting, the primary challenge is maintaining the ability to rapidly adapt to continually changing data distributions over long streams. Accordingly, our paper studies loss of plasticity rather than catastrophic forgetting, as our objective is continual adaptation to new data rather than repeated evaluation on previously encountered tasks.
+
+Relative cumulative regret measures the cumulative excess prediction loss of a method compared to the best-performing method at each timestep. A method that consistently adapts more quickly incurs fewer prediction errors immediately after distribution shifts, resulting in lower cumulative regret. Thus, while prequential accuracy measures average online prediction performance, relative cumulative regret summarizes how much excess loss is accumulated throughout the entire stream. Consider two methods that eventually achieve similar prequential accuracy. QOA reaches this performance within the first few hundred tasks, whereas Full Attention requires substantially more tasks before reaching the same level (Figure 1). During this period, Full Attention makes many additional prediction errors, which accumulate over time. Relative cumulative regret measures this accumulated excess loss. Consequently, although the two methods eventually achieve comparable performance, QOA exhibits substantially lower regret because it reaches that performance much earlier.
+
+=======================================================================================================================================================================================================================================
+5 Paper formatting: The paper presentation needs to be improved, e.g., equation numbers, description of symbols, and legends within figures. The contribution part is too long, but all the points are superficial. The methodology and analysis parts have the same issue; they lack a deep explanation.
+
+We thank the reviewer for the suggestions. We agree that the presentation can be improved. In the revised manuscript we will improve notation consistency, define all symbols upon first use, add more descriptive figure legends, streamline the contribution section to emphasize the primary scientific contributions, and expand the methodology and analysis to better motivate the proposed mechanism and the intuition behind the theoretical analysis.
+
+
+========================================================================================================================================================================================================================================
+========================================================================================================================================================================================================================================
+Reviewer LTse:
+
+1.How does QOA differ functionally from a matching network (Vinyals et al., 2016) or prototypical network (Snell et al., 2017) applied to this setting? Have you compared against these directly?
+
+We agree that QOA is functionally closely related to metric-learning methods such as Matching Networks. This similarity is expected rather than accidental. Our contribution is not to propose a fundamentally new metric-learning architecture, but to explain how such a mechanism naturally emerges from progressively simplifying the standard attention computation.
+
+Our motivation was inspired by recent work showing that full attention naturally mitigates loss of plasticity in fully online continual learning without relying on explicit plasticity-preserving mechanisms such as replay, selective reinitialization, or specialized regularization, while leaving the underlying reason unexplained. We therefore asked a different scientific question: what is the minimal computation within attention responsible for this behavior?
+
+Starting from standard attention, we progressively simplified the computation and found that the key and value projections are not necessary to preserve the plasticity benefits. This derivation naturally yields Query-Only Attention (QOA) and reveals that the essential computation is query-support similarity, establishing a close connection between attention and metric learning. We view this connection as a scientific insight rather than a limitation. While metric-learning methods have primarily been studied for few-shot learning and rapid adaptation, their role in preserving plasticity during long-horizon fully online continual learning has received comparatively little attention.
+
+More broadly, our work provides a mechanistic explanation for why similarity-based methods preserve plasticity. In conventional neural networks, each new task distribution is accommodated by continually modifying the model parameters. Over long non-stationary streams, these continual parameter updates progressively specialize the parameters to successive task distributions, reducing the model's ability to rapidly adapt to future tasks and ultimately resulting in loss of plasticity. In contrast, similarity-based methods learn a shared similarity function that is reused across tasks. Once this shared solution has been learned, adaptation relies primarily on query-support matching, requiring substantially smaller parameter updates. Figure 2(b) supports this hypothesis: vanilla backpropagation continues to exhibit large parameter changes throughout training, whereas both full attention and QOA rapidly reduce parameter updates as they converge toward a shared solution, thereby mitigating loss of plasticity.
+
+Our contribution is therefore not proposing a fundamentally new metric-learning architecture, but deriving this connection from attention, providing a mechanistic explanation for why similarity-based inference preserves plasticity, and demonstrating its effectiveness in fully online continual learning.
+
+=======================================================================================================================================================================================================================================
+2.Can you provide a comparison to full attention with matched parameter count and buffer size, to isolate the effect of the query-only mechanism from the effect of model size?
+
+A comparison with full attention using the same support-buffer size is already provided in Appendix Tables 5–9. Both methods use the identical online training protocol and support memory. The only architectural difference is that QOA uses only the query projection, whereas full attention additionally learns key and value projections.
+
+Despite having fewer trainable parameters, QOA consistently outperforms full attention in prequential accuracy, suggesting that the improvement is not due to increased model capacity but rather the query-support matching mechanism itself. We agree that a comparison with exactly matched parameter counts would further isolate the architectural contribution and will clarify the existing comparison by explicitly reporting the parameter counts in the revised manuscript.
+===========================================================================================================================================================================================================
+3. Can you report standard deviations across at least 3 seeds? The 0.00 regret values in particular need explanation.
+
+The reported results already include the mean over three random seeds, with standard deviations shown as shaded error bands in Figures 1(a) and 1(b). Due to space constraints, the remaining experimental results are presented in Appendix C using the same visualization.
+
+Regarding the reported regret values, our regret is a relative cumulative regret, computed as the cumulative excess prediction loss with respect to the best-performing method at each timestep. It is therefore a comparative measure rather than an absolute loss. Methods that adapt more slowly accumulate larger excess prediction errors immediately following distribution shifts, resulting in higher cumulative regret. Conversely, methods that rapidly adapt remain close to the best-performing method throughout the stream and therefore accumulate little or no excess regret.
+
+This behavior is illustrated in Figures 1(a) and 1(b) of the main paper and is consistently observed across the additional experiments in Appendix C. Although QOA and Full Attention eventually achieve similar prequential performance, Full Attention requires substantially more tasks to reach that level. During this period it incurs additional prediction errors, which accumulate into higher relative cumulative regret. In contrast, QOA adapts more rapidly, remains close to the best-performing method throughout training, and consequently exhibits near-zero relative cumulative regret. Thus, prequential accuracy reflects average online prediction performance, whereas relative cumulative regret summarizes the cumulative cost of slower adaptation over the entire stream.
+
+
+============================================================================================================================================================================================================
+
+4. What happens if QOA has no buffer (support set = only current sample)? This would isolate whether performance comes from the learned similarity or from buffer-based retrieval.
+
+This ablation is already included in Section 6.1 ("Ablation Study: Effect of Buffer Size"), where we evaluate QOA with a support set containing only the current sample (buffer size = 1). As shown, performance degrades substantially compared to larger support buffers.
+
+Importantly, the support buffer is not a replay buffer, but it is the attention context. Just as an attention model predicts the current token by attending to a context sequence, QOA predicts the current sample by attending to a small support set of recently observed samples. The support set is therefore part of the model's input, not additional training data. Each sample is updated exactly once when it first arrives and is never trained again. Afterwards, it only serves as attention context for future predictions until it leaves the FIFO buffer.
+
+Moreover, this attention context is very small relative to the data stream. Thus, the observed improvement arises from using a small attention context rather than repeatedly training on stored examples.
+
+===================================================================================================================================================================================================
+5.The global solution argument applies to any classifier on a shared label space. Can you articulate specifically what is different about QOA's optimization landscape that makes convergence faster or more reliable than vanilla backpropagation?
+
+The distinction is not that QOA optimizes a different loss, but that it learns a fundamentally different function than a conventional classifier.
+
+A conventional neural network learns a direct input-to-label mapping, y=f_θ(x). Consider Permuted MNIST, where the same digit appears under a different pixel permutation in each task. Although the semantic label remains unchanged, the input distribution changes from task to task. Consequently, the model must continually modify its parameters to represent each new input-to-label mapping, leading to repeated parameter specialization over long streams.
+
+In contrast, QOA does not directly map an input to its label. Instead, it learns a similarity function between the current query and support examples. The network outputs similarity scores, and the final prediction is obtained by aggregating the labels of the support examples according to these scores. Across Permuted MNIST tasks, while the pixel permutations change, the function being learned does not: the model is always required to assign higher similarity to support examples representing the same digit than to support examples representing different digits. Thus, adaptation occurs through the current support context during the forward pass rather than by continually relearning a new classifier. As a result, the model parameters converge toward a shared similarity function rather than repeatedly encoding task-specific input-to-label mappings. This reduces continual parameter drift, consistent with Figure 2(b), which shows substantially smaller parameter changes between consecutive tasks for QOA than for a conventional neural network.
+
+============================================================================================================================================================================================================================================
+============================================================================================================================================================================================================================================
+Reviewer hGyT:
+
+1. The proposed methodology is not clear and only superficially outlined on 1.5 pages in Section 4.
+
+We respectfully disagree that the methodology is only superficially described. Section 4 presents the complete QOA architecture, prediction equations, and training procedure, while implementation details (network architecture, hyperparameters, and algorithmic details) are provided in the appendix section D to improve readability. We will further expand the methodology section and better highlight the appendix in the final version to improve clarity.
+
+
+
+2. Only the loss of plasticity is addressed, but actually continual learning is about ensuring plasticity-stability balance
+
+We respectfully believe this comment conflates conventional continual learning with the fully online continual learning setting considered in this work. In conventional continual learning, the objective is often to balance stability and plasticity because performance is repeatedly evaluated on previously seen tasks. In contrast, fully online continual learning follows a prequential protocol: each sample is observed exactly once, the model first predicts its label, performs a single training update, and the sample is never seen again. Performance is therefore measured by prequential accuracy rather than repeated evaluation on previous samples.
+
+Our setting assumes an effectively infinite stream of tasks with a finite label space. Each task defines a temporary data distribution (e.g., a subset of CIFAR-100 classes with a particular noise level) and generates a fixed-length sequence of samples before the stream moves to the next distribution. The same semantic class (e.g., "truck") may appear repeatedly under different input distributions, but identical samples are never revisited.
+
+Accordingly, the primary challenge in this setting is not only preserving plasticity but also adapting rapidly to each new distribution. Since the stream consists of a large number of short-lived tasks (e.g., 10,000 tasks over the course of the stream), each task occupies only a very small fraction of the overall training time before the distribution changes again. Slow adaptation therefore results in poor prequential performance because the model spends most of each task learning rather than making correct predictions. Consequently, preserving plasticity and enabling rapid online adaptation are the central objectives in this setting, which is why we evaluate prequential accuracy and cumulative regret.
+
+
+===========================================================================================================================================================================================================
+3. There are too many claimed contributions (7) at the end of the introduction with some of these rather trivial.
+
+We agree that the contribution list can be streamlined. Our intention was to summarize all aspects of the work, but we will consolidate the contributions into a smaller set of higher-level contributions and remove items that are primarily experimental observations or implementation details.
+
+
+===========================================================================================================================================================================================================
+4. The abstract is too short and not indicative of the motivation
+The abstract was intentionally concise due to the word limit. However, we agree that the motivation can be stated more clearly. In the revised version, we will expand the abstract to better motivate the fully online continual learning setting, the loss of plasticity problem, and the motivation behind Query-Only Attention before summarizing the main contributions and results.
+
+
+
+
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We thank the reviewer for suggesting RanPAC. RanPAC is an important recent online continual learning method. However, it operates under a substantially different learning paradigm from our work. Specifically, RanPAC assumes a powerful pretrained and frozen feature extractor, while only the classifier is continually updated. In contrast, our work studies continual gradient-based representation learning from random initialization, where the representation itself must continually adapt and where loss of plasticity emerges. Since our objective is to understand and mitigate plasticity loss during continual representation learning, we primarily compare against methods operating under the same training-from-scratch setting (e.g., CBP, CReLU, ER, and DER). We believe this provides a more direct evaluation of the problem addressed in our work.
+
+RanDumb we will evaluvate under our setting
+
+
+
+We thank the reviewer for suggesting F-OAL. F-OAL is an important recent OCIL baseline; however, it addresses a fundamentally different setting from our work. F-OAL assumes a frozen ImageNet-pretrained ViT encoder and performs no online representation learning, updating only an analytic linear classifier via recursive least squares.
+In contrast, our paper investigates loss of plasticity during end-to-end online representation learning from random initialization. Our contribution is to explain why representation learning deteriorates over time and to propose a mechanism that preserves plasticity while continuously learning the representation itself. Since F-OAL does not update the feature extractor, it does not encounter or address the loss-of-plasticity problem that is central to our work.
+We agree that F-OAL is a valuable practical OCIL method. However, because it relies on a frozen pretrained backbone rather than online representation learning, we do not consider it a direct baseline for evaluating the scientific contribution of this paper.
+
+

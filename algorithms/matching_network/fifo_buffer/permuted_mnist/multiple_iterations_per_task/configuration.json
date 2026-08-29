@@ -1,0 +1,30 @@
+{ 
+"experiment_discription":"Permuted MNIST that generates 10 label at neural net output with reservoir replay algorithm",
+
+"data_config":
+{
+"data_dir": "datasets/permuted_mnist/0",        
+"num_tasks": 10000,
+"total_classes": 10,
+"classes_per_task":10,
+"num_old_task_window" : 5,
+"num_datapoints_per_timestep": 400,           
+"change_after": 60000
+}
+,
+
+"model_config":{
+"seed": 20,
+"use_gpu":0,
+"model_dir": "results/permuted_mnist/query_based_cl/fifo_buffer\\7\\0",
+"input_size": 49,    
+"num_features":20,
+"num_hidden_layers": 4,
+"step_size":0.0001,
+"weight_decay": 0.0,
+"buffer_size":800,
+"samples_per_label":60, 
+"test_batch_size": 1000
+}
+
+}

@@ -43,10 +43,10 @@ def set_seed(seed):
    
 def import_modules():
     
-    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.data_manager import DataManager 
-    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.runner import Runner 
-    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.checkpoint_manager import CheckpointManager 
-    from analysis_and_workings.query_based_cl.permuted_mnist.code_v2.neural_networks import ERNetwork
+    from analysis_and_workings.query_based_cl.permuted_mnist.theta_prime_analysis.data_manager import DataManager 
+    from analysis_and_workings.query_based_cl.permuted_mnist.theta_prime_analysis.runner import Runner 
+    from analysis_and_workings.query_based_cl.permuted_mnist.theta_prime_analysis.checkpoint_manager import CheckpointManager 
+    from analysis_and_workings.query_based_cl.permuted_mnist.theta_prime_analysis.neural_networks import ERNetwork
     
     global  ERNetwork, DataManager, Runner, CheckpointManager
     
