@@ -16,7 +16,7 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results/permuted_mnist/matching_network/fifo_buffer\\0\\0",
+"model_dir": "results/permuted_mnist/matching_network/fifo_buffer/0/0",
 "input_size": 49,    
 "num_features":40,
 "num_hidden_layers": 4,

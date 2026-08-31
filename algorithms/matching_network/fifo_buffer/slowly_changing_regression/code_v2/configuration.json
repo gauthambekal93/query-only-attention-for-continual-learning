@@ -15,7 +15,7 @@
 "model_config":{
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//slowly_changing_regression/matching_network/fifo_buffer\\1\\0",
+"model_dir": "results//slowly_changing_regression/matching_network/fifo_buffer/0/0",
 "num_inputs": 20,
 "num_outputs":20, 
 "num_features": 20,
