@@ -22,7 +22,7 @@ class feed_forward_nn(nn.Module):
         
         self.fc1 = nn.Linear(input_size, num_features)
         
-        self.fc2 = nn.Linear(num_features, num_outputs)
+        self.fc2 = nn.Linear(num_features * 2, 1)
     
         
         nn.init.kaiming_uniform_(self.fc1.weight, nonlinearity='relu')
@@ -30,12 +30,11 @@ class feed_forward_nn(nn.Module):
         
         nn.init.kaiming_uniform_(self.fc2.weight, nonlinearity='linear')
         nn.init.zeros_(self.fc2.bias)
-                
+    
+    """            
     def forward(self, data_manager_obj, query_x):
        
         '''
-        
-        
         x = x.expand( len(support_x) , -1)
         
         x = torch.cat([x, support_x, support_y], dim = 1 )
@@ -50,7 +49,8 @@ class feed_forward_nn(nn.Module):
         
         return x
         '''
-        support_x , support_y = data_manager_obj.get_fifo_data( )
+        
+        support_x , support_y = data_manager_obj.get_fifo_data()
         
         query_shape = query_x.shape 
            
@@ -88,6 +88,36 @@ class feed_forward_nn(nn.Module):
         x = x.sum(dim = 1)
     
         return x
+    """
     
+    def forward(self, data_manager_obj, query_x):
     
+        support_x , support_y = data_manager_obj.get_fifo_data()
+        
+        query_x = F.relu(self.fc1(query_x))
+        
+        support_x = F.relu(self.fc1(support_x))
+    
+        #ELEMENT WISE ADDITION OF SUPPORT VECTORS FOR RELATION NETWORK
+        support_x = torch.matmul(support_x.T, support_y.float()).T
+    
+        query_embed_shape = query_x.shape
+    
+        support_embed_shape = support_x.shape
+    
+        query_x = query_x.unsqueeze(1)
+    
+        query_x = query_x.expand(query_embed_shape[0], support_embed_shape[0],  query_embed_shape[1] )
+    
+        support_x = support_x.unsqueeze(0)
+    
+        support_x = support_x.expand(query_embed_shape[0], support_embed_shape[0],  query_embed_shape[1]  )
+    
+        x = torch.cat([query_x, support_x], dim=-1)
+        
+        x = torch.sigmoid( self.fc2(x) )
+        
+        x = x.reshape(-1, x.shape[1])
+        
+        return x
     

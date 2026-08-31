@@ -89,26 +89,31 @@ class Runner:
             
             batch_x, batch_y = train_x[ i : i + self.num_datapoints_per_timestep], train_y[ i : i + self.num_datapoints_per_timestep] 
             
+            #data_manager_obj.fill_fifo_buffer( batch_x, batch_y)
+            #if data_manager_obj.fifo_counter >= len(data_manager_obj.fifo_x):
+            if data_manager_obj.fifo_counter > 0 :
+                
+                prequential_loss.append( self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y ) )
+                
+                train_context.net.train()
+                
+                for param in train_context.net.parameters(): 
+                    param.grad = None   # apparently faster than optim.zero_grad()
+                
+                predictions = train_context.net.forward( data_manager_obj, batch_x)
+                   
+                current_reg_loss = train_context.loss(predictions, batch_y )
+                
+                current_reg_loss.backward()
+                
+                train_context.opt.step()
+                
+                train_loss.append( current_reg_loss)
+             
             data_manager_obj.fill_fifo_buffer( batch_x, batch_y)
             
-            prequential_loss.append( self.prequential_testing(train_context, data_manager_obj, batch_x, batch_y ) )
             
-            train_context.net.train()
-            
-            for param in train_context.net.parameters(): 
-                param.grad = None   # apparently faster than optim.zero_grad()
-            
-            predictions = train_context.net.forward( data_manager_obj, batch_x)
-               
-            current_reg_loss = train_context.loss(predictions, batch_y )
-            
-            current_reg_loss.backward()
-            
-            train_context.opt.step()
-            
-            train_loss.append( current_reg_loss)
-        
-        train_loss= torch.stack(train_loss).mean().item()
+        train_loss = torch.stack(train_loss).mean().item()
 
         prequential_loss = np.mean(prequential_loss)
         

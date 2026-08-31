@@ -36,12 +36,10 @@ def set_seed(seed):
    
 def import_modules():    
         
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.data_manager import DataManager 
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.runner import Runner 
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.checkpoint_manager import CheckpointManager 
-
-    from algorithms.query_based_cl.fifo_buffer.slowly_changing_regression.code_v1.neural_net import feed_forward_nn
-
+    from algorithms.relation_network.fifo_buffer.slowly_changing_regression.code_v1.data_manager import DataManager 
+    from algorithms.relation_network.fifo_buffer.slowly_changing_regression.code_v1.runner import Runner 
+    from algorithms.relation_network.fifo_buffer.slowly_changing_regression.code_v1.checkpoint_manager import CheckpointManager 
+    from algorithms.relation_network.fifo_buffer.slowly_changing_regression.code_v1.neural_net import feed_forward_nn
     global feed_forward_nn, DataManager, Runner, CheckpointManager
     
     
@@ -50,7 +48,7 @@ class TrainContext:
         
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-        self.net = feed_forward_nn(   num_inputs, num_features,num_outputs  )
+        self.net = feed_forward_nn( num_inputs, num_features, num_outputs  )
         
         self.net.to(self.device)
         
