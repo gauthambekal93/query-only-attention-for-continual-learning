@@ -15,7 +15,7 @@
 {
 "seed": 20,
 "use_gpu":0,
-"model_dir": "results//tiny_imagenet/augmentation/relation_network/fifo_buffer\\0\\0",
+"model_dir": "results//tiny_imagenet/augmentation/relation_network/fifo_buffer/0/0",
 "step_size":0.0001,
 "momentum": 0.9, 
 "weight_decay": 0.0,
